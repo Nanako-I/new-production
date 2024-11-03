@@ -159,7 +159,7 @@
                     {{ __('新規の利用者登録') }}
                 </x-dropdown-link>
 
-                <x-dropdown-link :href="url('peopleregister')" class="text-lg">
+                <x-dropdown-link :href="url('before-invitation')" class="text-lg">
                     {{ __('職員・保護者を招待する') }}
                 </x-dropdown-link>
 
@@ -208,12 +208,25 @@
 
                 @hasanyrole('super administrator|facility staff administrator|facility staff user|facility staff reader')
                 <x-dropdown-link :href="url('people')" class="text-lg">
+                    {{ __('今日の利用者') }}
+                </x-dropdown-link>
+
+                <x-dropdown-link :href="url('peoplelist')" class="text-lg">
                     {{ __('利用者一覧') }}
                 </x-dropdown-link>
 
                 <x-dropdown-link :href="url('peopleregister')" class="text-lg">
-                    {{ __('新規登録') }}
+                    {{ __('利用者の新規登録') }}
                 </x-dropdown-link>
+
+                <x-dropdown-link :href="url('before-invitation')" class="text-lg">
+                    {{ __('職員・保護者を招待する') }}
+                </x-dropdown-link>
+
+                <x-dropdown-link :href="url('calendar')" class="text-lg">
+                    {{ __('カレンダー') }}
+                </x-dropdown-link>
+
                 @endhasanyrole
 
                 @hasanyrole('super administrator|client family user|client family reader')
