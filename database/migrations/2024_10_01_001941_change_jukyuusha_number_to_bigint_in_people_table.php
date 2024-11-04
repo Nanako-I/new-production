@@ -14,8 +14,8 @@ class ChangeJukyuushaNumberToBigintInPeopleTable extends Migration
     public function up()
     {
         Schema::table('people', function (Blueprint $table) {
-            // jukyuusha_numberカラムをbigInteger型に変更
-            $table->bigInteger('jukyuusha_number')->unsigned()->change();
+            // jukyuusha_numberカラムを正数の大きな数も保存できるbigInteger型に変更
+            $table->unsignedBigInteger('jukyuusha_number')->default(0)->change();
         });
     }
 
@@ -28,7 +28,7 @@ class ChangeJukyuushaNumberToBigintInPeopleTable extends Migration
     {
         Schema::table('people', function (Blueprint $table) {
             // jukyuusha_numberカラムをinteger型に戻す
-            $table->integer('jukyuusha_number')->unsigned()->change();
+            $table->unsignedBigInteger('jukyuusha_number')->change();
         });
     }
 }

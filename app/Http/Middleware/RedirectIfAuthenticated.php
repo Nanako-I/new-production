@@ -18,15 +18,25 @@ class RedirectIfAuthenticated
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function handle(Request $request, Closure $next, ...$guards)
-    {
-        $guards = empty($guards) ? [null] : $guards;
+{
+    $guards = empty($guards) ? [null] : $guards;
 
-        foreach ($guards as $guard) {
-            if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::HOME);
+    foreach ($guards as $guard) {
+        if (Auth::guard($guard)->check()) {
+            if ($request->is('invitation/*') || $request->is('invitation_staff/*')) {
+                abort(403, 'このURLは有効期限切れです。施設管理者に招待URLの再送を依頼してください。');
             }
+            return redirect(RouteServiceProvider::HOME);
         }
-
-        return $next($request);
     }
+
+    // 署名の検証
+    if ($request->is('invitation/*') || $request->is('invitation_staff/*')) {
+        if (!$request->hasValidSignature()) {
+            abort(403, 'このURLは有効期限切れです。施設管理者に招待URLの再送を依頼してください。');
+        }
+    }
+
+    return $next($request);
+}
 }

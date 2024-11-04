@@ -26,6 +26,8 @@ use App\Http\Controllers\StaffUserController;
 use App\Http\Controllers\HogoshaUserController;
 use App\Http\Controllers\URLController;
 use App\Http\Controllers\BeforeInvitationController;//管理者が職員のIDを入力するためにfacility_idを取って画面遷移させるコントローラー
+use App\Http\Controllers\TermsAgreementController;//利用規約・プライバシーポリシー同意のコントローラー
+
 use App\Http\Controllers\CustomIDController;//管理者が職員のIDを登録するコントローラー
 use App\Http\Controllers\OptionController;//記録項目を追加するためのコントローラー
 use App\Http\Controllers\OptionItemController;//追加した記録項目に登録するためのコントローラー
@@ -153,12 +155,12 @@ Route::view('/register', 'register');
 
 Route::get('/invitation', [URLController::class, 'sendInvitation'])->name('invitation');
 
-Route::get('invitation/{signedUrl}', function (Request $request) {
-    if (! $request->hasValidSignature()) {
-        abort(403, 'このURLは有効期限切れです。施設管理者に招待URLの再送を依頼してください。');
-    }
-    return view('preregistrationmail');
-})->name('signed.invitation');
+// Route::get('invitation/{signedUrl}', function (Request $request) {
+//     if (! $request->hasValidSignature()) {
+//         abort(403, 'このURLは有効期限切れです。施設管理者に招待URLの再送を依頼してください。');
+//     }
+//     return view('preregistrationmail');
+// })->name('signed.invitation');
 
 
 Route::get('/before-invitation', [BeforeInvitationController::class, 'registrationConfirmation'])->name('before-invitation');
@@ -194,12 +196,12 @@ Route::get('/invitation_staff', function () {
 Route::get('/invitation_staff', [URLController::class, 'staffsendInvitation'])->name('staff.invitation');
 
 // 職員に届いた招待URLの認証
-Route::get('invitation_staff/{signedUrl}', function (Request $request) {
-    if (! $request->hasValidSignature()) {
-        abort(403, 'このURLは有効期限切れです。施設管理者に招待URLの再送を依頼してください。');
-    }
-    return view('register');
-})->name('signed.invitation_staff');
+// Route::get('invitation_staff/{signedUrl}', function (Request $request) {
+//     if (! $request->hasValidSignature()) {
+//         abort(403, 'このURLは有効期限切れです。施設管理者に招待URLの再送を依頼してください。');
+//     }
+//     return view('register');
+// })->name('signed.invitation_staff');
 
 Route::get('/test-mail', function () {
     $email = 'recipient@example.com';
@@ -209,6 +211,36 @@ Route::get('/test-mail', function () {
     });
     return 'Test email sent.';
 });
+
+// 署名付きURLの有効期限切れエラー処理用のルート(cursorを参考)
+// -------------------------------
+// Route::get('/invalid-signature', [URLController::class, 'handleInvalidSignature'])
+//     ->name('invalid.signature');
+
+// // 既存の署名付きURLルートを修正
+// Route::get('/invitation/{signedUrl}', function (Request $request) {
+//     if (!$request->hasValidSignature()) {
+//         abort(403, 'このURLは期限切れです。施設管理者に招待URLの再送を依頼してください。');
+//     }
+//     return view('preregistrationmail');
+// })->name('signed.invitation');
+
+// Route::get('/invitation_staff/{signedUrl}', function (Request $request) {
+//     if (!$request->hasValidSignature()) {
+//         abort(403, 'このURLは期限切れです。施設管理者に招待URLの再送を依頼してください。');
+//     }
+//     return view('preregistrationmail');
+// })->name('signed.invitation_staff');
+
+Route::get('/invalid-signature', [URLController::class, 'handleInvalidSignature'])
+    ->name('invalid.signature');
+
+Route::get('/invitation/{signedUrl}', [URLController::class, 'handleInvitation'])
+    ->name('signed.invitation');
+
+Route::get('/invitation_staff/{signedUrl}', [URLController::class, 'handleStaffInvitation'])
+    ->name('signed.invitation_staff');
+// -------------------------------
 
 // 新規登録前のメールにワンタイムパスコードを送るビュー
 Route::get('/preregistrationmail', function () {
@@ -222,6 +254,18 @@ Route::post('/send-passcode', [RegistrationController::class, 'sendPasscode'])->
 Route::get('/passcodeform', function () {
     return response()->view('passcodeform');
 })->name('passcodeform');
+
+// 保護者の利用規約同意↓
+Route::middleware(['web'])->group(function () {
+    Route::get('/terms-agreement', function (Request $request) {
+        if (!$request->session()->get('passcode_verified')) {
+            return redirect()->route('preregistrationmail');
+        }
+        return view('terms-agreement');
+    })->name('terms.show');
+});
+// Route::get('/terms-agreement', [TermsAgreementController::class, 'show'])->name('terms.show');
+Route::post('/terms-agreement', [TermsAgreementController::class, 'store'])->name('terms.agreement');
 
 // Route::get('/passcode-form', [PasscodeController::class, 'showPasscodeForm'])->name('passcode.form');
 Route::post('/passcodeform', [RegistrationController::class, 'validatePasscode'])->name('passcode.validate');
@@ -292,7 +336,7 @@ Route::middleware('auth')->group(function () {
 
 
 // 保護者のuser登録画面↓
-Route::get('/hogosharegister',[HogoshaUserController::class,'showRegister']);
+Route::get('/hogosharegister',[HogoshaUserController::class,'showRegister'])->name('hogosharegister');
 Route::post('/hogosharegister',[HogoshaUserController::class,'register']);
 Route::get('/hogosha', [HogoshaUserController::class, 'hogosha'])->name('hogosha');
 

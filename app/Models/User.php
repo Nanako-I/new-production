@@ -71,11 +71,16 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'last_name',
+        'first_name',
+        'last_name_kana',
+        'first_name_kana',
         'email',
         'password',
-        'custom_id',
-        // 'role',
+        'terms_accepted',
+        'privacy_accepted',
+        'terms_accepted_at',
+        'privacy_accepted_at'
     ];
 
     /**
@@ -83,6 +88,8 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+
+
     protected $hidden = [
         'password',
         'remember_token',
@@ -95,5 +102,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'terms_accepted' => 'boolean',
+        'privacy_accepted' => 'boolean',
     ];
 }

@@ -63,7 +63,8 @@ class PersonController extends Controller
             })
             ->get();
         } else {
-            $people = []; // まだpeople（利用者が登録されていない時もエラーが出ないようにする）
+            // $people = []; // まだpeople（利用者が登録されていない時もエラーが出ないようにする）
+            $people = collect([]); // 空のコレクションにする
         }
 
         foreach ($people as $person) {

@@ -20,7 +20,7 @@ class RegistrationController extends Controller
 
         $email = $request->input('email');
         $passcode = Str::random(6); // ランダムな6桁のパスコードを生成
-        $expiresAt = Carbon::now()->addMinutes(10); // 10分後に期限切れ
+        $expiresAt = Carbon::now()->addMinutes(120); // 10分後に期限切れ
 
         // パスコードをデータベースに保存
         Passcode::create([
@@ -53,27 +53,30 @@ class RegistrationController extends Controller
         $request->validate([
             'passcode' => 'required|string|size:6',
         ]);
-
+    
         $passcode = $request->input('passcode');
-        // $email = session('email');
         $email = $request->session()->get('email'); // セッションからメールアドレスを取得
         
-        // dd($email);
         $passcodeRecord = Passcode::where('email', $email)
             ->where('passcode', $passcode)
-            ->where('expires_at', '>', Carbon::now())
             ->first();
-
-        if ($passcodeRecord) {
-            // return redirect()->route('hogosharegister');
-            return view('hogosharegister'); 
-        } else {
+    
+        if (!$passcodeRecord) {
             return back()->withErrors(['passcode' => 'パスコードが一致しません。'])->withInput();
         }
+    
+        if ($passcodeRecord->expires_at < Carbon::now()) {
+            return back()->withErrors(['passcode' => 'パスコードが期限切れです。新しいパスコードを取得してください。'])->withInput();
+        }
+    
+        // パスコードの検証が成功した場合、セッションにフラグを設定
+        $request->session()->put('passcode_verified', true);
+        return redirect()->route('terms.show');
     }
+    
     
     public function showHogoshaRegisterForm()	
     {	
-    return view('hogosha.register'); // 適切なビューを返す	
+    return view('hogosharegister'); // 適切なビューを返す	
     }
 }

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\User;
 use App\Models\Facility;
@@ -26,34 +27,50 @@ class HogoshaUserController extends Controller
        return view('hogosharegister');
    }
    
-    public function register(Request $request)
-   {
-      $form = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+   public function register(Request $request)
+{
+    try {
+        $validatedData = $request->validate([
+            'last_name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name_kana' => ['nullable', 'string', 'max:255'],
+            'first_name_kana' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
             'password' => [
-            'required',
-            'string',
-            'min:8',
-            'confirmed',
-            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/' // '大文字小文字英数字含む,
-        ], [
-            //validation.phpにバリデーションのエラーは記載
-        ]
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/' // 大文字小文字英数字含む
+            ]
         ]);
-        
-        // 入力データを配列に保存
-    $userData = [
-        'name' => $request->input('name'),
-        'email' => $request->input('email'),
-        'password' => Hash::make($request->input('password')),
-    ];
-    // dd($userData);
-    $request->session()->put('user_data', $userData);
-    // dd($request->session()->get('user_data'));
-    return view('hogoshanumber', compact('userData'));
 
-  }
+        // バリデーションが成功した場合の処理
+        $userData = [
+            'last_name' => $validatedData['last_name'],
+            'first_name' => $validatedData['first_name'],
+            'last_name_kana' => $validatedData['last_name_kana'],
+            'first_name_kana' => $validatedData['first_name_kana'],
+            'email' => $validatedData['email'],
+            // 'password' => Hash::make($validatedData['password']), // セッションに保存する時にもハッシュ化するとPWが二重でハッシュ化されてしまう
+            'password' => $validatedData['password'],
+            'terms_accepted' => session('terms_accepted', false),
+            'privacy_accepted' => session('privacy_accepted', false),
+            'terms_accepted_at' => session('terms_accepted_at'),
+            'privacy_accepted_at' => session('privacy_accepted_at')
+        ];
+
+        $request->session()->put('user_data', $userData);
+
+        return view('hogoshanumber', compact('userData'));
+
+    } catch (ValidationException $e) {
+        // バリデーションが失敗した場合の処理
+        return view('hogosharegister')
+                         ->withErrors($e->errors())
+                         ->withInput();
+    }
+}
 
   public function edit(Request $request)
     {
@@ -128,22 +145,27 @@ class HogoshaUserController extends Controller
         // 人が見つかった場合
         if ($person) {
             // セッションから登録データを取得
-            $registerData = $request->session()->get('user_data');
+            $userData = $request->session()->get('user_data');
             //  dd($registerData);
             
-            if (!$registerData) {
-            $error = 'セッションの登録データが見つかりませんでした。';
-            return view('hogoshanumber', compact('error'));
-        }
-
-        try {
-            DB::beginTransaction();
-
-            $user = User::query()->create([
-                'name' => $registerData['name'],
-                'email' => $registerData['email'],
-                'password' => Hash::make($registerData['password']),
-            ]);
+            if (!$userData) {
+                $error = 'セッションの登録データが見つかりませんでした。';
+                return view('hogoshanumber', compact('error'));
+            }
+    
+            try {
+                DB::beginTransaction();
+    
+                $user = User::create([
+                    'last_name' => $userData['last_name'],
+                    'first_name' => $userData['first_name'],
+                    'last_name_kana' => $userData['last_name_kana'],
+                    'first_name_kana' => $userData['first_name_kana'],
+                    'email' => $userData['email'],
+                    'password' => Hash::make($userData['password']),
+                    'terms_accepted_at' => $userData['terms_accepted_at'],
+                    'privacy_accepted_at' => $userData['privacy_accepted_at'],
+                ]);
 
             Auth::login($user);
 
@@ -152,12 +174,12 @@ class HogoshaUserController extends Controller
             $user->assignRole('client family user');
 
             DB::commit();
-// 未読メッセージを取得
-$unreadMessages = Chat::where('people_id', $person->id)
-->where('is_read', false)
-->where('user_identifier', '!=', $user->id)
-->exists();
-// hogosha ビューにデータを渡して表示
+            // 未読メッセージを取得
+            $unreadMessages = Chat::where('people_id', $person->id)
+            ->where('is_read', false)
+            ->where('user_identifier', '!=', $user->id)
+            ->exists();
+            // hogosha ビューにデータを渡して表示
             return view('hogosha', compact('people', 'unreadMessages'));
         } catch (\Exception $e) {
             DB::rollBack();

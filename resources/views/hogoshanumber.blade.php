@@ -7,15 +7,19 @@
             </div>
         @endif
 
-        
+        @if (isset($userData))
+        <input type="" id="last_name" name="last_name" value="{{ $userData['last_name'] }}">
+            <input type="" id="first_name" name="first_name" value="{{ $userData['first_name'] }}">
+            <input type="" id="last_name_kana" name="last_name_kana" value="{{ $userData['last_name_kana'] }}">
+            <input type="" id="first_name_kana" name="first_name_kana" value="{{ $userData['first_name_kana'] }}">
+            <input type="" id="email" name="email" value="{{ $userData['email'] }}">
+            <!-- パスワードは通常出力しないが、ここでは例として表示 -->
+            <input type="" id="password" name="password" value="{{ $userData['password'] }}">
+           
+        @endif
         <div class="flex items-center justify-center">
 
-        @if (isset($userData))
-            <input type="hidden" id="name" name="name" value="{{ $userData['name'] }}">
-            <input type="hidden" id="email" name="email" value="{{ $userData['email'] }}">
-            <!-- パスワードは通常出力しないが、ここでは例として表示 -->
-            <input type="hidden" id="password" name="password" value="{{ $userData['password'] }}">
-        @endif
+       
         </div>
          
      <!-- Name -->

@@ -11,7 +11,7 @@ class URLController extends Controller
 {
     $url = URL::temporarySignedRoute(
         'signed.invitation', 
-        now()->addMinutes(30), 
+        now()->addHours(1), 
         ['signedUrl' => 'preregistrationmail']
         
     );
@@ -22,12 +22,27 @@ public function staffsendInvitation()
 {
     $url = URL::temporarySignedRoute(
         'signed.invitation_staff', 
-        now()->addMinutes(30), 
+        now()->addHours(1),
         ['signedUrl' => 'preregistrationmail']
         
     );
     return view('invitation_staff', compact( 'url'));
 }
+
+// public function handleInvalidSignature()
+// {
+//     abort(403, 'このURLは有効期限切れです。施設管理者に招待URLの再送を依頼してください。');
+// }
+
+public function handleInvitation(Request $request, $signedUrl)
+{
+    if (!$request->hasValidSignature()) {
+        abort(403, '期限切れです|施設管理者に招待URLの再送を依頼してください。');
+    }
+    return view('preregistrationmail');
+}
+
+
 // public function unsubscribe(Request $request, $signedUrl)
 // {
 //     if ($request->hasValidSignature()) {

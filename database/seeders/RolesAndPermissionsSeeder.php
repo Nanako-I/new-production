@@ -81,7 +81,10 @@ class RolesAndPermissionsSeeder extends Seeder
         // 施設管理者権限のユーザーを作成
         if (!User::where('email', 'admin_staff@boocare.co.jp')->exists()) {
         $facilityAdminUser = new User();
-        $facilityAdminUser->name = '施設太郎';
+        $facilityAdminUser->last_name = '施設';
+        $facilityAdminUser->first_name = '太郎';
+        $facilityAdminUser->last_name_kana = 'シセツ';
+        $facilityAdminUser->first_name_kana = 'タロウ';
         $facilityAdminUser->custom_id = 'kOERJHRU';
         $facilityAdminUser->email = 'admin_staff@boocare.co.jp';
         $facilityAdminUser->password = \Hash::make('Password1234');
@@ -111,7 +114,10 @@ class RolesAndPermissionsSeeder extends Seeder
         // 家族編集権限のユーザーを作成
         if (!User::where('email', 'admin_family@boocare.co.jp')->exists()) {
         $familyAdminUser = new User();
-        $familyAdminUser->name = '家族花子';
+        $familyAdminUser->last_name = '家族';
+        $familyAdminUser->first_name = '花子';
+        $familyAdminUser->last_name_kana = 'カゾク';
+        $familyAdminUser->first_name_kana = 'ハナコ';
         $facilityAdminUser->custom_id = '1223VbfH';
         $familyAdminUser->email = 'admin_family@boocare.co.jp';
         $familyAdminUser->password = \Hash::make('Password1234');
@@ -119,7 +125,6 @@ class RolesAndPermissionsSeeder extends Seeder
         $familyAdminUser->assignRole(RoleEnums::ClientFamilyUser);
 
 
-        // 家族花子の子ども（施設利用者）を作成
          // 家族花子の子ども（施設利用者）を作成
          if (!Person::where('last_name', '利用者')->where('first_name', '二郎')->exists()) {
             $person = new Person();
