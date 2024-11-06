@@ -20,7 +20,7 @@ class RegistrationController extends Controller
 
         $email = $request->input('email');
         $passcode = Str::random(6); // ランダムな6桁のパスコードを生成
-        $expiresAt = Carbon::now()->addMinutes(120); // 10分後に期限切れ
+        $expiresAt = Carbon::now()->addMinutes(10); // 10分後に期限切れ
 
         // パスコードをデータベースに保存
         Passcode::create([

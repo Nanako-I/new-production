@@ -18,8 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('people_id');
             $table->foreign('people_id')->references('id')->on('people')->onDelete('cascade');
             $table->dateTime('arrival_datetime');
-            $table->dateTime('exit_datetime');
-            $table->unsignedBigInteger('visit_type_id');
+            $table->dateTime('exit_datetime')->nullable();
+            $table->unsignedBigInteger('visit_type_id')->nullable();
             $table->foreign('visit_type_id')->references('id')->on('visit_types')->onDelete('cascade');
             $table->text('notes')->nullable();
             $table->string('pick_up')->nullable(); // 迎えの要否のカラムを追加

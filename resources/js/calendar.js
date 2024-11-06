@@ -15,15 +15,16 @@ document.addEventListener("DOMContentLoaded", function () {
         initialView: "dayGridMonth",
         eventColor: "blue",
         headerToolbar: {
-            center: "backEventButton addEventButton",
+            // center: "backEventButton addEventButton",
+            center: "backEventButton",
         },
         customButtons: {
-            addEventButton: {
-                text: "来訪予定登録",
-                click: function () {
-                    openModal();
-                },
-            },
+            // addEventButton: {
+            //     text: "来訪予定登録",
+            //     click: function () {
+            //         openModal();
+            //     },
+            // },
             backEventButton: {
                 text: "戻る",
                 click: function () {
@@ -31,7 +32,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
             },
         },
-        dayMaxEvents: true, // 多数のイベントがある日に「もっと見る」リンクを表示
+        dayMaxEvents: true,
+        selectable: true,
+        selectMirror: true,
+        select: function(info) {
+            const arrivalDate = document.getElementById("arrival-date");
+            const exitDate = document.getElementById("exit-date");
+            if (arrivalDate && exitDate) {
+                arrivalDate.value = dayjs(info.start).format("YYYY-MM-DD");
+                exitDate.value = dayjs(info.end).subtract(1, "day").format("YYYY-MM-DD");
+            }
+            
+            openModal();
+            calendar.unselect();
+        },
         eventDidMount: function (info) {
             function formatDate(date, is_end) {
                 const dateString = date?.toLocaleString();
@@ -59,37 +73,62 @@ document.addEventListener("DOMContentLoaded", function () {
                 .get("/calendar/index_scheduled_visit")
                 .then((response) => {
                     const schedules = response.data.contents.map((schedule) => {
-                        // day.jsを使用して日付を処理
                         let startDate = dayjs(schedule.arrival_datetime);
-                        let endDate = dayjs(schedule.exit_datetime);
+                        let endDate = schedule.exit_datetime ? dayjs(schedule.exit_datetime) : null;
                         let allDay = false;
 
-                        // 到着日時が "00:00:00" で終わる場合
                         if (schedule.arrival_datetime.endsWith("00:00:00")) {
-                            allDay = true; // 終日イベントとして設定
+                            allDay = true;
                         }
 
-                        // 到退去日時が "00:00:00" で終わる場合にのみ処理を行う
-                        if (schedule.exit_datetime.endsWith("00:00:00")) {
-                            endDate = endDate.add(1, "day"); // 終了日を1日加算
-                            allDay = true; // 終日イベントとして設定
+                        if (schedule.exit_datetime && schedule.exit_datetime.endsWith("00:00:00")) {
+                            endDate = endDate.add(1, "day");
+                            allDay = true;
                         }
 
-                        return {
-                            id: schedule.id,
-                            title: `${schedule.person_name}
-                            / ${VisitTypeConst.VISIT_TYPE_JA[schedule.type]}`,
-                            start: startDate.format("YYYY-MM-DD HH:mm"),
-                            end: endDate.format("YYYY-MM-DD HH:mm"),
-                            allDay: allDay,
-                        };
+                        // 迎え時間のフォーマット
+                        let pickUpTimeFormatted = '';
+                        if (schedule.pick_up_time) {
+                            pickUpTimeFormatted = dayjs(schedule.pick_up_time).format('H時mm分');
+                        }
+
+                        // イベントのタイトル作成
+                        let title = `${schedule.person_name}\n`;
+                        title += schedule.pick_up === '必要' ? 
+                            `迎え: ${pickUpTimeFormatted || '時間未定'}` : 
+                            '迎え: 不要';
+
+                            return {
+                                id: schedule.id,
+                                title: title,
+                                start: startDate.format("YYYY-MM-DD HH:mm"),
+                                end: endDate ? endDate.format("YYYY-MM-DD HH:mm") : startDate.format("YYYY-MM-DD HH:mm"),
+                                allDay: allDay,
+                                backgroundColor: 'transparent',
+                                borderColor: 'transparent',
+                                textColor: '#000000',
+                                className: 'font-bold',
+                                display: 'block',
+                            };
                     });
                     successCallback(schedules);
                 })
                 .catch((error) => {
-                    failureCallback(error); // エラーを処理
+                    failureCallback(error);
                     console.error("Error fetching events:", error);
                 });
+        },
+        dateClick: function(info) {
+            const arrivalDate = document.getElementById("arrival-date");
+            if (arrivalDate) {
+                // 日付を'YYYY-MM-DD HH:mm:ss'形式にフォーマット
+                const formattedDate = dayjs(info.date).format("YYYY-MM-DD[T]HH:mm");
+                arrivalDate.value = formattedDate;
+                // デバッグ用アラート
+                // alert('選択された日付: ' + formattedDate);
+                window.selectedDate = info.date;
+            }
+            openModal();
         },
     });
 
@@ -129,120 +168,95 @@ if (selectPeople) {
 
     // 登録モーダルで表示する訪問タイプの選択肢を取得
     const selectVisitType = document.getElementById("selectVisitType");
-    axios
-        .get("/calendar/index_visit_type")
-        .then((response) => {
-            response.data.contents.forEach((type) => {
-                const option = document.createElement("option");
-                option.value = type.id;
-                option.textContent = VisitTypeConst.VISIT_TYPE_JA[type.type];
-                selectVisitType.appendChild(option);
-            });
-        })
-        .catch((error) => {
-            console.error("Error fetching people:", error);
-            alert("データの取得に失敗しました。");
-        });
-
+    // axios
+    //     .get("/calendar/index_visit_type")
+    //     .then((response) => {
+    //         response.data.contents.forEach((type) => {
+    //             const option = document.createElement("option");
+    //             option.value = type.id;
+    //             option.textContent = VisitTypeConst.VISIT_TYPE_JA[type.type];
+    //             selectVisitType.appendChild(option);
+    //         });
+    //     })
+    //     .catch((error) => {
+    //         console.error("Error fetching people:", error);
+    //         alert("データの取得に失敗しました。");
+    //     });
+        if (selectVisitType) {
+            // デフォルトで日帰り（ID: 1）を設定
+            selectVisitType.value = "1";
+        }
     // フォームの送信
     let originalData = {};
     function registerSchedule() {
-        document
-            .getElementById("eventForm")
-            .addEventListener("submit", function (e) {
-                e.preventDefault();
-                const isEdit = submitButton.textContent === "編集する";
-                const url = isEdit ? "/calendar/edit" : "/calendar/register";
-    
-                // フォームのデータを取得
-                const peopleId = document.getElementById("selectPeople").value;
-                const visitTypeId = document.getElementById("selectVisitType").value;
-                const arrivalDate = document.getElementById("arrival-date").value;
-                const arrivalTime = document.getElementById("arrival-time").value || "00:00";
-                const arrivalDateTime = `${arrivalDate} ${arrivalTime}:00`;
-                const exitDate = document.getElementById("exit-date").value;
-                const exitTime = document.getElementById("exit-time").value || "00:00";
-                const exitDateTime = `${exitDate} ${exitTime}:00`;
-    
-                // 送迎の要否のデータを取得
-                const pickUpElement = document.querySelector('input[name="pick_up"]:checked');
-                const pickUp = pickUpElement ? pickUpElement.value : null;
-    
-                const dropOffElement = document.querySelector('input[name="drop_off"]:checked');
-                const dropOff = dropOffElement ? dropOffElement.value : null;
-    
-                const pickUpTimeInput = document.getElementById("pick_up_time");
-                const pickUpDate = document.getElementById("arrival-date").value; // 追加: ピックアップ日
-                const pickUpTime = pickUpTimeInput ? pickUpTimeInput.value : null;
-                const fullPickUpTime = pickUpDate && pickUpTime ? `${pickUpDate} ${pickUpTime}:00` : null; // 結合
-    
-                const dropOffTimeInput = document.getElementById("drop_off_time");
-                const dropOffDate = document.getElementById("exit-date").value; // 追加: ドロップオフ日
-                const dropOffTime = dropOffTimeInput ? dropOffTimeInput.value : null;
-                const fullDropOffTime = dropOffDate && dropOffTime ? `${dropOffDate} ${dropOffTime}:00` : null; // 結合
-    
-                const pickUpStaff = document.getElementById("pick_up_staff").value;
-                const dropOffStaff = document.getElementById("drop_off_staff").value;
-                const pickUpBus = document.getElementById("pick_up_bus").value;
-                const dropOffBus = document.getElementById("drop_off_bus").value;
-    
-                // 編集では変更があった項目のみを送信データに含める
-                const dataToSend = {
-                    people_id: peopleId,
-                };
-                if (isEdit) {
-                    dataToSend.visit_type_id = visitTypeId !== originalData.visit_type_id ? visitTypeId : null;
-                    dataToSend.arrival_datetime = arrivalDateTime !== originalData.arrival_datetime ? arrivalDateTime : null;
-                    dataToSend.exit_datetime = exitDateTime !== originalData.exit_datetime ? exitDateTime : null;
-                    dataToSend.pick_up = pickUp !== originalData.pick_up ? pickUp : null;
-                    dataToSend.drop_off = dropOff !== originalData.drop_off ? dropOff : null;
-                    dataToSend.pick_up_time = fullPickUpTime !== originalData.pick_up_time ? fullPickUpTime : null; // 更新
-                    dataToSend.drop_off_time = fullDropOffTime !== originalData.drop_off_time ? fullDropOffTime : null; // 更新
-                    dataToSend.pick_up_staff = pickUpStaff !== originalData.pick_up_staff ? pickUpStaff : null;
-                    dataToSend.drop_off_staff = dropOffStaff !== originalData.drop_off_staff ? dropOffStaff : null;
-                    dataToSend.pick_up_bus = pickUpBus !== originalData.pick_up_bus ? pickUpBus : null;
-                    dataToSend.drop_off_bus = dropOffBus !== originalData.drop_off_bus ? dropOffBus : null;
-                    dataToSend.notes = null;
-                } else {
-                    dataToSend.visit_type_id = visitTypeId;
-                    dataToSend.arrival_datetime = arrivalDateTime;
-                    dataToSend.exit_datetime = exitDateTime;
-                    dataToSend.pick_up = pickUp;
-                    dataToSend.drop_off = dropOff;
-                    dataToSend.pick_up_time = fullPickUpTime; // 新規
-                    dataToSend.drop_off_time = fullDropOffTime; // 新規
-                    dataToSend.pick_up_staff = pickUpStaff;
-                    dataToSend.drop_off_staff = dropOffStaff;
-                    dataToSend.pick_up_bus = pickUpBus;
-                    dataToSend.drop_off_bus = dropOffBus;
-                    dataToSend.notes = null;
-                }
-                console.log(dataToSend);
+    document
+        .getElementById("eventForm")
+        .addEventListener("submit", function (e) {
+            e.preventDefault();
             
-    
-    
+            const peopleId = document.getElementById("selectPeople")?.value;
+            const visitTypeId = document.getElementById("selectVisitType")?.value;
+            const arrivalDate = document.getElementById("arrival-date").value;
+            
+            // 日付が空の場合のチェック
+            if (!arrivalDate) {
+                alert('来訪予定日を入力してください');
+                return;
+            }
+            
+            // 日付と時間を正しい形式に変換
+            const formattedDateTime = dayjs(arrivalDate).format('YYYY-MM-DD HH:mm:ss');
+            
+            // 日付が正しく変換されたかチェック
+            if (formattedDateTime === 'Invalid Date') {
+                alert('日付の形式が正しくありません');
+                return;
+            }
+            
+            const dataToSend = {
+                people_id: peopleId,
+                // visit_type_id: visitTypeId,
+                visit_type_id: 1, // 日帰りのIDを固定で設定
+                arrival_datetime: formattedDateTime,
+                exit_datetime: null,
+                pick_up: document.querySelector('input[name="pick_up"]:checked')?.value || null,
+                drop_off: document.querySelector('input[name="drop_off"]:checked')?.value || null,
+                pick_up_time: document.getElementById("pick_up_time")?.value ? 
+                dayjs(arrivalDate.split('T')[0] + ' ' + document.getElementById("pick_up_time").value + ':00').format('YYYY-MM-DD HH:mm:ss') : null,
+                drop_off_time: null,
+                pick_up_staff: document.getElementById("pick_up_staff")?.value || null,
+                drop_off_staff: document.getElementById("drop_off_staff")?.value || null,
+                pick_up_bus: document.getElementById("pick_up_bus")?.value || null,
+                drop_off_bus: document.getElementById("drop_off_bus")?.value || null,
+                notes: null
+            };
 
-                axios
-                    .post(url, dataToSend, {
-                        headers: {
-                            "X-CSRF-TOKEN": document
-                                .querySelector('meta[name="csrf-token"]')
-                                .getAttribute("content"),
-                        },
-                    })
-                    .then(() => {
-                        let job = isEdit ? "編集" : "登録";
-                        alert(`${job}しました`);
-                        calendar.refetchEvents();
-                    })
-                    .catch((error) => {
-                        console.error(error);
-                        alert("登録に失敗しました");
-                    });
-
+            // デバッグ用のログ
+            console.log('送信する日時:', formattedDateTime);
+            
+            axios.post("/calendar/register", dataToSend, {
+                headers: {
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content"),
+                },
+            })
+            .then(() => {
+                alert("登録しました");
+                calendar.refetchEvents();
                 closeModal();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                if (error.response?.data?.errors) {
+                    const errorMessages = Object.values(error.response.data.errors).flat();
+                    alert(errorMessages.join('\n'));
+                } else {
+                    alert('登録中にエラーが発生しました。入力内容を確認してください。');
+                }
             });
-    }
+        });
+}
 
     
     calendar.setOption("eventClick", function (info) {
@@ -375,7 +389,10 @@ function openModal(edit = false, eventData = null) {
     } else {
         modalTitle.textContent = "来訪日登録";
         submitButton.textContent = "登録";
-        document.getElementById("eventForm").reset();
+        // フォームリセットを条件付きで行う
+        if (!window.selectedDate) {
+            document.getElementById("eventForm").reset();
+        }
     }
 
     modal.classList.remove("hidden");
@@ -415,4 +432,11 @@ function closeDeleteModal() {
     document.body.style.paddingRight = ""; // 補正を解除
     const modal = document.getElementById("deleteModal");
     modal.classList.add("hidden");
+}
+
+const cancelButton = document.getElementById("cancelButton");
+if (cancelButton) {
+    cancelButton.addEventListener("click", function() {
+        closeModal();
+    });
 }

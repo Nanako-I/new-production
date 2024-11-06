@@ -59,10 +59,17 @@
             <option value="" disabled selected>選択してください</option>
           </select>
         </div>
-        <div>
+        <!-- <div>
           <label for="selectVisitType" class="block text-sm font-medium text-gray-700">来訪タイプ</label>
           <select id="selectVisitType" name="visit_type_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500" required>
             <option value="" disabled selected>選択してください</option>
+          </select>
+        </div> -->
+        <!-- 来訪タイプをデフォルトで日帰りに設定↓ -->
+        <div class="hidden">
+          <label for="selectVisitType" class="block text-sm font-medium text-gray-700">来訪タイプ</label>
+          <select id="selectVisitType" name="visit_type_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500" required>
+            <option value="1" selected>日帰り</option>
           </select>
         </div>
       </div>
@@ -70,21 +77,21 @@
       <div class="grid grid-cols-2 gap-6">
         <div>
           <label for="arrival-date" class="block text-sm font-medium text-gray-700">来訪予定日</label>
-          <input type="date" id="arrival-date" name="arrival-date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500" required>
+          <input type="datetime-local" id="arrival-date" name="arrival-date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500">
         </div>
-        <div>
+        <!-- <div>
           <label for="arrival-time" class="block text-sm font-medium text-gray-700">来訪予定時間</label>
           <input type="time" id="arrival-time" name="arrival-time" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500">
-        </div>
-        <div>
+        </div> -->
+        <div class="hidden">
           <label for="exit-date" class="block text-sm font-medium text-gray-700">退館予定日</label>
-          <input type="date" id="exit-date" name="exit-date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500" required>
+          <input type="date" id="exit-date" name="exit-date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500">
         </div>
-        <div>
+        <div class="hidden">
           <label for="exit-time" class="block text-sm font-medium text-gray-700">退館予定時間</label>
           <input type="time" id="exit-time" name="exit-time" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500">
-        </div>
-      </div>
+        </div> 
+     </div>
 
       <div class="grid grid-cols-2 gap-6">
         <div>
@@ -120,10 +127,10 @@
           <label for="pick_up_time" class="block text-sm font-medium text-gray-700">迎え予定時間</label>
           <input type="time" id="pick_up_time" name="pick_up_time" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500">
         </div>
-        <div>
+        <!-- <div>
           <label for="drop_off_time" class="block text-sm font-medium text-gray-700">送り予定時間</label>
           <input type="time" id="drop_off_time" name="drop_off_time" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500">
-        </div>
+        </div> -->
       </div> 
 
       <div class="grid grid-cols-2 gap-6">
@@ -137,7 +144,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-6">
+      <!-- <div class="grid grid-cols-2 gap-6">
         <div>
           <label for="pick_up_bus" class="block text-sm font-medium text-gray-700">迎えの車</label>
           <input type="text" id="pick_up_bus" name="pick_up_bus" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500">
@@ -146,10 +153,10 @@
           <label for="drop_off_bus" class="block text-sm font-medium text-gray-700">送りの車</label>
           <input type="text" id="drop_off_bus" name="drop_off_bus" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500">
         </div>
-      </div>
+      </div> -->
 
       <div class="flex justify-end space-x-4">
-        <button type="button" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <button type="button" id="cancelButton" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
           キャンセル
         </button>
         <button id="submitButton" type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -175,7 +182,7 @@
       <h3 class="text-lg font-semibold">予定の操作</h3>
       <div class="mt-4 flex justify-end space-x-3">
         <button id="cancelOption" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">キャンセル</button>
-        <!-- 来所予定のデータのidが取得できず、上手くできないので編集ボタンのみ一旦hiddenにした -->
+        <!-- 来所予定のデータのidが取得できず、上くできないので編集ボタンのみ一旦hiddenにした -->
         <button id="editButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline hidden">編集</button>
         <button id="deleteButton" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">削除</button>
       </div>

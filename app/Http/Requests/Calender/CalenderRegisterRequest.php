@@ -31,16 +31,19 @@ class CalenderRegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            'people_id' => ['required', 'integer'],
-            'visit_type_id' => ['required', 'integer'],
-            'arrival_datetime' => ['required', 'date_format:Y-m-d H:i:s'],
-            'exit_datetime' => ['required', 'date_format:Y-m-d H:i:s'],
-            'pick_up' => ['nullable', 'in:必要,不要'], 
-            'drop_off' => ['nullable', 'in:必要,不要'],
-            'pick_up_time' => ['nullable', 'date_format:Y-m-d H:i:s'], 
-            'drop_off_time' => ['nullable', 'date_format:Y-m-d H:i:s'],
-
-            'notes' => ['nullable', 'text'],
+            'people_id' => 'required|integer|exists:people,id',
+            'arrival_datetime' => 'required|date_format:Y-m-d H:i:s',
+            'exit_datetime' => 'nullable|date_format:Y-m-d H:i:s',
+            'visit_type_id' => 'required|integer|exists:visit_types,id',
+            'notes' => 'nullable|string',
+            'pick_up' => 'nullable|string',
+            'drop_off' => 'nullable|string',
+            'pick_up_time' => 'nullable|date_format:Y-m-d H:i:s',
+            'drop_off_time' => 'nullable|date_format:Y-m-d H:i:s',
+            'pick_up_staff' => 'nullable|string',
+            'drop_off_staff' => 'nullable|string',
+            'pick_up_bus' => 'nullable|string',
+            'drop_off_bus' => 'nullable|string',
         ];
     }
 

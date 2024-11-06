@@ -147,18 +147,18 @@ class CalenderController extends Controller
 
 
     public function rules()
-{
-    return [
-        'people_id' => 'required|integer|exists:people,id',
-        'arrival_datetime' => 'required|date',
-        'exit_datetime' => 'required|date|after:arrival_datetime',
-        'visit_type_id' => 'required|integer|exists:visit_types,id',
-        'notes' => 'nullable|string',
-        'pick_up_time' => 'nullable|date', 
-        'drop_off_time' => 'nullable|date',
-        // 'transport' => 'required|in:必要,不要', // "必要" または "不要" のみ許可
-    ];
-}
+    {
+        return [
+            'people_id' => 'required|integer|exists:people,id',
+            'arrival_datetime' => 'required|date',
+            // 'exit_datetime' => 'required|date|after:arrival_datetime',
+            'exit_datetime' => 'nullable|date', // 退館予定日についてnullを許容
+            'visit_type_id' => 'required|integer|exists:visit_types,id',
+            'notes' => 'nullable|string',
+            'pick_up_time' => 'nullable|date_format:Y-m-d H:i:s', 
+            'drop_off_time' => 'nullable|date_format:Y-m-d H:i:s',
+        ];
+    }
     /**
      * カレンダーに利用者の訪問予定を登録する
      *
