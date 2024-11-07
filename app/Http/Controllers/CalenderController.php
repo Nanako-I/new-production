@@ -181,7 +181,7 @@ class CalenderController extends Controller
             $result = ScheduledVisit::create([
                 'people_id' => $array['people_id'],
                 'arrival_datetime' => $array['arrival_datetime'],
-                'exit_datetime' => $array['exit_datetime'],
+                'exit_datetime' => $array['exit_datetime'] ?? $array['arrival_datetime'], // デフォルト値を設定
                 'visit_type_id' => $array['visit_type_id'],
                 'notes' => $array['notes'],
                 'pick_up' => $array['pick_up'],

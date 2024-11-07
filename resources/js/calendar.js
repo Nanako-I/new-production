@@ -149,7 +149,8 @@ if (selectPeople) {
                 // visit_type_id: visitTypeId,
                 visit_type_id: 1, // 日帰りのIDを固定で設定
                 arrival_datetime: formattedDateTime,
-                exit_datetime: null,
+                // exit_datetime: null,
+                exit_datetime: formattedDateTime, //nullでも登録エラーを回避するためformattedDateTimeを設定
                 pick_up: document.querySelector('input[name="pick_up"]:checked')?.value || null,
                 drop_off: document.querySelector('input[name="drop_off"]:checked')?.value || null,
                 pick_up_time: document.getElementById("pick_up_time")?.value ? 
