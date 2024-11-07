@@ -172,18 +172,23 @@ if (selectPeople) {
                         .getAttribute("content"),
                 },
             })
-            .then(() => {
+            .then((response) => {
+                console.log('Registration success:', response);
                 alert("登録しました");
                 calendar.refetchEvents();
                 closeModal();
             })
             .catch((error) => {
-                console.error('Error:', error);
-                if (error.response?.data?.errors) {
-                    const errorMessages = Object.values(error.response.data.errors).flat();
-                    alert(errorMessages.join('\n'));
+                console.error('Registration error:', {
+                    message: error.message,
+                    response: error.response?.data,
+                    status: error.response?.status
+                });
+                
+                if (error.response?.data?.message) {
+                    alert(error.response.data.message);
                 } else {
-                    alert('登録中にエラーが発生しました。入力内容を確認してください。');
+                    alert('登録中にエラーが発生しました。システム管理者に連絡してください。');
                 }
             });
         });

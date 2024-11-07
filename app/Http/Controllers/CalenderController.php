@@ -147,18 +147,18 @@ class CalenderController extends Controller
 
 
     public function rules()
-    {
-        return [
-            'people_id' => 'required|integer|exists:people,id',
-            'arrival_datetime' => 'required|date',
-            // 'exit_datetime' => 'required|date|after:arrival_datetime',
-            'exit_datetime' => 'nullable|date', // 退館予定日についてnullを許容
-            'visit_type_id' => 'required|integer|exists:visit_types,id',
-            'notes' => 'nullable|string',
-            'pick_up_time' => 'nullable|date_format:Y-m-d H:i:s', 
-            'drop_off_time' => 'nullable|date_format:Y-m-d H:i:s',
-        ];
-    }
+{
+    return [
+        'people_id' => 'required|integer|exists:people,id',
+        'arrival_datetime' => 'required|date',
+        // 'exit_datetime' => 'required|date|after:arrival_datetime',
+        'exit_datetime' => 'nullable|date', // 退館予定日についてnullを許容
+        'visit_type_id' => 'required|integer|exists:visit_types,id',
+        'notes' => 'nullable|string',
+        'pick_up_time' => 'nullable|date_format:Y-m-d H:i:s', 
+        'drop_off_time' => 'nullable|date_format:Y-m-d H:i:s',
+    ];
+}
     /**
      * カレンダーに利用者の訪問予定を登録する
      *
@@ -167,19 +167,23 @@ class CalenderController extends Controller
      */
     public function register(CalenderRegisterRequest $request)
     {
-        
-        $array = CalenderRegisterRequest::getOnlyRequest($request);
-
-        DB::beginTransaction();
-        \Log::info('Received data for registration:', $request->all());
-    try {
-            ScheduledVisit::create([
+        try {
+            // リクエストデータのログ
+            \Log::info('Request data:', $request->all());
+            
+            $array = CalenderRegisterRequest::getOnlyRequest($request);
+            
+            // バリデーション前のデータチェック
+            \Log::info('Validated data:', $array);
+            
+            DB::beginTransaction();
+            
+            $result = ScheduledVisit::create([
                 'people_id' => $array['people_id'],
                 'arrival_datetime' => $array['arrival_datetime'],
                 'exit_datetime' => $array['exit_datetime'],
                 'visit_type_id' => $array['visit_type_id'],
                 'notes' => $array['notes'],
-                // 'transport' => $array['transport'],
                 'pick_up' => $array['pick_up'],
                 'drop_off' => $array['drop_off'],
                 'pick_up_time' => $array['pick_up_time'],
@@ -189,18 +193,25 @@ class CalenderController extends Controller
                 'pick_up_bus' => $array['pick_up_bus'],
                 'drop_off_bus' => $array['drop_off_bus'],
             ]);
+            
+            \Log::info('Created record:', ['result' => $result]);
+            
             DB::commit();
-        $response = self::returnMessageIndex(true);
-        $status = Response::HTTP_OK;
-    } catch (\Exception $e) {
-        DB::rollBack();
-        \Log::error('Error in register method: ' . $e->getMessage());
-        \Log::error('Stack trace: ' . $e->getTraceAsString());
-        $response = self::messageErrorStatusText($e->getMessage());
-        $status = Response::HTTP_INTERNAL_SERVER_ERROR;
+            return response()->json(['message' => '登録成功'], 200);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Registration error:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'message' => '登録に失敗しました',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
-    return response()->json($response, $status);
-}
     /**
      * カレンダーに利用者の訪問予定を編集する
      *

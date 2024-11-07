@@ -15,6 +15,7 @@ class CalenderRegisterRequest extends FormRequest
     {
         // 現在のユーザー情報を取得
         $user = Auth::user();
+        \Log::info('User attempting to authorize:', ['user' => $user]);
 
         return $user->hasRole([
             RoleEnum::SuperAdministrator,
