@@ -10,21 +10,12 @@ document.addEventListener("DOMContentLoaded", function () {
         themeSystem: "bootstrap5",
         plugins: [interactionPlugin, dayGridPlugin],
         locale: "ja",
-        // 設定しないのが正なのか少し怪しいため消さずにコメントアウト
-        // timeZone: "Asia/Tokyo",
         initialView: "dayGridMonth",
         eventColor: "blue",
         headerToolbar: {
-            // center: "backEventButton addEventButton",
             center: "backEventButton",
         },
         customButtons: {
-            // addEventButton: {
-            //     text: "来訪予定登録",
-            //     click: function () {
-            //         openModal();
-            //     },
-            // },
             backEventButton: {
                 text: "戻る",
                 click: function () {
@@ -35,100 +26,40 @@ document.addEventListener("DOMContentLoaded", function () {
         dayMaxEvents: true,
         selectable: true,
         selectMirror: true,
-        select: function(info) {
-            const arrivalDate = document.getElementById("arrival-date");
-            const exitDate = document.getElementById("exit-date");
-            if (arrivalDate && exitDate) {
-                arrivalDate.value = dayjs(info.start).format("YYYY-MM-DD");
-                exitDate.value = dayjs(info.end).subtract(1, "day").format("YYYY-MM-DD");
-            }
-            
-            openModal();
-            calendar.unselect();
-        },
-        eventDidMount: function (info) {
-            function formatDate(date, is_end) {
-                const dateString = date?.toLocaleString();
-                if (/ 0:00:00$/.test(dateString)) {
-                    return is_end
-                        ? dayjs(dateString).subtract(1, "day").format("MM-DD")
-                        : dayjs(dateString).format("MM-DD");
-                } else {
-                    return dayjs(dateString).format("MM-DD HH:mm");
-                }
-            }
-
-            var tooltip = new bootstrap.Tooltip(info.el, {
-                title: `${info.event.title}
-                <br>来訪: ${formatDate(info.event.start, false)}
-                <br>退館: ${formatDate(info.event.end, true)}`,
-                placement: "top",
-                trigger: "hover",
-                container: "body",
-                html: true,
-            });
-        },
-        events: function (info, successCallback, failureCallback) {
-            axios
-                .get("/calendar/index_scheduled_visit")
-                .then((response) => {
-                    const schedules = response.data.contents.map((schedule) => {
-                        let startDate = dayjs(schedule.arrival_datetime);
-                        let endDate = schedule.exit_datetime ? dayjs(schedule.exit_datetime) : null;
-                        let allDay = false;
-
-                        if (schedule.arrival_datetime.endsWith("00:00:00")) {
-                            allDay = true;
-                        }
-
-                        if (schedule.exit_datetime && schedule.exit_datetime.endsWith("00:00:00")) {
-                            endDate = endDate.add(1, "day");
-                            allDay = true;
-                        }
-
-                        // 迎え時間のフォーマット
-                        let pickUpTimeFormatted = '';
-                        if (schedule.pick_up_time) {
-                            pickUpTimeFormatted = dayjs(schedule.pick_up_time).format('H時mm分');
-                        }
-
-                        // イベントのタイトル作成
-                        let title = `${schedule.person_name}\n`;
-                        title += schedule.pick_up === '必要' ? 
-                            `迎え: ${pickUpTimeFormatted || '時間未定'}` : 
-                            '迎え: 不要';
-
-                            return {
-                                id: schedule.id,
-                                title: title,
-                                start: startDate.format("YYYY-MM-DD HH:mm"),
-                                end: endDate ? endDate.format("YYYY-MM-DD HH:mm") : startDate.format("YYYY-MM-DD HH:mm"),
-                                allDay: allDay,
-                                backgroundColor: 'transparent',
-                                borderColor: 'transparent',
-                                textColor: '#000000',
-                                className: 'font-bold',
-                                display: 'block',
-                            };
-                    });
-                    successCallback(schedules);
-                })
-                .catch((error) => {
-                    failureCallback(error);
-                    console.error("Error fetching events:", error);
-                });
-        },
         dateClick: function(info) {
             const arrivalDate = document.getElementById("arrival-date");
             if (arrivalDate) {
-                // 日付を'YYYY-MM-DD HH:mm:ss'形式にフォーマット
                 const formattedDate = dayjs(info.date).format("YYYY-MM-DD[T]HH:mm");
                 arrivalDate.value = formattedDate;
-                // デバッグ用アラート
-                // alert('選択された日付: ' + formattedDate);
                 window.selectedDate = info.date;
             }
             openModal();
+        },
+        editable: false,
+        navLinks: false,
+        events: function(info, successCallback, failureCallback) {
+            axios.get("/calendar/index_scheduled_visit")
+                .then((response) => {
+                    const events = response.data.contents.map(schedule => {
+                        return {
+                            id: schedule.id,
+                            title: `${schedule.person_name}\n${schedule.pick_up === '必要' ? 
+                                `迎え: ${schedule.pick_up_time ? dayjs(schedule.pick_up_time).format('H時mm分') : '時間未定'}` : 
+                                '迎え: 不要'}`,
+                            start: schedule.arrival_datetime,
+                            end: schedule.exit_datetime || schedule.arrival_datetime,
+                            backgroundColor: 'transparent',
+                            borderColor: 'transparent',
+                            textColor: '#000000',
+                            className: 'font-bold'
+                        };
+                    });
+                    successCallback(events);
+                })
+                .catch((error) => {
+                    console.error("Error fetching events:", error);
+                    failureCallback(error);
+                });
         },
     });
 
@@ -434,6 +365,7 @@ function closeDeleteModal() {
     modal.classList.add("hidden");
 }
 
+// closeModalの設定の後に追加
 const cancelButton = document.getElementById("cancelButton");
 if (cancelButton) {
     cancelButton.addEventListener("click", function() {
