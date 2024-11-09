@@ -115,7 +115,8 @@ class HogoshaUserController extends Controller
    
    public function numberregister(Request $request)
 {
-   
+    Log::info('numberregister メソッド開始');
+    Log::info('リクエストデータ: ' . json_encode($request->all()));
       // バリデーションルールとメッセージを定義
     $rules = [
         'jukyuusha_number' => 'required|digits:10',
@@ -142,6 +143,7 @@ class HogoshaUserController extends Controller
     $person = Person::where('jukyuusha_number', $request->jukyuusha_number)
                     ->where('date_of_birth', $request->date_of_birth)
                     ->first();
+    Log::info('検索された人物: ' . ($person ? json_encode($person) : 'なし'));
     // dd($person);
         // 人が見つかった場合
         if ($person) {
@@ -169,7 +171,7 @@ class HogoshaUserController extends Controller
                 'terms_accepted_at' => $registerData['terms_accepted_at'],
                 'privacy_accepted_at' => $registerData['privacy_accepted_at'],
             ]);
-
+            Log::info('ユーザー作成後: ' . json_encode($user));
             Auth::login($user);
 
             $user->people_family()->syncWithoutDetaching($person->id);
@@ -187,6 +189,7 @@ class HogoshaUserController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('登録処理中のエラー: ' . $e->getMessage());
+            Log::error('エラーの詳細: ' . $e->getTraceAsString());
             $error = '登録処理中にエラーが発生しました。もう一度お試しください。';
             return view('hogoshanumber', compact('error'));
         }
