@@ -31,7 +31,10 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name_kana' => ['nullable', 'string', 'max:255'],
+            'first_name_kana' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
             'custom_id' => ['required', 'string', 'max:255', 'unique:'.User::class],
             'password' => [
@@ -44,11 +47,21 @@ class RegisteredUserController extends Controller
         ]);
 
         $user = User::create([
-            'name' => $request->name,
+            'last_name' => $request['last_name'],
+            'first_name' => $request['first_name'],
+            'last_name_kana' => $request['last_name_kana'],
+            'first_name_kana' => $request['first_name_kana'],
             'email' => $request->email,
             'custom_id' => $request->custom_id,
             'password' => Hash::make($request->password),
+            'terms_accepted_at' => session('admin_terms_accepted_at'),
+            'privacy_accepted_at' => session('admin_privacy_accepted_at'),
             // 'custom_id' => Str::random(10), // ランダムな英数字IDを生成
+           'password' => $request['password'],
+           'terms_accepted' => true,  // ここまでくる前に必ず同意をチェックしてるためrueを設定
+           'privacy_accepted' => true,  // ここまでくる前に必ず同意をチェックしてるためrueを設定
+            'terms_accepted_at' => session('terms_accepted_at'),
+            'privacy_accepted_at' => session('privacy_accepted_at')
         ]);
 
         event(new Registered($user));

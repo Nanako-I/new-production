@@ -151,7 +151,13 @@ Route::get('/hogoshalogin', function () {
 // 保護者ログイン処理のルート
 Route::post('/hogoshalogin', [HogoshaLoginController::class, 'store'])->name('hogoshalogin.submit');
 
+// 施設管理者用利用規約の同意↓
+Route::get('/admin/terms-agreement', [TermsAgreementController::class, 'showAdmin'])->name('admin.terms');
+Route::post('/admin/terms-agreement', [TermsAgreementController::class, 'storeAdmin'])->name('admin.terms.agreement');
+
+// 施設管理者の登録
 Route::view('/register', 'register');
+
 
 Route::get('/invitation', [URLController::class, 'sendInvitation'])->name('invitation');
 
@@ -178,8 +184,6 @@ Route::get('custom_id_entryform/{facilityId}', [BeforeInvitationController::clas
 
 // 施設に医療的ケアの利用者がいるか選択する↓
 Route::patch('/medical_care_needs', [FacilityController::class, 'updateMedicalCareNeeds'])->name('update.medical.care.needs');
-// Route::get('/medical_care_needs', [PersonController::class, 'showMedicalCare'])->name('show.medical.care.needs');
-// Route::patch('/medical_care_needs', [PersonController::class, 'storeMedicalCare'])->name('store.medical.care.needs');
 
 //管理者が職員を招待する前に職員IDを入力・確認する↓
 Route::get('custom_id_entryform/{facilityId}', [CustomIDController::class, 'entryForm'])->name('custom_id.entryform');

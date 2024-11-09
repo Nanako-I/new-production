@@ -275,7 +275,7 @@
                                 @if($chat->filename)
                                     <img alt="team" class="w-80 h-64" 
                                         src="{{ asset('storage/sample/chat_photo/' . $chat->filename) }}"
-                                         onerror="this.onerror=null; this.src='/images/default.png';">
+                                        onerror="this.onerror=null; this.src='{{ asset('images/default.png') }}';">
                                 @endif
                             </div>
                             <p class="text-sm font-normal {{ $chat->user_identifier == session('user_identifier') ? 'text-right' : 'text-left' }}">
@@ -292,7 +292,8 @@
                 <div class="items-center" id="chatbot-footer">
                     <input type="hidden" name="user_identifier" value="{{ session('user_identifier') }}">
                     <input class="hidden py-1 px-2 rounded text-center mb-2 md:mb-0 md:mr-2 md:ml-0 md:flex-initial" type="text"
-                           name="last_name" placeholder="UserName" maxlength="20" value="{{ $user_name }}" required>
+                           name="last_name" placeholder="UserName" maxlength="20" value="{{ $user_name }}" required
+                           style="display: none;">
                     <label for="filename" style="cursor: pointer;">
                         <i class="fa-regular fa-image mt-2" style="font-size: 2em;"></i>
                         <input name="filename" id="filename" type="file" style="display: none;" onChange="uploadFile1()">
@@ -322,17 +323,28 @@
                 const userIdentifier = document.getElementById('chatbot-text').getAttribute('data-user-identifier');
 
                 window.displayMessage = function(data) {
-                    const messageHtml = `
-                        <div class="chat-message ${data.user_identifier === userIdentifier ? 'right' : 'left'}">
-                            <div class="flex items-end ${data.user_identifier === userIdentifier ? 'justify-end' : ''}">
-                                <div class="flex flex-col space-y-2 text-xs max-w-xs mx-2 ${data.user_identifier === userIdentifier ? 'order-1 items-end' : 'order-2 items-start'}">
-                                    <div><span class="px-4 py-2 rounded-lg inline-block ${data.user_identifier === userIdentifier ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'}">${data.message}</span></div>
-                                    ${data.filename ? `<img alt="team" class="w-80 h-64" src="/storage/sample/chat_photo/${data.filename}" onerror="this.onerror=null; this.src='/images/no-image.png';">` : ''}
-                                </div>
-                            </div>
-                        </div>`;
+                    const chatUl = document.getElementById('chatbot-ul');
+                    const li = document.createElement('li');
+                    const className = data.user_identifier == userIdentifier ? 'self' : 'other';
+                    li.classList.add(className);
                     
-                    document.getElementById('chat-messages').insertAdjacentHTML('beforeend', messageHtml);
+                    const lastName = data.last_name || '';
+                    const firstName = data.first_name || '';
+                    const createdAt = data.created_at || '';
+                    const message = data.message || '';
+                    
+                    li.innerHTML = `
+                        <div class="message-container ${className === 'self' ? 'self-message' : 'other-message'}">
+                            <div style="overflow-wrap: break-word;">
+                                <p style="overflow-wrap: break-word;" class="text-gray-900">${message}</p>
+                                ${data.filename ? `<img alt="team" class="w-80 h-64" src="/storage/sample/chat_photo/${data.filename}" onerror="this.onerror=null; this.src='/images/default.png';">` : ''}
+                            </div>
+                            <p class="text-sm font-normal ${className === 'self' ? 'text-right' : 'text-left'}">
+                                ${createdAt} ＠${lastName}${firstName}
+                            </p>
+                        </div>
+                    `;
+                    chatUl.appendChild(li);
                     chatToBottom();
                 };
 

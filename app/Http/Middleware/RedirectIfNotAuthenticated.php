@@ -23,7 +23,7 @@ class RedirectIfNotAuthenticated
             'login', 'register', 'forgot-password', 'before-login', 
             'passcodeform', 'send-passcode', 'hogoshalogin', 
             'hogosharegister', 'hogoshanumber', 'staffregister', 'terms-agreement',
-            'reset-password/*', 'invitation/*', 'invitation_staff/*', 'preregistrationmail/*'
+            'reset-password/*', 'invitation/*', 'invitation_staff/*', 'preregistrationmail/*', 'admin/terms-agreement'
         ];
 
         // リクエストが許可されたルートでない場合はリダイレクト

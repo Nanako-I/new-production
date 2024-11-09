@@ -86,7 +86,7 @@ class ChatController extends Controller
 
             $user = Auth::user();
             if ($user) {
-                $user_name = $user->last_name . $user->first_name;
+                $user_name = $user->name;
                 $user_identifier = $user->id;
             } else {
                 $user_name = 'Guest';
@@ -104,25 +104,15 @@ class ChatController extends Controller
 
             if ($request->hasFile('filename')) {
                 $request->validate(['filename' => 'image|max:2048']);
-                
-                $storage_path = storage_path('app/public/sample/chat_photo');
-                if (!file_exists($storage_path)) {
-                    mkdir($storage_path, 0775, true);
-                }
-                
                 $filename = uniqid() . '.' . $request->file('filename')->getClientOriginalExtension();
-                $request->file('filename')->storeAs('public/sample/chat_photo', $filename);
-                $filepath = 'sample/chat_photo/' . $filename;
-                
-                chmod($storage_path . '/' . $filename, 0664);
+                $request->file('filename')->storeAs($directory, $filename);
+                $filepath = $directory . '/' . $filename;
             }
 
             $chat = Chat::create([
                 'people_id' => $people_id,
                 'user_name' => $user_name,
                 'user_identifier' => $user_identifier,
-                'last_name' => $user ? $user->last_name : 'Guest',
-                'first_name' => $user ? $user->first_name : '',
                 'message' => $request->message,
                 'filename' => $filename,
                 'path' => $filepath,
@@ -136,20 +126,11 @@ class ChatController extends Controller
                 'message' => $request->message,
                 'user_identifier' => $user_identifier,
                 'user_name' => $user_name,
-                'last_name' => $user ? $user->last_name : 'Guest',
-                'first_name' => $user ? $user->first_name : '',
-                'created_at' => now()->format('Y-m-d H:i:s'),
-                'filename' => $chat->filename,
-                'filepath' => $chat->path
+                'created_at' => $chat->created_at->format('Y-m-d H:i:s'),
+                'filename' => $chat->filename
             ]);
 
-            // return response()->json([
-            //     'message' => $request->message,
-            //     'user_identifier' => $user->id,
-            //     'user_name' => $user->name,
-            //     'created_at' => $chat->created_at->format('Y-m-d H:i:s'),
-            //     'filename' => $chat->filename
-            // ]);
+            
         } catch (\Exception $e) {
             // エラーが発生した場合のレスポンス
             // return response()->json(['error' => 'メッセージの保存に失敗しました。'], 500);
@@ -178,7 +159,7 @@ class ChatController extends Controller
 
    // もしログインしているユーザーが存在するかチェックする場合
     if ($user) {
-        $user_name = $user->last_name . $user->first_name;
+        $user_name = $user->name;
         $user_identifier = $user->id;
     } else {
         // ユーザーが存在しない場合の処理
@@ -194,9 +175,6 @@ class ChatController extends Controller
     if ($request->session()->missing('user_identifier')) {
         session(['user_identifier' => Str::random(20)]);
     }
-       // ユーザー名を変数に登録（デフォルト値：Guest）
-  // $user_name = $request->session()->get('user_name', 'Guest');
-    //dd($user_name);
     // ユーザー名を変数に登録（デフォルト値：Guest）
     if ($request->session()->missing('user_name')) {
         session(['user_name' => $user_name]);
