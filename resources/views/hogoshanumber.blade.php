@@ -1,21 +1,40 @@
 <x-guest-layout>
+    <!-- デバッグ表示を追加 -->
+    @if(isset($userData))
+        <div>
+            <p>利用規約とプライバシーポリシーの同意状態:</p>
+            <p>利用規約: {{ $userData['terms_accepted'] ? '同意済み' : '未同意' }}</p>
+            <p>プライバシーポリシー: {{ $userData['privacy_accepted'] ? '同意済み' : '未同意' }}</p>
+        </div>
+    @endif
+
+    <!-- 既存のフォーム -->
     <form action="{{ route('hogoshanumber.store') }}" method="POST">
         @csrf
-       @if (isset($error))
+        <!-- 既存のフォームフィールド -->
+        @if(isset($userData))
+            <input type="hidden" name="terms_accepted_at" value="{{ $userData['terms_accepted_at'] ?? '' }}">
+            <input type="hidden" name="privacy_accepted_at" value="{{ $userData['privacy_accepted_at'] ?? '' }}">
+        @endif
+        @if (isset($error))
             <div style="color: red;">
                 {!! $error !!}
             </div>
         @endif
 
         @if (isset($userData))
-        <input type="" id="last_name" name="last_name" value="{{ $userData['last_name'] }}">
-            <input type="" id="first_name" name="first_name" value="{{ $userData['first_name'] }}">
-            <input type="" id="last_name_kana" name="last_name_kana" value="{{ $userData['last_name_kana'] }}">
-            <input type="" id="first_name_kana" name="first_name_kana" value="{{ $userData['first_name_kana'] }}">
-            <input type="" id="email" name="email" value="{{ $userData['email'] }}">
+            <input type="hidden" id="last_name" name="last_name" value="{{ $userData['last_name'] }}">
+        
+            <input type="hidden" id="first_name" name="first_name" value="{{ $userData['first_name'] }}">
+            <input type="hidden" id="last_name_kana" name="last_name_kana" value="{{ $userData['last_name_kana'] }}">
+            <input type="hidden" id="first_name_kana" name="first_name_kana" value="{{ $userData['first_name_kana'] }}">
+            <input type="hidden" id="email" name="email" value="{{ $userData['email'] }}">
             <!-- パスワードは通常出力しないが、ここでは例として表示 -->
-            <input type="" id="password" name="password" value="{{ $userData['password'] }}">
-           
+            <input type="hidden" id="password" name="password" value="{{ $userData['password'] }}">
+            <input type="hidden" name="terms_accepted" value="{{ $userData['terms_accepted'] ? '1' : '0' }}">
+            <input type="hidden" name="privacy_accepted" value="{{ $userData['privacy_accepted'] ? '1' : '0' }}">
+            <input type="hidden" name="terms_accepted_at" value="{{ $userData['terms_accepted_at'] ?? '' }}">
+            <input type="hidden" name="privacy_accepted_at" value="{{ $userData['privacy_accepted_at'] ?? '' }}">
         @endif
         <div class="flex items-center justify-center">
 

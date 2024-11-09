@@ -158,12 +158,14 @@ class HogoshaUserController extends Controller
             DB::beginTransaction();
 
             $user = User::query()->create([
-                'last_name' => $validatedData['last_name'],
-                'first_name' => $validatedData['first_name'],
-                'last_name_kana' => $validatedData['last_name_kana'],
-                'first_name_kana' => $validatedData['first_name_kana'],
+                'last_name' => $registerData['last_name'],
+                'first_name' => $registerData['first_name'],
+                'last_name_kana' => $registerData['last_name_kana'],
+                'first_name_kana' => $registerData['first_name_kana'],
                 'email' => $registerData['email'],
                 'password' => Hash::make($registerData['password']),
+                'terms_accepted' => $registerData['terms_accepted'],
+                'privacy_accepted' => $registerData['privacy_accepted'],
                 'terms_accepted_at' => $registerData['terms_accepted_at'],
                 'privacy_accepted_at' => $registerData['privacy_accepted_at'],
             ]);
