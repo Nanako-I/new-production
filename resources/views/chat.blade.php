@@ -277,7 +277,7 @@
                                 @endif
                             </div>
                             <p class="text-sm font-normal {{ $chat->user_identifier == session('user_identifier') ? 'text-right' : 'text-left' }}">
-                                {{ $chat->created_at }} ＠{{ $chat->user_name }}
+                                {{ $chat->created_at }} ＠{{ $chat->last_name }}{{ $chat->first_name }}
                             </p>
                         </div>
                     </li>
@@ -290,7 +290,7 @@
                 <div class="items-center" id="chatbot-footer">
                     <input type="hidden" name="user_identifier" value="{{ session('user_identifier') }}">
                     <input class="hidden py-1 px-2 rounded text-center mb-2 md:mb-0 md:mr-2 md:ml-0 md:flex-initial" type="text"
-                           name="user_name" placeholder="UserName" maxlength="20" value="{{ $user_name }}" required>
+                           name="last_name" placeholder="UserName" maxlength="20" value="{{ $user_name }}" required>
                     <label for="filename" style="cursor: pointer;">
                         <i class="fa-regular fa-image mt-2" style="font-size: 2em;"></i>
                         <input name="filename" id="filename" type="file" style="display: none;" onChange="uploadFile1()">
@@ -306,7 +306,7 @@
             function uploadFile1() {
                 var filename = document.getElementById('filename').value;
                 if (filename.trim() !== '') {
-                    document.getElementById('chatbot-text').value = '写真が選択されました';
+                    document.getElementById('chatbot-text').value = '写真選択済。送信ボタンを押してください。';
                 }
             }
 
@@ -319,19 +319,25 @@
                 chatToBottom();
                 const userIdentifier = document.getElementById('chatbot-text').getAttribute('data-user-identifier');
 
-                window.displayMessage = function(message, user_identifier, user_name, created_at, filename) {
+                window.displayMessage = function(data) {
                     const chatUl = document.getElementById('chatbot-ul');
                     const li = document.createElement('li');
-                    const className = user_identifier == userIdentifier ? 'self' : 'other';
+                    const className = data.user_identifier == userIdentifier ? 'self' : 'other';
                     li.classList.add(className);
+                    
+                    const lastName = data.last_name || '';
+                    const firstName = data.first_name || '';
+                    const createdAt = data.created_at || '';
+                    const message = data.message || '';
+                    
                     li.innerHTML = `
                         <div class="message-container ${className === 'self' ? 'self-message' : 'other-message'}">
                             <div style="overflow-wrap: break-word;">
                                 <p style="overflow-wrap: break-word;" class="text-gray-900">${message}</p>
-                                ${filename ? `<img alt="team" class="w-80 h-64" src="/storage/sample/chat_photo/${filename}">` : ''}
+                                ${data.filename ? `<img alt="team" class="w-80 h-64" src="/storage/sample/chat_photo/${data.filename}">` : ''}
                             </div>
                             <p class="text-sm font-normal ${className === 'self' ? 'text-right' : 'text-left'}">
-                                ${created_at} ＠${user_name}
+                                ${createdAt} ＠${lastName}${firstName}
                             </p>
                         </div>
                     `;
@@ -341,19 +347,10 @@
 
                 document.getElementById('chat-form').addEventListener('submit', function(e) {
                     e.preventDefault();
-
                     var formData = new FormData(this);
 
-                    // fetch(this.action, {
-                    //     method: 'POST',
-                    //     body: formData
-                    // }).then(response => {
-                    //     console.log('Response:', response);
-                    //     return response.json();
-                    // })
                     const isFileSelected = document.getElementById('filename').files.length > 0;
             
-                    // 写真が送信されましたとする
                     if (isFileSelected) {
                         formData.append('message', '写真が送信されました');
                     }
@@ -361,17 +358,25 @@
                     fetch(this.action, {
                         method: 'POST',
                         body: formData
-                    }).then(response => {
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
                         return response.json();
                     })
-
                     .then(data => {
                         console.log('Data:', data);
-                        window.displayMessage(data.message, data.user_identifier, data.user_name,data.created_at,data.filename);
+                        if (data.error) {
+                            throw new Error(data.error);
+                        }
+                        window.displayMessage(data);
                         document.getElementById('chatbot-text').value = '';
+                        document.getElementById('filename').value = '';
                     })
                     .catch(error => {
                         console.error('Error:', error);
+                        alert('メッセージの送信に失敗しました。');
                     });
                 });
             });

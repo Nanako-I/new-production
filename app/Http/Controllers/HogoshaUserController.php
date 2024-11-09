@@ -143,15 +143,15 @@ class HogoshaUserController extends Controller
     $person = Person::where('jukyuusha_number', $request->jukyuusha_number)
                     ->where('date_of_birth', $request->date_of_birth)
                     ->first();
-    Log::info('検索された人物: ' . ($person ? json_encode($person) : 'なし'));
-    // dd($person);
-        // 人が見つかった場合
+    // Log::info('検索された人物: ' . ($person ? json_encode($person) : 'なし'));
+    // 人が見つかった場合
         if ($person) {
             // セッションから登録データを取得
             $registerData = $request->session()->get('user_data');
-            //  dd($registerData);
+            Log::info('セッションデータ: ' . json_encode($registerData));
             
             if (!$registerData) {
+            // throw new \Exception('セッションの登録データが見つかりませんでした。');
             $error = 'セッションの登録データが見つかりませんでした。';
             return view('hogoshanumber', compact('error'));
         }
@@ -179,6 +179,7 @@ class HogoshaUserController extends Controller
             $user->assignRole('client family user');
 
             DB::commit();
+            Log::info('登録成功: ユーザーID ' . $user->id);
             // 未読メッセージを取得
             $unreadMessages = Chat::where('people_id', $person->id)
             ->where('is_read', false)
@@ -188,8 +189,8 @@ class HogoshaUserController extends Controller
             return view('hogosha', compact('people', 'unreadMessages'));
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('登録処理中のエラー: ' . $e->getMessage());
-            Log::error('エラーの詳細: ' . $e->getTraceAsString());
+            // Log::error('登録処理中のエラー: ' . $e->getMessage());
+            // Log::error('エラーの詳細: ' . $e->getTraceAsString());
             $error = '登録処理中にエラーが発生しました。もう一度お試しください。';
             return view('hogoshanumber', compact('error'));
         }

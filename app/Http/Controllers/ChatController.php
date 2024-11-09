@@ -86,7 +86,7 @@ class ChatController extends Controller
 
             $user = Auth::user();
             if ($user) {
-                $user_name = $user->name;
+                $user_name = $user->last_name . $user->first_name;
                 $user_identifier = $user->id;
             } else {
                 $user_name = 'Guest';
@@ -113,6 +113,8 @@ class ChatController extends Controller
                 'people_id' => $people_id,
                 'user_name' => $user_name,
                 'user_identifier' => $user_identifier,
+                'last_name' => $user ? $user->last_name : 'Guest',
+                'first_name' => $user ? $user->first_name : '',
                 'message' => $request->message,
                 'filename' => $filename,
                 'path' => $filepath,
@@ -126,7 +128,9 @@ class ChatController extends Controller
                 'message' => $request->message,
                 'user_identifier' => $user_identifier,
                 'user_name' => $user_name,
-                'created_at' => $chat->created_at->format('Y-m-d H:i:s'),
+                'last_name' => $user ? $user->last_name : 'Guest',
+                'first_name' => $user ? $user->first_name : '',
+                'created_at' => now()->format('Y-m-d H:i:s'),
                 'filename' => $chat->filename
             ]);
 
@@ -165,7 +169,7 @@ class ChatController extends Controller
 
    // もしログインしているユーザーが存在するかチェックする場合
     if ($user) {
-        $user_name = $user->name;
+        $user_name = $user->last_name . $user->first_name;
         $user_identifier = $user->id;
     } else {
         // ユーザーが存在しない場合の処理

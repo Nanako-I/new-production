@@ -9,7 +9,7 @@ class Chat extends Model
 {
     use HasFactory;
     protected $table = 'chats';
-    protected $fillable = ['people_id','user_name','user_identifier','message','filename','path','created_at','updated_at','is_read'];
+    protected $fillable = ['people_id','last_name','first_name','user_identifier','message','filename','path','created_at','updated_at','is_read'];
 
     // チャットが所属するPerson
     public function person()
@@ -27,7 +27,7 @@ class Chat extends Model
     // ユーザ名とメッセージを取得するスコープ
     public function scopeGetData($query)
     {
-        return $this->created_at . ' @' . $this->user_name . ' ' . $this->message;
+        return $this->created_at . ' @' . $this->last_name. $this->first_name . ' ' . $this->message;
     }
 
 }
