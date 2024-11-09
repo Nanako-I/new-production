@@ -104,9 +104,24 @@ class ChatController extends Controller
 
             if ($request->hasFile('filename')) {
                 $request->validate(['filename' => 'image|max:2048']);
+                
+                // ディレクトリのパスを修正
+                $storage_path = storage_path('app/' . $directory);
+                
+                // ディレクトリが存在しない場合は作成
+                if (!file_exists($storage_path)) {
+                    mkdir($storage_path, 0775, true);
+                }
+                
                 $filename = uniqid() . '.' . $request->file('filename')->getClientOriginalExtension();
                 $request->file('filename')->storeAs($directory, $filename);
+                
+                // filepathの設定を修正
                 $filepath = 'sample/chat_photo/' . $filename;
+                
+                // ファイルのパーミッションを設定
+                $full_path = storage_path('app/' . $directory . '/' . $filename);
+                chmod($full_path, 0664);
             }
 
             $chat = Chat::create([
@@ -131,7 +146,8 @@ class ChatController extends Controller
                 'last_name' => $user ? $user->last_name : 'Guest',
                 'first_name' => $user ? $user->first_name : '',
                 'created_at' => now()->format('Y-m-d H:i:s'),
-                'filename' => $chat->filename
+                'filename' => $filename,
+                'filepath' => $filepath
             ]);
 
             // return response()->json([
