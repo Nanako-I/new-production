@@ -104,9 +104,17 @@ class ChatController extends Controller
 
             if ($request->hasFile('filename')) {
                 $request->validate(['filename' => 'image|max:2048']);
+                
+                $storage_path = storage_path('app/public/sample/chat_photo');
+                if (!file_exists($storage_path)) {
+                    mkdir($storage_path, 0775, true);
+                }
+                
                 $filename = uniqid() . '.' . $request->file('filename')->getClientOriginalExtension();
-                $request->file('filename')->storeAs($directory, $filename);
+                $request->file('filename')->storeAs('public/sample/chat_photo', $filename);
                 $filepath = 'sample/chat_photo/' . $filename;
+                
+                chmod($storage_path . '/' . $filename, 0664);
             }
 
             $chat = Chat::create([
@@ -131,7 +139,8 @@ class ChatController extends Controller
                 'last_name' => $user ? $user->last_name : 'Guest',
                 'first_name' => $user ? $user->first_name : '',
                 'created_at' => now()->format('Y-m-d H:i:s'),
-                'filename' => $chat->filename
+                'filename' => $chat->filename,
+                'filepath' => $chat->path
             ]);
 
             // return response()->json([
