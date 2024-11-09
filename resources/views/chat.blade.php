@@ -273,7 +273,7 @@
                             <div style="overflow-wrap: break-word;">
                                 <p style="overflow-wrap: break-word;" class="text-gray-900">{{ $chat->message }}</p>
                                 @if($chat->filename && $chat->path)
-                                    <img alt="team" class="w-80 h-64" src="{{ asset('storage/sample/chat_photo/' . $chat->filename) }}">
+                                    <img alt="team" class="w-80 h-64" src="{{ Storage::url('sample/chat_photo/' . $chat->filename) }}">
                                 @endif
                             </div>
                             <p class="text-sm font-normal {{ $chat->user_identifier == session('user_identifier') ? 'text-right' : 'text-left' }}">
@@ -306,7 +306,7 @@
             function uploadFile1() {
                 var filename = document.getElementById('filename').value;
                 if (filename.trim() !== '') {
-                    document.getElementById('chatbot-text').value = '写真選択済。送信ボタンを押してください。';
+                    document.getElementById('chatbot-text').value = '写真選択済。送信ボタンを押してください';
                 }
             }
 
@@ -334,7 +334,7 @@
                         <div class="message-container ${className === 'self' ? 'self-message' : 'other-message'}">
                             <div style="overflow-wrap: break-word;">
                                 <p style="overflow-wrap: break-word;" class="text-gray-900">${message}</p>
-                                ${data.filename ? `<img alt="team" class="w-80 h-64" src="/storage/sample/chat_photo/${data.filename}">` : ''}
+                                ${data.filename ? `<img alt="team" class="w-80 h-64" src="${window.location.origin}/storage/sample/chat_photo/${data.filename}">` : ''}
                             </div>
                             <p class="text-sm font-normal ${className === 'self' ? 'text-right' : 'text-left'}">
                                 ${createdAt} ＠${lastName}${firstName}

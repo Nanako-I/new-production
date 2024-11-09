@@ -106,7 +106,7 @@ class ChatController extends Controller
                 $request->validate(['filename' => 'image|max:2048']);
                 $filename = uniqid() . '.' . $request->file('filename')->getClientOriginalExtension();
                 $request->file('filename')->storeAs($directory, $filename);
-                $filepath = $directory . '/' . $filename;
+                $filepath = 'sample/chat_photo/' . $filename;
             }
 
             $chat = Chat::create([
