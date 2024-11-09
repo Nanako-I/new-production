@@ -277,7 +277,7 @@ class HogoshaUserController extends Controller
             // 署名付きURLの生成
             $signedUrl = URL::temporarySignedRoute(
                 'hogosha.register',
-                now()->addDays(7),
+                now()->addDays(1),
                 [
                     'jukyuusha_number' => $person->jukyuusha_number,
                     'date_of_birth' => $person->date_of_birth,

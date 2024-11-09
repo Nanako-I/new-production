@@ -233,13 +233,13 @@ Route::get('/test-mail', function () {
 // })->name('signed.invitation_staff');
 
 // 家族招待関連のルート
-Route::get('/invitation/generate/{person}', [HogoshaUserController::class, 'generateInviteUrl'])
-    ->name('invitation.generate')
-    ->middleware('auth');
+// Route::get('/invitation/generate/{person}', [HogoshaUserController::class, 'generateInviteUrl'])
+//     ->name('invitation.generate')
+//     ->middleware('auth');
 
-Route::get('/hogosha/register', [HogoshaUserController::class, 'showRegistrationForm'])
-    ->name('hogosha.register')
-    ->middleware('signed');
+// Route::get('/hogosha/register', [HogoshaUserController::class, 'showRegistrationForm'])
+//     ->name('hogosha.register')
+//     ->middleware('signed');
 
 Route::get('/invalid-signature', [URLController::class, 'handleInvalidSignature'])
     ->name('invalid.signature');
