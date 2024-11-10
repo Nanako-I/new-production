@@ -76,68 +76,74 @@ class ChatController extends Controller
 
     //      return redirect()->route('chat.show', $conversationId);
     //  }
-
     public function store(Request $request, $people_id)
-    {
+{
+    \Log::info('Store method called with people_id: ' . $people_id);
+    \Log::info('Request data: ' . json_encode($request->all()));
 
-        \Log::info('People ID in store method: ' . $people_id);
-        try {
-            $person = Person::findOrFail($people_id);
+    try {
+        $person = Person::findOrFail($people_id);
 
-            $user = Auth::user();
-            if ($user) {
-                $user_name = $user->name;
-                $user_identifier = $user->id;
-            } else {
-                $user_name = 'Guest';
-                $user_identifier = Str::random(20);
-            }
-
-            // ユーザー名と識別子をセッションに登録
-            session(['user_name' => $user_name]);
-            session(['user_identifier' => $user_identifier]);
-
-            // 画像保存
-            $directory = 'public/sample/chat_photo';
-            $filename = null;
-            $filepath = null;
-
-            if ($request->hasFile('filename')) {
-                $request->validate(['filename' => 'image|max:2048']);
-                $filename = uniqid() . '.' . $request->file('filename')->getClientOriginalExtension();
-                $request->file('filename')->storeAs($directory, $filename);
-                $filepath = $directory . '/' . $filename;
-            }
-
-            $chat = Chat::create([
-                'people_id' => $people_id,
-                'user_name' => $user_name,
-                'user_identifier' => $user_identifier,
-                'message' => $request->message,
-                'filename' => $filename,
-                'path' => $filepath,
-            ]);
-
-            // イベントをブロードキャスト
-          broadcast(new MessageSent($chat))->toOthers();
-
-            // 正常に保存された場合のレスポンス
-            return response()->json([
-                'message' => $request->message,
-                'user_identifier' => $user_identifier,
-                'user_name' => $user_name,
-                'created_at' => $chat->created_at->format('Y-m-d H:i:s'),
-                'filename' => $chat->filename
-            ]);
-
-            
-        } catch (\Exception $e) {
-            // エラーが発生した場合のレスポンス
-            // return response()->json(['error' => 'メッセージの保存に失敗しました。'], 500);
-             return response()->json(['error' => $e->getMessage()], 500);
-
+        $user = Auth::user();
+        if ($user) {
+            $user_name = $user->name;
+            $user_identifier = $user->id;
+        } else {
+            $user_name = 'Guest';
+            $user_identifier = Str::random(20);
         }
+
+        session(['user_name' => $user_name]);
+        session(['user_identifier' => $user_identifier]);
+
+        // 画像保存
+        $directory = 'public/sample/chat_photo';
+        $filename = null;
+        $filepath = null;
+
+        if ($request->hasFile('filename')) {
+            \Log::info('File received: ' . $request->file('filename')->getClientOriginalName());
+            
+            $request->validate(['filename' => 'image|max:2048']);
+            $filename = uniqid() . '.' . $request->file('filename')->getClientOriginalExtension();
+            
+            try {
+                $path = $request->file('filename')->storeAs($directory, $filename);
+                \Log::info('File stored at: ' . $path);
+                $filepath = $directory . '/' . $filename;
+            } catch (\Exception $e) {
+                \Log::error('File storage failed: ' . $e->getMessage());
+                return response()->json(['error' => 'ファイルの保存に失敗しました。'], 500);
+            }
+        } else {
+            \Log::info('No file received in the request.');
+        }
+
+        $chat = Chat::create([
+            'people_id' => $people_id,
+            'user_name' => $user_name,
+            'user_identifier' => $user_identifier,
+            'message' => $request->message,
+'filename' => $filename,
+            'path' => $filepath,
+        ]);
+
+        broadcast(new MessageSent($chat))->toOthers();
+
+        return response()->json([
+            'message' => $request->message,
+            'user_identifier' => $user_identifier,
+            'user_name' => $user_name,
+            'created_at' => $chat->created_at->format('Y-m-d H:i:s'),
+            'filename' => $chat->filename
+        ]);
+
+    } catch (\Exception $e) {
+        \Log::error('Error in store method: ' . $e->getMessage());
+        \Log::error('Stack trace: ' . $e->getTraceAsString());
+        return response()->json(['error' => $e->getMessage()], 500);
     }
+}
 
 
 
