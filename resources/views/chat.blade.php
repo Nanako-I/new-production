@@ -275,7 +275,7 @@
                                 @if($chat->filename)
                                     <img alt="team" class="w-80 h-64" 
                                         
-                                        src="{{ asset('storage/app/public/sample/chat_photo/' . $chat->filename) }}"
+                                        src="{{ asset('storage/sample/chat_photo/' . $chat->filename) }}"
                                         onerror="this.onerror=null;">
                                         <!-- <img alt="team" class="w-80 h-64" 
                                         src="{{ asset('storage/sample/chat_photo/' . $chat->filename) }}"
@@ -340,7 +340,7 @@
                         <div class="message-container ${className === 'self' ? 'self-message' : 'other-message'}">
                             <div style="overflow-wrap: break-word;">
                                 <p style="overflow-wrap: break-word;" class="text-gray-900">${message}</p>
-                                ${data.filename ? `<img alt="team" class="w-80 h-64" src="/storage/sample/chat_photo/${data.filename}" onerror="this.onerror=null; this.src='/images/default.png';">` : ''}
+                                ${data.filename ? `<img alt="team" class="w-80 h-64" src="/storage/sample/chat_photo/${data.filename}" onerror="this.onerror=null;">` : ''}
                             </div>
                             <p class="text-sm font-normal ${className === 'self' ? 'text-right' : 'text-left'}">
                                 ${createdAt} ＠${lastName}${firstName}
