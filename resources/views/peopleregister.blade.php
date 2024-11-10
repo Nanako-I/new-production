@@ -21,7 +21,9 @@
                 @endif
             </div>
         @endif
-
+        @if ($errors->has('file_upload'))
+            <div class="alert alert-danger">{{ $errors->first('file_upload') }}</div>
+        @endif
 
       <body class="h-full w-full">
  

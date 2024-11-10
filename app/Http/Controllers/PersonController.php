@@ -237,6 +237,7 @@ class PersonController extends Controller
             
             'date_of_birth' => 'required|max:255',
             'jukyuusha_number' => 'required|digits:10',
+            'filename' => 'nullable|image|max:2048',
         ]);
         
         $user = auth()->user();
@@ -273,7 +274,7 @@ class PersonController extends Controller
     $filename = null;
     $filepath = null;
 
-    if ($request->hasFile('filename')) {
+    if ($request->hasFile('filename') && $request->file('filename')->isValid()) {
         \Log::info('File received for person registration: ' . $request->file('filename')->getClientOriginalName());
         
         try {
@@ -288,7 +289,7 @@ class PersonController extends Controller
             return back()->withErrors(['file_upload' => 'ファイルのアップロードに失敗しました。'])->withInput();
         }
     } else {
-        \Log::info('No file received for person registration');
+        \Log::info('人物登録に有効なファイルが受信されませんでした');
     }
 
     $newpeople = Person::create([
