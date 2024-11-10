@@ -97,7 +97,7 @@ class ChatController extends Controller
         session(['user_identifier' => $user_identifier]);
 
         // 画像保存
-        $directory = 'public/sample/chat_photo';
+        $directory = 'sample/chat_photo';
         $filename = null;
         $filepath = null;
 
@@ -108,9 +108,9 @@ class ChatController extends Controller
             $filename = uniqid() . '.' . $request->file('filename')->getClientOriginalExtension();
             
             try {
-                $path = $request->file('filename')->storeAs($directory, $filename);
+                $path = $request->file('filename')->storeAs($directory, $filename, 'public');
                 \Log::info('File stored at: ' . $path);
-                $filepath = $directory . '/' . $filename;
+                $filepath = 'storage/' . $directory . '/' . $filename;
             } catch (\Exception $e) {
                 \Log::error('File storage failed: ' . $e->getMessage());
                 return response()->json(['error' => 'ファイルの保存に失敗しました。'], 500);
@@ -124,7 +124,7 @@ class ChatController extends Controller
             'user_name' => $user_name,
             'user_identifier' => $user_identifier,
             'message' => $request->message,
-'filename' => $filename,
+            'filename' => $filename,
             'path' => $filepath,
         ]);
 
@@ -144,7 +144,6 @@ class ChatController extends Controller
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }
-
 
 
 
