@@ -232,7 +232,7 @@ class PersonController extends Controller
     public function store(Request $request)
     {
         \Log::info('Person registration process started');
-        \Log::info('Request data: ' . json_encode($request->all()));
+        \Log::debug('Full request data: ' . json_encode($request->all()));
         $storeData = $request->validate([
             
             'date_of_birth' => 'required|max:255',
@@ -270,7 +270,7 @@ class PersonController extends Controller
         }
     }
    
-    $directory = 'sample';
+    $directory = 'sample/person_photo';
     $filename = null;
     $filepath = null;
 
