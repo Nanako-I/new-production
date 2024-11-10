@@ -269,25 +269,27 @@ class PersonController extends Controller
         }
     }
    
-    $directory = 'sample'; // 'public/' プレフィックスを削除
+    $directory = 'sample';
     $filename = null;
     $filepath = null;
 
-      if ($request->hasFile('filename')) {
+    if ($request->hasFile('filename')) {
         \Log::info('File received for person registration: ' . $request->file('filename')->getClientOriginalName());
         
         try {
-            $path = $request->file('filename')->storeAs($directory, $filename, 'public');
+            $file = $request->file('filename');
+            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs($directory, $filename, 'public');
             \Log::info('File stored for person at: ' . $path);
+            $filepath = 'storage/' . $path;
         } catch (\Exception $e) {
             \Log::error('File storage failed for person: ' . $e->getMessage());
             \Log::error('Stack trace: ' . $e->getTraceAsString());
-            return back()->withErrors(['file_upload' => 'ファイルのアップロードに失敗しました。']);
+            return back()->withErrors(['file_upload' => 'ファイルのアップロードに失敗しました。'])->withInput();
         }
     } else {
         \Log::info('No file received for person registration');
     }
-
 
     $newpeople = Person::create([
         'last_name' => $request->last_name,
@@ -301,7 +303,6 @@ class PersonController extends Controller
         'filename' => $filename,
         'path' => $filepath,
     ]);
-        
 
 
         // 現在ログインしているユーザーが属する施設にpeople（利用者）を紐づける↓
