@@ -79,63 +79,60 @@ class ChatController extends Controller
 
     public function store(Request $request, $people_id)
     {
-
-        \Log::info('People ID in store method: ' . $people_id);
         try {
-            $person = Person::findOrFail($people_id);
-
             $user = Auth::user();
-            if ($user) {
-                $user_name = $user->name;
-                $user_identifier = $user->id;
-            } else {
-                $user_name = 'Guest';
-                $user_identifier = Str::random(20);
-            }
-
-            // ユーザー名と識別子をセッションに登録
-            session(['user_name' => $user_name]);
-            session(['user_identifier' => $user_identifier]);
-
-            // 画像保存
-            $directory = 'public/sample/chat_photo';
-            $filename = null;
-            $filepath = null;
-
+            $user_identifier = $user->id;
+            
+            // ファイルがアップロードされた場合の処理
             if ($request->hasFile('filename')) {
-                $request->validate(['filename' => 'image|max:2048']);
-                $filename = uniqid() . '.' . $request->file('filename')->getClientOriginalExtension();
-                $request->file('filename')->storeAs($directory, $filename);
-                $filepath = $directory . '/' . $filename;
+                $file = $request->file('filename');
+                
+                // バリデーション
+                $request->validate([
+                    'filename' => 'image|max:2048',
+                ]);
+
+                // ディレクトリの存在確認と作成
+                $directory = 'public/sample/chat_photo';
+                if (!\Storage::exists($directory)) {
+                    \Storage::makeDirectory($directory);
+                }
+
+                // ファイル名の生成と保存
+                $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->storeAs($directory, $filename);
+
+                // パーミッションの設定
+                $fullPath = storage_path('app/' . $directory . '/' . $filename);
+                chmod($fullPath, 0644);
+                chown($fullPath, 'apache');
+                chgrp($fullPath, 'apache');
+            } else {
+                $filename = null;
             }
 
             $chat = Chat::create([
-                'people_id' => $people_id,
-                'user_name' => $user_name,
-                'user_identifier' => $user_identifier,
                 'message' => $request->message,
+                'user_identifier' => $user_identifier,
+                'people_id' => $people_id,
+                'last_name' => $user->last_name,
+                'first_name' => $user->first_name,
                 'filename' => $filename,
-                'path' => $filepath,
+                'is_read' => false
             ]);
 
-            // イベントをブロードキャスト
-          broadcast(new MessageSent($chat))->toOthers();
-
-            // 正常に保存された場合のレスポンス
             return response()->json([
                 'message' => $request->message,
                 'user_identifier' => $user_identifier,
-                'user_name' => $user_name,
+                'last_name' => $user->last_name,
+                'first_name' => $user->first_name,
                 'created_at' => $chat->created_at->format('Y-m-d H:i:s'),
-                'filename' => $chat->filename
+                'filename' => $filename
             ]);
 
-            
         } catch (\Exception $e) {
-            // エラーが発生した場合のレスポンス
-            // return response()->json(['error' => 'メッセージの保存に失敗しました。'], 500);
-             return response()->json(['error' => $e->getMessage()], 500);
-
+            \Log::error('Chat store error: ' . $e->getMessage());
+            return response()->json(['error' => 'メッセージの保存に失敗しました。'], 500);
         }
     }
 
@@ -148,67 +145,33 @@ class ChatController extends Controller
      * @param  \App\Models\Chat  $chat
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request, $people_id)
-{
-
-    $person = Person::findOrFail($people_id);
-    $people = Person::all(); // ここで $people を取得
-    // 現在ログインしているユーザーを取得
-    $user = Auth::user();
-
-
-   // もしログインしているユーザーが存在するかチェックする場合
-    if ($user) {
-        $user_name = $user->name;
+    public function show($people_id)
+    {
+        $person = Person::findOrFail($people_id);
+        $user = Auth::user();
         $user_identifier = $user->id;
-    } else {
-        // ユーザーが存在しない場合の処理
-        $user_name = 'Guest';
-        $user_identifier = Str::random(20);
+        $user_name = $user->last_name . ' ' . $user->first_name;
+
+        // チャット画面を表示する際に、未読メッセージを既読にする
+        Chat::where('people_id', $people_id)
+            ->where('user_identifier', '!=', $user_identifier)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
+        $length = Chat::where('people_id', $people_id)->count();
+        $display = 5;
+
+        $chats = Chat::where('people_id', $people_id)
+                     ->offset($length - $display)
+                     ->limit($display)
+                     ->get();
+
+        $unreadMessages = Chat::where('people_id', $people_id)
+            ->where('is_read', false)
+            ->count();
+
+        return view('chat', ['id' => $person->id], compact('person', 'user', 'chats', 'unreadMessages', 'user_name'));
     }
-    // ユーザーIDをセッションに登録
-    //   $user_identifier = $request->session()->get('user_identifier', Str::random(20));
-      session(['user_identifier' => $user_identifier]);
-      session(['user_identifier' => $user_identifier]);
-
-    // ユーザー識別子がなければランダムに生成してセッションに登録
-    if ($request->session()->missing('user_identifier')) {
-        session(['user_identifier' => Str::random(20)]);
-    }
-    // ユーザー名を変数に登録（デフォルト値：Guest）
-    if ($request->session()->missing('user_name')) {
-        session(['user_name' => $user_name]);
-    }
-
-    // チャット画面を表示する際に、未読メッセージを既読にする
-    Chat::where('people_id', $people_id)
-        ->where('user_identifier', '!=', $user_identifier)
-        ->where('is_read', false)
-        ->update(['is_read' => true]);
-
-    // 指定されたpeople_idの未読メッセージの件数を取得
-    // $unreadMessages = Chat::where('people_id', $people_id)->where('is_read', false)->count();
-
-
-   // データベース内の指定されたpeople_idのチャットの件数を取得
-    $length = Chat::where('people_id', $people_id)->count();
-
-    // 表示するチャットメッセージの件数を設定
-    $display = 5;
-
-    // 指定されたpeople_idの最新の5件のチャットメッセージを取得
-    $chats = Chat::where('people_id', $people_id)
-                 ->offset($length - $display)
-                 ->limit($display)
-                 ->get(['*', 'filename', 'path']);
-
-    $unreadMessages = Chat::where('people_id', $people_id)
-    ->where('is_read', false)
-    ->count();
-
-    // ビューにデータを渡して表示
-    return view('chat', ['id' => $person->id], compact('person', 'user_name', 'chats', 'unreadMessages'));
-}
 
 
     /**
