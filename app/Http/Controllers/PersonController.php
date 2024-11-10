@@ -231,6 +231,8 @@ class PersonController extends Controller
 
     public function store(Request $request)
     {
+        \Log::info('Person registration process started');
+        \Log::info('Request data: ' . json_encode($request->all()));
         $storeData = $request->validate([
             
             'date_of_birth' => 'required|max:255',
@@ -271,22 +273,21 @@ class PersonController extends Controller
     $filename = null;
     $filepath = null;
 
-    if ($request->hasFile('filename')) {
-        $request->validate([
-            'filename' => 'image|max:2048',
-        ]);
-        $file = $request->file('filename');
-        $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+      if ($request->hasFile('filename')) {
+        \Log::info('File received for person registration: ' . $request->file('filename')->getClientOriginalName());
         
         try {
-            $path = $file->storeAs($directory, $filename, 'public');
-            \Log::info('File stored at: ' . $path);
-            $filepath = 'storage/' . $directory . '/' . $filename;
+            $path = $request->file('filename')->storeAs($directory, $filename, 'public');
+            \Log::info('File stored for person at: ' . $path);
         } catch (\Exception $e) {
-            \Log::error('File storage failed: ' . $e->getMessage());
+            \Log::error('File storage failed for person: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
             return back()->withErrors(['file_upload' => 'ファイルのアップロードに失敗しました。']);
         }
+    } else {
+        \Log::info('No file received for person registration');
     }
+
 
     $newpeople = Person::create([
         'last_name' => $request->last_name,
@@ -315,7 +316,7 @@ class PersonController extends Controller
 
         // 二重送信防止
         $request->session()->regenerateToken();
-        return view('people', compact('people'));
+        return redirect()->route('people.index')->with('success', '正常に登録されました。');
     }
 
 
