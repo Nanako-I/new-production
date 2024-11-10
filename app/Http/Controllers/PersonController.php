@@ -267,35 +267,39 @@ class PersonController extends Controller
         }
     }
    
-        
+    $directory = 'sample'; // 'public/' プレフィックスを削除
+    $filename = null;
+    $filepath = null;
 
-        $directory = 'public/sample';
-        $filename = null;
-        $filepath = null;
-
-        if ($request->hasFile('filename')) {
-            $request->validate([
-                'filename' => 'image|max:2048',
-            ]);
-            $filename = uniqid() . '.' . $request->file('filename')->getClientOriginalExtension();
-            $filename = $request->file('filename')->getClientOriginalName();
-            $request->file('filename')->storeAs($directory, $filename);
-            $filepath = $directory . '/' . $filename;
-        }
-
-        $newpeople = Person::create([
-            'last_name' => $request->last_name,
-            'first_name' => $request->first_name,
-            'last_name_kana' => $request->last_name_kana,
-            'first_name_kana' => $request->first_name_kana,
-            'date_of_birth' => $request->date_of_birth,
-            'gender' => $request->gender,
-            'jukyuusha_number' => $request->jukyuusha_number,
-            'medical_care' => $request->medical_care,
-            'filename' => $filename,
-            'path' => $filepath,
-
+    if ($request->hasFile('filename')) {
+        $request->validate([
+            'filename' => 'image|max:2048',
         ]);
+        $file = $request->file('filename');
+        $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+        
+        try {
+            $path = $file->storeAs($directory, $filename, 'public');
+            \Log::info('File stored at: ' . $path);
+            $filepath = 'storage/' . $directory . '/' . $filename;
+        } catch (\Exception $e) {
+            \Log::error('File storage failed: ' . $e->getMessage());
+            return back()->withErrors(['file_upload' => 'ファイルのアップロードに失敗しました。']);
+        }
+    }
+
+    $newpeople = Person::create([
+        'last_name' => $request->last_name,
+        'first_name' => $request->first_name,
+        'last_name_kana' => $request->last_name_kana,
+        'first_name_kana' => $request->first_name_kana,
+        'date_of_birth' => $request->date_of_birth,
+        'gender' => $request->gender,
+        'jukyuusha_number' => $request->jukyuusha_number,
+        'medical_care' => $request->medical_care,
+        'filename' => $filename,
+        'path' => $filepath,
+    ]);
         
 
 

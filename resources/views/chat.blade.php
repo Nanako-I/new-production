@@ -312,7 +312,7 @@
             function uploadFile1() {
                 var filename = document.getElementById('filename').value;
                 if (filename.trim() !== '') {
-                    document.getElementById('chatbot-text').value = '写真が選択されました';
+                    document.getElementById('chatbot-text').value = '写真選択済。送信ボタンを押してください';
                 }
             }
 
