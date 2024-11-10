@@ -287,13 +287,11 @@
                 </ul>
             </div>
 
-            <form  id="chat-form" action="{{ url('chat/'.$person->id) }}" method="POST" enctype="multipart/form-data">
+            <form id="chat-form" action="{{ url('chat/'.$person->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="items-center" id="chatbot-footer">
                     <input type="hidden" name="user_identifier" value="{{ session('user_identifier') }}">
-                    <input class="hidden py-1 px-2 rounded text-center mb-2 md:mb-0 md:mr-2 md:ml-0 md:flex-initial" type="text"
-                           name="last_name" placeholder="UserName" maxlength="20" value="{{ $user_name }}" required
-                           style="display: none;">
+                    <input type="hidden" name="last_name" value="{{ $user_name }}">
                     <label for="filename" style="cursor: pointer;">
                         <i class="fa-regular fa-image mt-2" style="font-size: 2em;"></i>
                         <input name="filename" id="filename" type="file" style="display: none;" onChange="uploadFile1()">
