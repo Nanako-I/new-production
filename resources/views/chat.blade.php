@@ -275,9 +275,12 @@
                                 @if($chat->filename)
                                     <img alt="team" class="w-80 h-64" 
                                         
-                                        src="{{ asset('storage/sample/chat_photo/' . $chat->filename) }}"
+                                        src="{{ asset('storage/app/public/sample/chat_photo/' . $chat->filename) }}"
                                         onerror="this.onerror=null;">
-                                        <!-- <img alt="team" class="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 rounded-full mr-4" src="{{ asset('storage/sample/' . $person->filename) }}"> -->
+                                        <!-- <img alt="team" class="w-80 h-64" 
+                                        src="{{ asset('storage/sample/chat_photo/' . $chat->filename) }}"
+                                        onerror="this.onerror=null;"> -->
+
                                 @endif
                             </div>
                             <p class="text-sm font-normal {{ $chat->user_identifier == session('user_identifier') ? 'text-right' : 'text-left' }}">
