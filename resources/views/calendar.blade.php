@@ -75,7 +75,7 @@
       </div>
 
       <div class="grid grid-cols-2 gap-6">
-        <div>
+        <div class="hidden">
           <label for="arrival-date" class="block text-sm font-medium text-gray-700">来訪予定日</label>
           <input type="datetime-local" id="arrival-date" name="arrival-date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500">
         </div>

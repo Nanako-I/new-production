@@ -50,6 +50,7 @@ use App\Http\Controllers\ToiletController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\SpeechController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\NotebookController;
 use App\Http\Controllers\RecordController;
 use App\Http\Controllers\SpreadsheetController; // Qiitaの記事
 use App\Http\Controllers\UploadController;
@@ -505,6 +506,14 @@ Route::get('/speech/{id}/edit', 'SpeechController@edit')->name('speech.edit');
 
 // 連絡帳(職員側)↓
 Route::get('record/{people_id}/edit', [RecordController::class, 'show'])->name('record.edit');
+
+// 連絡帳の文章作成↓
+Route::get('notebookwriting/{people_id}', [NotebookController::class, 'show'])->name('notebook.show');
+Route::post('notebookwriting/{people_id}', [NotebookController::class,'store'])->name('notebook.post');
+
+// 編集↓
+Route::get('notebookchange/{people_id}', [NotebookController::class, 'change'])->name('notebook.change');
+Route::post('notebookchange/{people_id}',[NotebookController::class,'update'])->name('notebook_update');
 
 // 連絡帳(保護者側)↓
 Route::get('recordstamp/{people_id}', [RecordController::class, 'RecordStampshow'])->name('recordstamp.edit');

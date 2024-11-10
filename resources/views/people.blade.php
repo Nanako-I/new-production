@@ -2174,8 +2174,53 @@
                                         </div>
                                   </div>
                                 @endif 
-                                      　    　
-                                    
+                                      
+                                    <!-- <div class="border-2 p-2 rounded-lg bg-white mx-2 mb-2 mt-8">
+                                          <div class="flex justify-start items-center">
+                                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+                                            <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
+                                            <i class="fa-regular fa-clipboard text-green-700" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
+                                            <p class="font-bold text-xl ml-2">連絡帳の文章作成</p>
+                                          </div>
+                                          <div class="flex justify-center mt-4">
+                                            <a href="{{ url('notebookwriting/'.$person->id) }}" class="relative">
+                                              @csrf
+                                              <i class="material-icons md-90">add</i>
+                                            </a>
+                                          </div>
+                                    </div> -->
+
+                                    <div class="border-2 p-2 rounded-lg bg-white mx-2 mb-2 mt-8">
+                                          <div class="flex justify-start items-center">
+                                            <i class="fa-solid fa-pencil text-orange-600" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
+                                            <p class="font-bold text-xl ml-2">連絡帳の文章作成</p>
+                                          </div>
+                                          <div class="flex items-center justify-center p-4">
+                                            @php
+                                                $today = \Carbon\Carbon::now()->toDateString();
+                                                $todayNotebook = $person->notebooks()
+                                                    ->whereDate('created_at', $today)
+                                                    ->latest()  // 最新のレコードを取得
+                                                    ->first();
+                                            @endphp
+                                            
+                                            @if ($todayNotebook)
+                                                <!-- 登録済みの場合 -->
+                                                <a href="{{ url('notebookchange/'.$person->id) }}" class="relative ml-2 flex items-center">
+                                                    @csrf
+                                                    <p class="font-bold text-xl p-2">{{ $todayNotebook->notebook }}</p>
+                                                    <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s; vertical-align: middle;"></i>
+                                                </a>
+                                            @else
+                                                <!-- 未登録の場合 -->
+                                                <a href="{{ url('notebookwriting/'.$person->id) }}" class="relative">
+                                                    <summary class="text-red-500 font-bold text-xl">登録する</summary>
+                                                    @csrf
+                                                    <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </div>
                                    
                                     
                                     
@@ -2184,7 +2229,7 @@
                                             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                             <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
                                             <i class="fa-regular fa-clipboard text-green-700" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
-                                            <p class="font-bold text-xl ml-2">{{$person->last_name}}{{$person->first_name}}さんの記録</p>
+                                            <p class="font-bold text-xl ml-2">{{$person->last_name}}{{$person->first_name}}さんの連絡帳</p>
                                           </div>
                                           <div class="flex justify-center mt-4">
                                             <a href="{{ url('record/'.$person->id.'/edit') }}" class="relative">
