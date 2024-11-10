@@ -96,7 +96,7 @@ class RecordController extends Controller
         ->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd])
         ->latest()
         ->first();
-    // 対応するOptionモデルのデータを取得
+    // 対応するOptionモデルのデータを取得 
     $correspondingOption = null;
     if ($lastOptions) {
     $correspondingOption = Option::where('id', $lastOptions->option_id)->first();

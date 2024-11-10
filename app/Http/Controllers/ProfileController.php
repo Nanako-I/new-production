@@ -33,14 +33,13 @@ class ProfileController extends Controller
             $user->email_verified_at = null;
         }
 
-        // パスワードがリクエストに含まれている場合のみ更新
         if ($request->filled('password')) {
             $user->password = bcrypt($request->input('password'));
         }
 
         $user->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('people.index')->with('success', 'プロフィールが正常に変更されました。');
     }
 
 

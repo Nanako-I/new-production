@@ -1,9 +1,9 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+    @if (session('status') === 'profile-updated')
+        <div class="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 fixed top-0 left-0 right-0 z-50 text-center">
+            <p class="font-bold text-xl">{{ __('プロフィールが正常に変更されました。') }}</p>
+        </div>
+    @endif
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
