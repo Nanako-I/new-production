@@ -385,7 +385,7 @@ class PersonController extends Controller
         $person = Person::findOrFail($id);
 
         //   画像保存
-        $directory = 'public/sample';
+        $directory = 'sample';
         $filename = $person->filename; // 更新しない場合既存のファイル名を保持
         $filepath = $person->path; // 既存のパスを保持
     
