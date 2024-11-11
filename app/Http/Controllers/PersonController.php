@@ -229,15 +229,13 @@ class PersonController extends Controller
         return view('peopleregister');
     }
 
+    
     public function store(Request $request)
     {
-        \Log::info('Person registration process started');
-        \Log::debug('Full request data: ' . json_encode($request->all()));
         $storeData = $request->validate([
             
             'date_of_birth' => 'required|max:255',
             'jukyuusha_number' => 'required|digits:10',
-            'filename' => 'nullable|image|max:2048',
         ]);
         
         $user = auth()->user();
@@ -270,40 +268,36 @@ class PersonController extends Controller
         }
     }
    
-    $directory = 'sample/person_photo';
-    $filename = null;
-    $filepath = null;
-
-    if ($request->hasFile('filename') && $request->file('filename')->isValid()) {
-        \Log::info('File received for person registration: ' . $request->file('filename')->getClientOriginalName());
         
-        try {
-            $file = $request->file('filename');
-            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs($directory, $filename, 'public');
-            \Log::info('File stored for person at: ' . $path);
-            $filepath = 'storage/' . $path;
-        } catch (\Exception $e) {
-            \Log::error('File storage failed for person: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
-            return back()->withErrors(['file_upload' => 'ファイルのアップロードに失敗しました。'])->withInput();
-        }
-    } else {
-        \Log::info('人物登録に有効なファイルが受信されませんでした');
-    }
 
-    $newpeople = Person::create([
-        'last_name' => $request->last_name,
-        'first_name' => $request->first_name,
-        'last_name_kana' => $request->last_name_kana,
-        'first_name_kana' => $request->first_name_kana,
-        'date_of_birth' => $request->date_of_birth,
-        'gender' => $request->gender,
-        'jukyuusha_number' => $request->jukyuusha_number,
-        'medical_care' => $request->medical_care,
-        'filename' => $filename,
-        'path' => $filepath,
-    ]);
+        $directory = 'public/sample';
+        $filename = null;
+        $filepath = null;
+
+        if ($request->hasFile('filename')) {
+            $request->validate([
+                'filename' => 'image|max:2048',
+            ]);
+            $filename = uniqid() . '.' . $request->file('filename')->getClientOriginalExtension();
+            $filename = $request->file('filename')->getClientOriginalName();
+            $request->file('filename')->storeAs($directory, $filename);
+            $filepath = $directory . '/' . $filename;
+        }
+
+        $newpeople = Person::create([
+            'last_name' => $request->last_name,
+            'first_name' => $request->first_name,
+            'last_name_kana' => $request->last_name_kana,
+            'first_name_kana' => $request->first_name_kana,
+            'date_of_birth' => $request->date_of_birth,
+            'gender' => $request->gender,
+            'jukyuusha_number' => $request->jukyuusha_number,
+            'medical_care' => $request->medical_care,
+            'filename' => $filename,
+            'path' => $filepath,
+
+        ]);
+        
 
 
         // 現在ログインしているユーザーが属する施設にpeople（利用者）を紐づける↓
@@ -318,7 +312,7 @@ class PersonController extends Controller
 
         // 二重送信防止
         $request->session()->regenerateToken();
-        return redirect()->route('people.index')->with('success', '正常に登録されました。');
+        return view('people', compact('people'));
     }
 
 
