@@ -71,8 +71,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            // 'email' => trans('auth.throttle', [
-            'custom_id' => trans('auth.throttle', [ //emailからcustom_idに変更
+            'custom_id' => trans('試行回数が多すぎます。:minutes分後に再試行してください。', [ //emailからcustom_idに変更
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -84,6 +83,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->input('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->input('custom_id')).'|'.$this->ip());
     }
 }

@@ -39,20 +39,43 @@
                     </div>
                 </div>
 
+                <form action="{{ route('update.facility.items', $facility->id) }}" method="POST">
+    @csrf
+    @method('PATCH')
+                @if(!empty($additionalItems))
+        @foreach ($additionalItems as $item)
+        <div class="flex items-center mb-2">
+            <input type="checkbox" 
+                name="selected_items[]" 
+                value="{{ $item['id'] }}" 
+                class="form-checkbox h-5 w-5 text-gray-600"
+                {{ $item['flag'] == 1 ? 'checked' : '' }}>
+            <label class="ml-2 text-gray-700">
+                <p class="text-gray-900 font-bold text-xl px-1.5">{{ $item['title'] }}</p>
+                @if(!empty($item['items']))
+                    <p class="text-gray-500 text-base px-1.5">({{ $item['items'] }})</p>
+                @endif
+            </label>
+        </div>
+        @endforeach
+    @endif
+
                 <!-- 記録項目を追加するボタン -->
-                <div class="flex items-center justify-center mt-4">
-                    <button type="button" id="add-item-button" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-base text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+                <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
+                <div class="flex items-center justify-center mt-4 text-gray-900 font-bold text-xl cursor-pointer" id="add-item-button">
+                <i class="fa-solid fa-plus"></i>
                         記録項目を追加
-                    </button>
                 </div>
 
+           
                 <!-- 更新ボタン -->
                 <div class="flex items-center justify-center mt-4">
                     <button type="submit" id="update-button" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-base text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
-                        更新
-                    </button>
+                    更新
+                </button>
                 </div>
-            <!-- </form> -->
+            </form>
         </div>
     </div>
  <!-- モーダル -->
@@ -123,134 +146,32 @@
     </form>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-
-            @if ($errors->any())
-                document.getElementById('add-item-modal').classList.remove('hidden');
-            @endif
             // モーダル要素
             const modal = document.getElementById('add-item-modal');
             const openModalButton = document.getElementById('add-item-button');
             const closeModalButton = document.getElementById('cancel-add-item');
-            const confirmAddItemButton = document.getElementById('confirm-add-item');
-            const newItemTitleInput = document.getElementById('title');
-            const errorMessage = document.getElementById('error-message');
-            const formErrorMessage = document.getElementById('form-error-message');
-            const recordItemsForm = document.getElementById('record-items-form');
-
-            // 項目入力フィールドのコンテナ
-            const itemFieldsContainer = document.getElementById('item-fields-container');
             const addItemFieldButton = document.getElementById('add-item-field-button');
+            const itemFieldsContainer = document.getElementById('item-fields-container');
 
-            // モーダルを開く関数
-            function openModal() {
+            // モーダルを開く
+            openModalButton.addEventListener('click', function() {
                 modal.classList.remove('hidden');
-                newItemTitleInput.focus();
-            }
+            });
 
-            // モーダルを閉じる関数
-            function closeModal() {
+            // モーダルを閉じる
+            closeModalButton.addEventListener('click', function() {
                 modal.classList.add('hidden');
-                newItemTitleInput.value = '';
-                const itemFields = itemFieldsContainer.querySelectorAll('.item-field');
-                itemFields.forEach((field, index) => {
-                    if (index === 0) {
-                        field.querySelector('input').value = '';
-                    } else {
-                        field.remove();
-                    }
-                });
-                errorMessage.classList.add('hidden');
-                newItemTitleInput.classList.remove('border-red-500');
-            }
-
-            // モーダルを開くボタンのイベントリスナー
-            openModalButton.addEventListener('click', openModal);
-
-            // モーダルを閉じ
-    // 新しい項目を追加するボタンのイベントリスナー
-            confirmAddItemButton.addEventListener('click', function() {
-                const newItemTitle = newItemTitleInput.value.trim();
-                const newItemInputs = document.getElementsByName('item[]');
-                const newItems = [];
-
-                // エラーメッセージのリセット
-                errorMessage.classList.add('hidden');
-
-                // タイトルのバリデーション
-                if (newItemTitle.length > 32) {
-                    errorMessage.textContent = 'タイトルは32文字以内で入力してください。';
-                    errorMessage.classList.remove('hidden');
-                    return;
-                } else if (newItemTitle === '') {
-                    alert('タイトルを入力してください。');
-                    return;
-                }
-
-                // 項目のバリデーション
-                for (let input of newItemInputs) {
-                    const value = input.value.trim();
-                    if (value.length > 32) {
-                        errorMessage.textContent = '各項目は32文字以内で入力してください。';
-                        errorMessage.classList.remove('hidden');
-                        return;
-                    } else if (value !== '') {
-                        newItems.push(value);
-                    }
-                }
-
-                if (newItems.length === 0) {
-                    alert('少なくとも1つの項目を入力してください。');
-                    return;
-                }
-
-                // フォームデータを作成
-        const formData = {
-            title: newItemTitle,
-            item: newItems
-        };
-
-                // モーダルを閉じる
-                closeModal();
-
-                // フォームを送信（API経由）
-                submitForm(formData);
             });
 
-            // フォームの送信イベントリスナー
-            recordItemsForm.addEventListener('submit', function(event) {
-                event.preventDefault();
-
-                // フォームデータを収集
-                const formData = new FormData(recordItemsForm);
-
-                // フォームを送信
-                submitForm(formData);
+            // 項目を追加する
+            addItemFieldButton.addEventListener('click', function() {
+                const itemFieldHTML = `
+                    <div class="item-field mb-2">
+                        <input type="text" name="item[]" class="border border-gray-300 rounded-md w-full px-3 py-2" placeholder="項目を入力" maxlength="32">
+                    </div>
+                `;
+                itemFieldsContainer.insertAdjacentHTML('beforeend', itemFieldHTML);
             });
-
-            
-
-
-            // フォームを送信する関数
-            function submitForm(formData) {
-                const personId = formData.get('people_id');
-
-                // Axiosを使用してAPIリクエストを送信
-                // TODO: ここでバックエンドで作成したAPIのエンドポイントを指定する、以下のは例
-                axios.post(`/api/record-items/${personId}`, formData)
-                    .then(response => {
-                        // 成功メッセージの表示
-                        alert(response.data.message);
-
-                        // ページをリロードして最新の状態を取得
-                        window.location.reload();
-                    })
-                    .catch(error => {
-                        // エラーメッセージの表示
-                        console.error(error);
-                        formErrorMessage.classList.remove('hidden');
-                        formErrorMessage.textContent = error.response?.data?.message || 'エラーが発生しました。再度お試しください。';
-                    });
-            }
         });
     </script>
 </x-app-layout>

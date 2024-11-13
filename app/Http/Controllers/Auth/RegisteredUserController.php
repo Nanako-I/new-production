@@ -54,10 +54,9 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'custom_id' => $request->custom_id,
             'password' => Hash::make($request->password),
+
             'terms_accepted_at' => session('admin_terms_accepted_at'),
             'privacy_accepted_at' => session('admin_privacy_accepted_at'),
-            // 'custom_id' => Str::random(10), // ランダムな英数字IDを生成
-           'password' => $request['password'],
            'terms_accepted' => true,  // ここまでくる前に必ず同意をチェックしてるためrueを設定
            'privacy_accepted' => true,  // ここまでくる前に必ず同意をチェックしてるためrueを設定
             'terms_accepted_at' => session('terms_accepted_at'),

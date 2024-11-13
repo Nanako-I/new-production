@@ -229,13 +229,16 @@ class PersonController extends Controller
         return view('peopleregister');
     }
 
-    
     public function store(Request $request)
     {
+        try {
+        \Log::info('Person registration process started');
+        \Log::debug('Full request data: ' . json_encode($request->all()));
         $storeData = $request->validate([
             
             'date_of_birth' => 'required|max:255',
             'jukyuusha_number' => 'required|digits:10',
+            'filename' => 'nullable|image|max:2048',
         ]);
         
         $user = auth()->user();
@@ -268,51 +271,59 @@ class PersonController extends Controller
         }
     }
    
-        
+    $directory = 'sample/person_photo';
+    $filename = null;
+    $filepath = null;
 
-        $directory = 'public/sample';
-        $filename = null;
-        $filepath = null;
+            if ($request->hasFile('filename') && $request->file('filename')->isValid()) {
+                \Log::info('File received for person registration: ' . $request->file('filename')->getClientOriginalName());
+                
+                // ディレクトリの存在確認と作成
+                if (!\Storage::exists($directory)) {
+                    \Storage::makeDirectory($directory, 0755, true);
+                }
 
-        if ($request->hasFile('filename')) {
-            $request->validate([
-                'filename' => 'image|max:2048',
+                try {
+                    $file = $request->file('filename');
+                    $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+                    $path = $file->storeAs($directory, $filename);
+                    \Log::info('File stored for person at: ' . $path);
+                    
+                    // パーミッションの設定
+                    $fullPath = storage_path('app/' . $directory . '/' . $filename);
+                    if (file_exists($fullPath)) {
+                        chmod($fullPath, 0644);
+                        chown($fullPath, 'apache');
+                        chgrp($fullPath, 'apache');
+                    }
+                    
+                    $filepath = $directory . '/' . $filename;
+                } catch (\Exception $e) {
+                    \Log::error('File storage failed for person: ' . $e->getMessage());
+                    \Log::error('Stack trace: ' . $e->getTraceAsString());
+                    return back()->withErrors(['file_upload' => 'ファイルのアップロードに失敗しました。'])->withInput();
+                }
+            }
+
+            // Personモデルの作成処理
+            $person = Person::create([
+                // 他のフィールド...
+                'filename' => $filename,
+                'path' => $filepath
             ]);
-            $filename = uniqid() . '.' . $request->file('filename')->getClientOriginalExtension();
-            $filename = $request->file('filename')->getClientOriginalName();
-            $request->file('filename')->storeAs($directory, $filename);
-            $filepath = $directory . '/' . $filename;
-        }
 
-        $newpeople = Person::create([
-            'last_name' => $request->last_name,
-            'first_name' => $request->first_name,
-            'last_name_kana' => $request->last_name_kana,
-            'first_name_kana' => $request->first_name_kana,
-            'date_of_birth' => $request->date_of_birth,
-            'gender' => $request->gender,
-            'jukyuusha_number' => $request->jukyuusha_number,
-            'medical_care' => $request->medical_care,
-            'filename' => $filename,
-            'path' => $filepath,
+            \Log::info('Person created successfully with ID: ' . $person->id);
+            return redirect()->route('people.index')->with('success', '利用者情報が登録されました。');
 
-        ]);
-        
-
-
-        // 現在ログインしているユーザーが属する施設にpeople（利用者）を紐づける↓
-        // syncWithoutDetaching＝完全重複以外は、重複OK
-        $newpeople->people_facilities()->syncWithoutDetaching($firstFacility->id);
-
-        if ($firstFacility) {
-            $people = $firstFacility->people_facilities()->get();
-        } else {
-            $people = []; // まだpeople（利用者が登録されていない時もエラーが出ないようにする）
+        } catch (\Exception $e) {
+            \Log::error('Person registration failed: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            return back()->withErrors(['error' => '登録に失敗しました。'])->withInput();
         }
 
         // 二重送信防止
         $request->session()->regenerateToken();
-        return view('people', compact('people'));
+        return redirect()->route('people.index')->with('success', '正常に登録されました。');
     }
 
 
@@ -482,6 +493,7 @@ class PersonController extends Controller
             'id' => $option->id,
             'title' => $option->title,
             'items' => $option->getItemsAsString(),
+            'flag' => $option->flag,
         ];
     })->toArray();
 
@@ -541,7 +553,9 @@ public function updateSelectedItems(Request $request, $id)
 private function getAdditionalItems($id)
 {
     $person = Person::findOrFail($id);
-    $options = Option::where('people_id', $id)->get();
+    $options = Option::where('people_id', $id)
+                    ->orderBy('created_at', 'desc')  // 新しく追加された項目を上に表示
+                    ->get();
 
     $additionalItems = [];
     foreach ($options as $option) {
@@ -557,7 +571,8 @@ private function getAdditionalItems($id)
             'id' => $option->id,
             'title' => $option->title,
             'items' => implode(', ', $items),
-            'facility_id' => $option->facility_id
+            'facility_id' => $option->facility_id,
+            'is_new' => $option->created_at->gt(now()->subMinutes(5))  // 5分以内に作成された項目を新規とみなす
         ];
     }
 
@@ -567,38 +582,28 @@ private function getAdditionalItems($id)
 public function showAddItemForm($id)
 {
     $facility = Facility::findOrFail($id);
-    return view('item', compact('facility', 'id'));
+    
+    // 施設に関連する全てのオプションを取得
+    $options = Option::where('facility_id', $id)
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+    
+    $additionalItems = $options->map(function ($option) {
+        return [
+            'id' => $option->id,
+            'title' => $option->title,
+            'items' => $option->getItemsAsString(),
+            'flag' => $option->flag,
+            'facility_id' => $option->facility_id
+        ];
+    })->toArray();
+
+    // デフォルトで全ての項目を選択状態にする
+    $selectedItems = $options->pluck('id')->toArray();
+
+    return view('item', compact('facility', 'id', 'additionalItems', 'selectedItems'));
 }
 
-// selected-itemビューで施設利用者全員に記録項目を追加させるボタン
-
-// private function addItemToAll(Request $request)
-// {
-//     $person = Person::findOrFail($id);
-//     dd($person);
-//     $options = Option::where('people_id', $id)->get();
-//     $people = Person::where('facility_id', $facilityId)->get();
-
-//     $additionalItems = [];
-//     foreach ($options as $option) {
-//         $items = [];
-//         for ($i = 1; $i <= 5; $i++) {
-//             $itemKey = "item{$i}";
-//             if (!is_null($option->$itemKey) && $option->$itemKey !== '') {
-//                 $items[] = $option->$itemKey;
-//             }
-//         }
-        
-//         $additionalItems[] = [
-//             'id' => $option->id,
-//             'title' => $option->title,
-//             'items' => implode(', ', $items),
-//             'facility_id' => $option->facility_id
-//         ];
-//     }
-
-//     return $additionalItems;
-// }
 
 
 
@@ -627,7 +632,7 @@ public function addItemToAll($people_id)
                 $person->save();
             }
         }
-
+        $request->session()->regenerateToken();
         return response()->json(['message' => '項目が全ての利用者に追加されました。']);
     } catch (\Exception $e) {
         \Log::error('Error in addItemToAll: ' . $e->getMessage());
@@ -635,6 +640,19 @@ public function addItemToAll($people_id)
     }
 }
 
+public function updateFacilityItems(Request $request, $facility_id)
+{
+    $selectedItems = $request->input('selected_items', []);
+    
+    // 施設に関連する全てのオプションのflagを更新
+    Option::where('facility_id', $facility_id)->update(['flag' => 0]);
+    
+    if (!empty($selectedItems)) {
+        Option::whereIn('id', $selectedItems)->update(['flag' => 1]);
+    }
+
+    return redirect()->back()->with('success', '記録項目が更新されました。');
+}
 
 
     public function uploadForm()

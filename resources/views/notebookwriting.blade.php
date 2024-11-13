@@ -98,12 +98,58 @@
     </button>
     <div id="result-div"></div>
 </div>
+@php
+        $today = \Carbon\Carbon::now()->toDateString();
+        $todayOptions = \App\Models\Option::where('people_id', $person->id)
+            ->where('flag', true)
+            ->whereHas('optionItems', function($query) use ($today) {
+                $query->whereDate('created_at', $today);
+            })
+            ->get();
+    @endphp
 
+    @php
+        $todayTemperature = \App\Models\Temperature::where('people_id', $person->id)
+            ->whereDate('created_at', $today)
+            ->first();
+    @endphp
 <form action="{{ route('notebook.post', $person->id) }}" method="POST" class="w-full max-w-lg mx-auto mt-4">
     @csrf
     <div class="flex flex-col items-center my-4">
         <!-- amivoiceで読み取った文字が反映される↓ -->
-        <textarea id="recognitionResult" name="notebook" class="w-full max-w-lg font-bold" style="height: 300px;"></textarea>
+        <textarea id="recognitionResult" name="notebook" class="w-full max-w-lg font-bold" style="height: 300px;">
+        <div class="mt-4">
+    
+
+    @foreach($todayOptions as $option)
+        <div class="mb-4">
+            <h3 class="text-lg font-bold">{{ $option->title }}</h3>
+            @php
+                $todayItems = $option->optionItems()
+                    ->whereDate('created_at', $today)
+                    ->first();
+            @endphp
+            @if($todayItems)
+                <p class="text-gray-600">{{ $todayItems->item1 }}</p>
+            @endif
+        </div>
+    @endforeach
+</div>
+
+<!-- その日の体温の表示 -->
+<div class="mt-4">
+    
+    
+    @if($todayTemperature)
+        <div class="mb-4">
+            <h3 class="text-lg font-bold">体温</h3>
+            <p class="text-gray-600">{{ $todayTemperature->temperature }}℃</p>
+            <p class="text-gray-500 text-sm">{{ $todayTemperature->created_at->format('H:i') }}</p>
+        </div>
+    @endif
+</div>
+
+        </textarea>
         <span class="recognitionResultText"></span><span class="recognitionResultInfo"></span>
     </div>
     <div class="flex justify-center my-2">

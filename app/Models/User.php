@@ -75,6 +75,7 @@ class User extends Authenticatable
         'first_name',
         'last_name_kana',
         'first_name_kana',
+        'custom_id',
         'email',
         'password',
         'terms_accepted',

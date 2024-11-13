@@ -17,6 +17,16 @@ class Option extends Model
         return $this->belongsTo(Person::class, 'people_id');
     }
 
+    public function facility()
+    {
+        return $this->belongsTo(Facility::class);
+    }
+
+    public function optionItems()
+    {
+        return $this->hasMany(OptionItem::class);
+    }
+
     public function getItemsAsString()
     {
         $items = [];

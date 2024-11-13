@@ -47,6 +47,30 @@
                     </div>
 
                     <!-- 記録項目の表示 -->
+
+                    <div class="bg-gray-50 p-4 rounded-lg mb-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-700">施設共通の記録項目</h3>
+            <a href="{{ route('item.index', ['facility' => $facility->id]) }}" 
+               class="inline-flex items-center px-4 py-2 bg-blue-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:border-blue-700 focus:ring ring-blue-300 disabled:opacity-25 transition ease-in-out duration-150">
+                <i class="fas fa-edit mr-2"></i>
+                施設共通の記録項目を編集
+            </a>
+        </div>
+        
+        @foreach ($additionalItems as $item)
+            <div class="flex flex-row items-center my-3 pl-4">
+                <div class="w-6 h-6 flex items-center justify-center">
+                    @if($item['flag'] == 1)
+                        <i class="fas fa-check text-green-500"></i>
+                    @endif
+                </div>
+                <p class="text-gray-900 font-bold text-xl px-1.5">{{ $item['title'] }}</p>
+                <p class="text-gray-500 text-base px-1.5">{{ $item['items'] }}</p>
+            </div>
+        @endforeach
+    </div>
+    </a>
                     @php
                 if ($person->medical_care == 1) {
                     $items = [
@@ -63,61 +87,38 @@
                     $items = [
                         ['name' => '体温'],
                         ['name' => '食事', 'details' => '昼食・メニュー・おやつ・おやつのメニュー'],
-                        ['name' => 'トイレ', 'details' => '尿量・便量・便状態・便通処置・写真'],
-                        ['name' => 'トレーニング', 'details' => 'コミュニケーション・運動・読み書き・計算・宿題・買い物・その他'],
-                        ['name' => '生活習慣', 'details' => '荷物整理・掃除・その他'],
-                        ['name' => '創作活動', 'details' => '図画工作・料理・その他'],
-                        ['name' => '集団・個人活動', 'details' => '課題・余暇・レクリエーション・地域交流']
+                        
                     ];
                 }
                 @endphp
 
                 @foreach($items as $item)
                     <div class="flex flex-row items-center my-3">
-                        <input type="checkbox" name="selected_items[]" value="{{ $item['name'] }}" {{ in_array($item['name'], $selectedItems) ? 'checked' : '' }} class="w-6 h-6">
+                        <input type="checkbox" 
+                            name="selected_items[]" 
+                            value="{{ $item['name'] }}" 
+                            {{ in_array($item['name'], $selectedItems) ? 'checked' : '' }} 
+                            class="w-6 h-6">
                         <p class="text-gray-900 font-bold text-xl px-1.5">{{ $item['name'] }}</p>
                         @if(isset($item['details']))
-                        <p class="text-gray-500 text-base px-1.5">{{ $item['details'] }}</p>
+                            <p class="text-gray-500 text-base px-1.5">{{ $item['details'] }}</p>
                         @endif
-                        <!-- <button type="button" class="add-to-all-btn ml-2 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600" data-item="{{ $item['name'] }}" data-facility-id="{{ $facility->id}}">
-                            全員に追加
-                        </button> -->
                     </div>
                 @endforeach
-                
-                @if(!empty($additionalItems))
-    @foreach ($additionalItems as $item)
-        <div class="flex flex-row items-center my-3">
-            <input type="checkbox" 
-                name="selected_additional_items[]" 
-                value="{{ $item['id'] }}" 
-                {{ in_array($item['id'], $selectedItems) || (session('newly_added_items') && in_array($item['id'], session('newly_added_items'))) ? 'checked' : '' }} 
-                class="w-6 h-6">
-            <p class="text-gray-900 font-bold text-xl px-1.5">{{ $item['title'] }}</p>
-            <p class="text-gray-500 text-base px-1.5">{{ $item['items'] }}</p>
-            <!-- <form action="{{ route('addItemToAll', ['people_id' => $person->id]) }}" method="POST" class="w-full max-w-lg">
-                @csrf
-                <button type="submit"  
-                    class="add-to-all-btn ml-2 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600" 
-                    data-item="{{ $item['id'] }}" 
-                    data-facility-id="{{ $facility->id}}">
-                    全員に追加
-                </button>
-            </form> -->
-        </div>
-    @endforeach
-@endif
-           
+
+
+</div>
 
 
 
 
 
                 <!-- 記録項目を追加するボタン -->
-                <div class="flex items-center justify-center mt-4">
-                    <button type="button" id="add-item-button" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-base text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+                <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
+                <div class="flex items-center justify-center mt-4 text-gray-900 font-bold text-xl cursor-pointer" id="add-item-button">
+                <i class="fa-solid fa-plus"></i>
                         記録項目を追加
-                    </button>
                 </div>
 
                 <!-- 更新ボタン -->

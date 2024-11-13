@@ -75,7 +75,14 @@
                         </x-nav-link>
                     </div>
                     
-                      <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('peopleregister') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
+                      <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('item/{id}') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
+                         <!--<i class="material-icons md-48" id="face">face</i>-->
+                         <x-nav-link :href="route('show.items', ['id' => auth()->user()->facility_staffs()->first()->id])" :active="request()->routeIs('show.items')">
+                            {{ __('事業所の共通記録追加') }}
+                        </x-nav-link>
+                    </div>
+
+                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('peopleregister') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
                          <!--<i class="material-icons md-48" id="face">face</i>-->
                          <x-nav-link :href="url('peopleregister')" :active="request()->is('peopleregister')">
                             {{ __('新規の利用者登録') }}
@@ -155,6 +162,10 @@
                     {{ __('利用者一覧') }}
                 </x-dropdown-link>
 
+                <x-dropdown-link :href="url('show.items')" class="text-lg">
+                    {{ __('事業所の共通記録追加') }}
+                </x-dropdown-link>
+
                 <x-dropdown-link :href="url('peopleregister')" class="text-lg">
                     {{ __('新規の利用者登録') }}
                 </x-dropdown-link>
@@ -217,6 +228,10 @@
 
                 <x-dropdown-link :href="url('peopleregister')" class="text-lg">
                     {{ __('利用者の新規登録') }}
+                </x-dropdown-link>
+
+                <x-dropdown-link :href="url('show.items')" class="text-lg">
+                    {{ __('事業所の共通記録追加') }}
                 </x-dropdown-link>
 
                 <x-dropdown-link :href="url('before-invitation')" class="text-lg">
