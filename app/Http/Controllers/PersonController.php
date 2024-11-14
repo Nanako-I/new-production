@@ -269,7 +269,7 @@ class PersonController extends Controller
    
         
 
-        $directory = 'public/sample/person_photo';
+        $directory = 'sample/person_photo';
         $filename = null;
         $filepath = null;
 
