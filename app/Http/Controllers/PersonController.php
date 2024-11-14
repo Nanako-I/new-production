@@ -186,20 +186,6 @@ class PersonController extends Controller
                 ->get();
     }
 
-    // foreach ($options as $option) {
-    //     $items = collect([$option->item1, $option->item2, $option->item3, $option->item4, $option->item5])
-    //         ->filter()
-    //         ->implode(', '); // NULL 以外の値をカンマ区切りで結合
-
-    //     if ($items) {
-    //         $additionalItems[] = [
-    //             'title' => $option->title,
-    //             'items' => $items,
-    //         ];
-    //     }
-    // }
-
-    // return view('select_item', compact('person', 'selectedItems', 'personOptions', 'id'));
     return view('people', compact('people', 'selectedItems', 'personOptions', 'options', 'id'));
 }
 
@@ -632,11 +618,16 @@ public function updateFacilityItems(Request $request, $facility_id)
 {
     $selectedItems = $request->input('selected_items', []);
     
-    // 施設に関連する全てのオプションのflagを更新
-    Option::where('facility_id', $facility_id)->update(['flag' => 0]);
+    // 施設に関連する全てのオプションを取得
+    $facilityOptions = Option::where('facility_id', $facility_id)->get();
     
-    if (!empty($selectedItems)) {
-        Option::whereIn('id', $selectedItems)->update(['flag' => 1]);
+    foreach ($facilityOptions as $option) {
+        if (in_array($option->id, $selectedItems)) {
+            $option->flag = 1;
+        } else {
+            $option->flag = 0;
+        }
+        $option->save();
     }
 
     return redirect()->back()->with('success', '記録項目が更新されました。');

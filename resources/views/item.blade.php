@@ -152,6 +152,7 @@
     const addItemFieldButton = document.getElementById('add-item-field-button');
     const itemFieldsContainer = document.getElementById('item-fields-container');
     const addItemForm = document.getElementById('add-item-form');
+    const errorMessageContainer = document.getElementById('error-message');
 
     openModalButton.addEventListener('click', function() {
         modal.classList.remove('hidden');
@@ -176,6 +177,7 @@
         
         const submitButton = document.getElementById('confirm-add-item');
         submitButton.disabled = true;
+        errorMessageContainer.classList.add('hidden');
 
         fetch(this.action, {
             method: 'POST',
@@ -187,16 +189,16 @@
             }
         })
         .then(response => {
+            console.log('Response:', response);
+            console.log('Response headers:', response.headers);
             const contentType = response.headers.get("content-type");
             if (contentType && contentType.indexOf("application/json") !== -1) {
-                return response.json().then(data => {
-                    if (!response.ok) {
-                        throw data;
-                    }
-                    return data;
-                });
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
             } else {
-                throw new Error("サーバーからの応答が不正です。");
+                throw new Error("サーバーからHTMLレスポンスが返されました。サーバーサイドでエラーが発生している可能性があります。");
             }
         })
         .then(data => {
@@ -204,24 +206,23 @@
                 modal.classList.add('hidden');
                 resetForm();
                 alert(data.message);
-                // 必要に応じて、ページをリロードするか、新しい項目を動的に追加する
                 location.reload();
             } else {
-                alert('エラーが発生しました: ' + data.message);
+                throw new Error(data.message || 'エラーが発生しました');
             }
         })
         .catch(error => {
             console.error('Error:', error);
+            let errorMessage = 'エラーが発生しました: ';
             if (error.errors) {
-                // バリデーションエラー
-                let errorMessage = 'バリデーションエラー:\n';
-                for (let field in error.errors) {
-                    errorMessage += `${field}: ${error.errors[field].join(', ')}\n`;
-                }
-                alert(errorMessage);
+                errorMessage += Object.values(error.errors).flat().join('\n');
+            } else if (error.message) {
+                errorMessage += error.message;
             } else {
-                alert('エラーが発生しました: ' + (error.message || '不明なエラー'));
+                errorMessage += '不明なエラー';
             }
+            alert(errorMessage);
+            console.log('Full error object:', error);
         })
         .finally(() => {
             submitButton.disabled = false;
@@ -234,6 +235,7 @@
         for (let i = 1; i < itemFields.length; i++) {
             itemFields[i].remove();
         }
+        errorMessageContainer.classList.add('hidden');
     }
 });
     </script>
