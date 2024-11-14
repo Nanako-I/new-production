@@ -231,14 +231,10 @@ class PersonController extends Controller
 
     public function store(Request $request)
     {
-        try {
-        \Log::info('Person registration process started');
-        \Log::debug('Full request data: ' . json_encode($request->all()));
         $storeData = $request->validate([
             
             'date_of_birth' => 'required|max:255',
             'jukyuusha_number' => 'required|digits:10',
-            'filename' => 'nullable|image|max:2048',
         ]);
         
         $user = auth()->user();
@@ -271,59 +267,51 @@ class PersonController extends Controller
         }
     }
    
-    $directory = 'sample/person_photo';
-    $filename = null;
-    $filepath = null;
+        
 
-            if ($request->hasFile('filename') && $request->file('filename')->isValid()) {
-                \Log::info('File received for person registration: ' . $request->file('filename')->getClientOriginalName());
-                
-                // ディレクトリの存在確認と作成
-                if (!\Storage::exists($directory)) {
-                    \Storage::makeDirectory($directory, 0755, true);
-                }
+        $directory = 'public/sample/person_photo';
+        $filename = null;
+        $filepath = null;
 
-                try {
-                    $file = $request->file('filename');
-                    $filename = uniqid() . '.' . $file->getClientOriginalExtension();
-                    $path = $file->storeAs($directory, $filename);
-                    \Log::info('File stored for person at: ' . $path);
-                    
-                    // パーミッションの設定
-                    $fullPath = storage_path('app/' . $directory . '/' . $filename);
-                    if (file_exists($fullPath)) {
-                        chmod($fullPath, 0644);
-                        chown($fullPath, 'apache');
-                        chgrp($fullPath, 'apache');
-                    }
-                    
-                    $filepath = $directory . '/' . $filename;
-                } catch (\Exception $e) {
-                    \Log::error('File storage failed for person: ' . $e->getMessage());
-                    \Log::error('Stack trace: ' . $e->getTraceAsString());
-                    return back()->withErrors(['file_upload' => 'ファイルのアップロードに失敗しました。'])->withInput();
-                }
-            }
-
-            // Personモデルの作成処理
-            $person = Person::create([
-                // 他のフィールド...
-                'filename' => $filename,
-                'path' => $filepath
+        if ($request->hasFile('filename')) {
+            $request->validate([
+                'filename' => 'image|max:2048',
             ]);
+            $filename = uniqid() . '.' . $request->file('filename')->getClientOriginalExtension();
+            $filename = $request->file('filename')->getClientOriginalName();
+            $request->file('filename')->storeAs($directory, $filename);
+            $filepath = $directory . '/' . $filename;
+        }
 
-            \Log::info('Person created successfully with ID: ' . $person->id);
-            return redirect()->route('people.index')->with('success', '利用者情報が登録されました。');
+        $newpeople = Person::create([
+            'last_name' => $request->last_name,
+            'first_name' => $request->first_name,
+            'last_name_kana' => $request->last_name_kana,
+            'first_name_kana' => $request->first_name_kana,
+            'date_of_birth' => $request->date_of_birth,
+            'gender' => $request->gender,
+            'jukyuusha_number' => $request->jukyuusha_number,
+            'medical_care' => $request->medical_care,
+            'filename' => $filename,
+            'path' => $filepath,
 
-        } catch (\Exception $e) {
-            \Log::error('Person registration failed: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
-            return back()->withErrors(['error' => '登録に失敗しました。'])->withInput();
+        ]);
+        
+
+
+        // 現在ログインしているユーザーが属する施設にpeople（利用者）を紐づける↓
+        // syncWithoutDetaching＝完全重複以外は、重複OK
+        $newpeople->people_facilities()->syncWithoutDetaching($firstFacility->id);
+
+        if ($firstFacility) {
+            $people = $firstFacility->people_facilities()->get();
+        } else {
+            $people = []; // まだpeople（利用者が登録されていない時もエラーが出ないようにする）
         }
 
         // 二重送信防止
         $request->session()->regenerateToken();
-        return redirect()->route('people.index')->with('success', '正常に登録されました。');
+        return view('people', compact('people'));
     }
 
 

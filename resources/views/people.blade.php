@@ -92,7 +92,7 @@
                           <!--ハンバーガーメニューが表示された時は、下に表示されるようz-0をつける-->
                           
                             @if ($person->filename)
-                              <img alt="team" class="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 rounded-full mr-4" src="{{ asset('storage/sample/' . $person->filename) }}">
+                              <img alt="team" class="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 rounded-full mr-4" src="{{ asset('storage/sample/person_photo/' . $person->filename) }}">>
                             @else
                               <img alt="team" class="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 rounded-full mr-4" src="https://dummyimage.com/80x80">
                             @endif

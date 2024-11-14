@@ -145,33 +145,96 @@
     </div>
     </form>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // モーダル要素
-            const modal = document.getElementById('add-item-modal');
-            const openModalButton = document.getElementById('add-item-button');
-            const closeModalButton = document.getElementById('cancel-add-item');
-            const addItemFieldButton = document.getElementById('add-item-field-button');
-            const itemFieldsContainer = document.getElementById('item-fields-container');
+    document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('add-item-modal');
+    const openModalButton = document.getElementById('add-item-button');
+    const closeModalButton = document.getElementById('cancel-add-item');
+    const addItemFieldButton = document.getElementById('add-item-field-button');
+    const itemFieldsContainer = document.getElementById('item-fields-container');
+    const addItemForm = document.getElementById('add-item-form');
 
-            // モーダルを開く
-            openModalButton.addEventListener('click', function() {
-                modal.classList.remove('hidden');
-            });
+    openModalButton.addEventListener('click', function() {
+        modal.classList.remove('hidden');
+    });
 
-            // モーダルを閉じる
-            closeModalButton.addEventListener('click', function() {
+    closeModalButton.addEventListener('click', function() {
+        modal.classList.add('hidden');
+        resetForm();
+    });
+
+    addItemFieldButton.addEventListener('click', function() {
+        const itemFieldHTML = `
+            <div class="item-field mb-2">
+                <input type="text" name="item[]" class="border border-gray-300 rounded-md w-full px-3 py-2" placeholder="項目を入力" maxlength="32">
+            </div>
+        `;
+        itemFieldsContainer.insertAdjacentHTML('beforeend', itemFieldHTML);
+    });
+
+    addItemForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const submitButton = document.getElementById('confirm-add-item');
+        submitButton.disabled = true;
+
+        fetch(this.action, {
+            method: 'POST',
+            body: new FormData(this),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => {
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                return response.json().then(data => {
+                    if (!response.ok) {
+                        throw data;
+                    }
+                    return data;
+                });
+            } else {
+                throw new Error("サーバーからの応答が不正です。");
+            }
+        })
+        .then(data => {
+            if (data.success) {
                 modal.classList.add('hidden');
-            });
-
-            // 項目を追加する
-            addItemFieldButton.addEventListener('click', function() {
-                const itemFieldHTML = `
-                    <div class="item-field mb-2">
-                        <input type="text" name="item[]" class="border border-gray-300 rounded-md w-full px-3 py-2" placeholder="項目を入力" maxlength="32">
-                    </div>
-                `;
-                itemFieldsContainer.insertAdjacentHTML('beforeend', itemFieldHTML);
-            });
+                resetForm();
+                alert(data.message);
+                // 必要に応じて、ページをリロードするか、新しい項目を動的に追加する
+                location.reload();
+            } else {
+                alert('エラーが発生しました: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            if (error.errors) {
+                // バリデーションエラー
+                let errorMessage = 'バリデーションエラー:\n';
+                for (let field in error.errors) {
+                    errorMessage += `${field}: ${error.errors[field].join(', ')}\n`;
+                }
+                alert(errorMessage);
+            } else {
+                alert('エラーが発生しました: ' + (error.message || '不明なエラー'));
+            }
+        })
+        .finally(() => {
+            submitButton.disabled = false;
         });
+    });
+
+    function resetForm() {
+        addItemForm.reset();
+        const itemFields = itemFieldsContainer.querySelectorAll('.item-field');
+        for (let i = 1; i < itemFields.length; i++) {
+            itemFields[i].remove();
+        }
+    }
+});
     </script>
 </x-app-layout>

@@ -14,7 +14,7 @@
                         <a href="{{ url('people/'.$person->id.'/edit') }}" class="relative ml-2">
                             <div class="h-30 flex flex-row items-center rounded-lg bg-white">
                                 @if ($person->filename)
-                                    <img alt="team" class="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 rounded-full mr-4" src="{{ asset('storage/sample/' . $person->filename) }}">
+                                    <img alt="team" class="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 rounded-full mr-4" src="{{ asset('storage/sample/person_photo/' . $person->filename) }}">
                                 @else
                                     <img alt="team" class="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 rounded-full mr-4" src="https://dummyimage.com/80x80">
                                 @endif
