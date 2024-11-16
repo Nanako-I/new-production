@@ -21,7 +21,7 @@ use App\Models\Person;
 use App\Models\Record;
 use App\Models\Option;
 use App\Models\OptionItem;
-
+use App\Models\Notebook;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -138,9 +138,14 @@ class RecordController extends Controller
     $lastCreative = Creative::where('people_id', $people_id)
         ->whereDate('created_at', $selectedDate)
         ->latest()
-        ->first();    
+        ->first();   
+    
+    $lastNotebook = Notebook::where('people_id', $people_id)
+    ->whereDate('created_at', $selectedDate)
+    ->latest()
+    ->first();  
 
-    return view('recordedit', compact('person', 'selectedDate', 'records', 'stamps','timesOnSelectedDate','foodsOnSelectedDate',  'watersOnSelectedDate' , 'medicinesOnSelectedDate', 'tubesOnSelectedDate',  'temperaturesOnSelectedDate', 'bloodpressuresOnSelectedDate','toiletsOnSelectedDate','kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate' , 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative','lastOptions', 'correspondingOption'));
+    return view('recordedit', compact('person', 'selectedDate', 'records', 'stamps','timesOnSelectedDate','foodsOnSelectedDate',  'watersOnSelectedDate' , 'medicinesOnSelectedDate', 'tubesOnSelectedDate',  'temperaturesOnSelectedDate', 'bloodpressuresOnSelectedDate','toiletsOnSelectedDate','kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate' , 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative','lastOptions', 'correspondingOption', 'lastNotebook'));
 }
 
     /**
