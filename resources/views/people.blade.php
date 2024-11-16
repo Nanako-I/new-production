@@ -57,7 +57,8 @@
  <!-- 利用者情報 -->
 
 @hasanyrole('super administrator|facility staff administrator|facility staff user|facility staff reader')
-  <div class="flex flex-row justify-start w-screen overflow-x-auto">
+  <div class="flex flex-row justify-start w-screen">
+  <!-- <div class="flex flex-row justify-start w-screen overflow-x-auto"> -->
     <div class="slider">
     @csrf
                 @if (isset($people) && !empty($people) && count($people) > 0)
