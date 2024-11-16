@@ -18,16 +18,16 @@ return new class extends Migration
             $table->unsignedBigInteger('people_id');
             // onDelete('cascade')は、外部キーの参照先のpeopleテーブルのidのレコードが削除された場合に、このレコードも一緒に削除されるようにする
             $table->foreign('people_id')->references('id')->on('people')->onDelete('cascade');
-            $table->string('food')->nullable();
-            $table->string('staple_food');
-            $table->string('side_dish');
+            $table->string('lunch')->nullable();
+            $table->string('lunch_bikou')->nullable();
+            $table->string('oyatsu')->nullable();
+            $table->string('oyatsu_bikou')->nullable();
+            $table->string('staple_food')->nullable();
+            $table->string('side_dish')->nullable();
             $table->string('medicine')->nullable();
             $table->string('medicine_name')->nullable();
             $table->string('bikou')->nullable();
-            // $table->string('rice');
-            // $table->string('main_dish');
             $table->dateTime('created_at')->useCurrent()->nullable(false)->change();
-
             $table->timestamps();
         });
     }

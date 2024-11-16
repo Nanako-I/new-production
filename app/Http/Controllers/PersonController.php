@@ -51,43 +51,39 @@ class PersonController extends Controller
 
         $firstFacility = $facilities->first();
         if ($firstFacility) {
+            $people = $firstFacility->people_facilities()->get();
             // 本日の日付を取得
-        $today = \Carbon\Carbon::now()->toDateString();
+            $today = \Carbon\Carbon::now()->toDateString();
+            // $people = $firstFacility->people_facilities()->get();
 
-        // 本日訪問予定がある人物のみを取得
-        $people = $firstFacility->people_facilities()
-        ->with('scheduled_visits') // リレーションを事前にロード
-            ->whereHas('scheduled_visits', function($query) use ($today) {
-                $query->whereDate('arrival_datetime', $today)
-                      ->orWhereDate('exit_datetime', $today);
-            })
-            ->get();
-        } else {
-            // $people = []; // まだpeople（利用者が登録されていない時もエラーが出ないようにする）
-            $people = collect([]); // 空のコレクションにする
-        }
+            // 本日訪問予定がある人物のみを取得(送迎は開発途中のためコメントアウト。一旦利用者全員表示させる)
+            // $people = $firstFacility->people_facilities()
+            // ->with('scheduled_visits') // リレーションを事前にロード
+            //     ->whereHas('scheduled_visits', function($query) use ($today) {
+            //         $query->whereDate('arrival_datetime', $today)
+            //               ->orWhereDate('exit_datetime', $today);
+            //     })
+            //     ->get();
+            // } else {
+            //     $people = collect([]); // 空のコレクションにする
+            // }
 
-        foreach ($people as $person) {
-            $unreadMessages = Chat::where('people_id', $person->id)
-                                  ->where('is_read', false)
-                                  ->where('user_identifier', '!=', $user->id)
-                                  ->exists();
-        
-            $person->unreadMessages = $unreadMessages;
-            \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
+            foreach ($people as $person) {
+                $unreadMessages = Chat::where('people_id', $person->id)
+                                    ->where('is_read', false)
+                                    ->where('user_identifier', '!=', $user->id)
+                                    ->exists();
+            
+                $person->unreadMessages = $unreadMessages;
+                \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
         }
 
         $selectedItems = [];
         
-        // Loop through each person and decode their selected items
         foreach ($people as $person) {
             $selectedItems[$person->id] = json_decode($person->selected_items, true) ?? [];
         }
-        // dd($selectedItems);
-        // Loop through each person and decode their selected items
-        // foreach ($people as $person) {
-        //     $selectedItems[$person->id] = json_decode($person->selected_items, true) ?? [];
-        // }
+        
         $today = \Carbon\Carbon::now()->toDateString();
 
         foreach ($people as $person) {
@@ -105,19 +101,19 @@ class PersonController extends Controller
                 ->where('flag', 1)
                 ->get();
         }
-        // dd($options);
 
-        // 各利用者の訪問データを取得して送迎の要否を確認
-        foreach ($people as $person) {
-            $scheduledVisit = ScheduledVisit::where('people_id', $person->id)->first();
-            $person->transport = $scheduledVisit ? $scheduledVisit->transport : '未登録';
-        }
-        // dd($person->id, array_keys($selectedItems));
+        // 各利用者の訪問データを取得して送迎の要否を確認(送迎は開発途中のためコメントアウト）
+        // foreach ($people as $person) {
+        //     $scheduledVisit = ScheduledVisit::where('people_id', $person->id)->first();
+        //     $person->transport = $scheduledVisit ? $scheduledVisit->transport : '未登録';
+        // }
 
     return view('people', compact('people', 'selectedItems', 'options', 'personOptions'));
     }
-     
-  
+    else {
+        $people = collect([]); // 空のコレクションを作成
+}
+}
 
     public function show($id)
 {

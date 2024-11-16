@@ -92,7 +92,7 @@
                           <!--ハンバーガーメニューが表示された時は、下に表示されるようz-0をつける-->
                           
                             @if ($person->filename)
-                              <img alt="team" class="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 rounded-full mr-4" src="{{ asset('storage/sample/person_photo/' . $person->filename) }}">>
+                              <img alt="team" class="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 rounded-full mr-4" src="{{ asset('storage/sample/person_photo/' . $person->filename) }}">
                             @else
                               <img alt="team" class="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 rounded-full mr-4" src="https://dummyimage.com/80x80">
                             @endif
@@ -665,109 +665,109 @@
                                   @endif
 
                                   @php 
-    $lastOptionItem = $person->option_items()->latest()->first();
-@endphp
+                                    $lastOptionItem = $person->option_items()->latest()->first();
+                                @endphp
 
-@if(isset($personOptions[$person->id]))
-    @foreach($personOptions[$person->id] as $option)
-        <div class="border-2 p-2 rounded-lg bg-white m-2">
-            <div class="flex justify-start items-center">
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-                <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
-                <p class="font-bold text-xl ml-2">{{ $option->title ?? '' }}</p>
-            </div>
-            
-            <div class="flex items-center justify-center p-4">
-                <style>
-                    summary::-webkit-details-marker {
-                        display: inline-block;
-                        content: '▼';
-                        margin-right: 5px;
-                    }
-                    summary {
-                        display: list-item;
-                        cursor: pointer;
-                        list-style: none;
-                        font-weight: bold;
-                        text-align: center;
-                    }
-                    summary::-moz-list-bullet {
-                        display: inline-block;
-                        content: '▼';
-                        margin-right: 5px;
-                    }
-                    summary::marker {
-                        display: inline-block;
-                        content: '▼';
-                        margin-right: 5px;
-                    }
-                </style>
+                                @if(isset($personOptions[$person->id]))
+                                    @foreach($personOptions[$person->id] as $option)
+                                        <div class="border-2 p-2 rounded-lg bg-white m-2">
+                                            <div class="flex justify-start items-center">
+                                                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+                                                <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
+                                                <p class="font-bold text-xl ml-2">{{ $option->title ?? '' }}</p>
+                                            </div>
+                                            
+                                            <div class="flex items-center justify-center p-4">
+                                                <style>
+                                                    summary::-webkit-details-marker {
+                                                        display: inline-block;
+                                                        content: '▼';
+                                                        margin-right: 5px;
+                                                    }
+                                                    summary {
+                                                        display: list-item;
+                                                        cursor: pointer;
+                                                        list-style: none;
+                                                        font-weight: bold;
+                                                        text-align: center;
+                                                    }
+                                                    summary::-moz-list-bullet {
+                                                        display: inline-block;
+                                                        content: '▼';
+                                                        margin-right: 5px;
+                                                    }
+                                                    summary::marker {
+                                                        display: inline-block;
+                                                        content: '▼';
+                                                        margin-right: 5px;
+                                                    }
+                                                </style>
 
-                @php
-                    $todayItems = $person->todayOptionItems->where('option_id', $option->id);
-                @endphp
+                                                @php
+                                                    $todayItems = $person->todayOptionItems->where('option_id', $option->id);
+                                                @endphp
 
-                @if($todayItems->isEmpty())
-                    <form action="{{ route('options.item.store', ['people_id' => $person->id, 'id' => $option->id]) }}" method="POST">
-                        @csrf
-                        <details class="justify-center">
-                            <summary class="text-red-500 font-bold text-xl">登録する</summary>
+                                            @if($todayItems->isEmpty())
+                                                <form action="{{ route('options.item.store', ['people_id' => $person->id, 'id' => $option->id]) }}" method="POST">
+                                                    @csrf
+                                                    <details class="justify-center">
+                                                        <summary class="text-red-500 font-bold text-xl">登録する</summary>
 
-                            <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
-                            
-                            <input type="hidden" name="people_id" value="{{ $person->id }}">
-                            <input type="hidden" name="option_id" value="{{ $option->id }}">
+                                                        <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
+                                                        
+                                                        <input type="hidden" name="people_id" value="{{ $person->id }}">
+                                                        <input type="hidden" name="option_id" value="{{ $option->id }}">
 
-                            <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
-                                @for($i = 1; $i <= 5; $i++)
-                                    @php
-                                        $itemKey = "item{$i}";
-                                    @endphp
-                                    @if(!is_null($option->$itemKey) && $option->$itemKey !== '')
-                                        <input type="checkbox" name="item{{ $i }}" value="1" class="w-6 h-6">
-                                        <p class="text-gray-900 font-bold text-xl px-1.5">{{ $option->$itemKey }}</p>
-                                    @endif
-                                @endfor
-                            </div>
+                                                        <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
+                                                            @for($i = 1; $i <= 5; $i++)
+                                                                @php
+                                                                    $itemKey = "item{$i}";
+                                                                @endphp
+                                                                @if(!is_null($option->$itemKey) && $option->$itemKey !== '')
+                                                                    <input type="checkbox" name="item{{ $i }}" value="1" class="w-6 h-6">
+                                                                    <p class="text-gray-900 font-bold text-xl px-1.5">{{ $option->$itemKey }}</p>
+                                                                @endif
+                                                            @endfor
+                                                        </div>
 
-                            <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
-                                <p class="text-gray-900 font-bold text-xl">備考</p>
-                                <textarea id="bikou" name="bikou" class="w-3/4 max-w-lg font-bold" style="height: 200px;"></textarea>
-                            </div>
-                            <div class="my-2" style="display: flex; justify-content: center; align-items: center; max-width: 300px;">
-                                <button type="submit" class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
-                                    送信
-                                </button>
-                            </div>
-                        </details>
-                    </form>
-                @else
-                    <div class="flex flex-col items-center">
-                        @foreach($todayItems as $optionItem)
-                            <div class="flex items-center justify-around mb-2">
-                                @for($i = 1; $i <= 5; $i++)
-                                    @php
-                                        $itemKey = "item{$i}";
-                                        $itemData = json_decode($optionItem->$itemKey);
-                                    @endphp
-                                    @if(!is_null($option->$itemKey) && $option->$itemKey !== '' && !empty($itemData) && is_array($itemData) && count($itemData) > 0)
-                                        <p class="text-gray-900 font-bold text-xl px-1">{{ $option->$itemKey }}</p>
-                                    @endif
-                                @endfor
-                                <p class="text-gray-600 text-sm">{{ $optionItem->created_at->format('H:i') }}</p>
-                            </div>
-                        @endforeach
-                        
-                        <a href="{{ url('optionchange/' . $person->id . '/' . $optionItem->id) }}" class="text-stone-500">
-                            <i class="fa-solid fa-pencil text-stone-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
-                            編集
-                        </a>
-                    </div>
-                @endif
-            </div>
-        </div>
-    @endforeach
-@endif
+                                                        <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
+                                                            <p class="text-gray-900 font-bold text-xl">備考</p>
+                                                            <textarea id="bikou" name="bikou" class="w-3/4 max-w-lg font-bold" style="height: 200px;"></textarea>
+                                                        </div>
+                                                        <div class="my-2" style="display: flex; justify-content: center; align-items: center; max-width: 300px;">
+                                                            <button type="submit" class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                                                                送信
+                                                            </button>
+                                                        </div>
+                                                    </details>
+                                                </form>
+                                            @else
+                                                <div class="flex flex-col items-center">
+                                                    @foreach($todayItems as $optionItem)
+                                                        <div class="flex items-center justify-around mb-2">
+                                                            @for($i = 1; $i <= 5; $i++)
+                                                                @php
+                                                                    $itemKey = "item{$i}";
+                                                                    $itemData = json_decode($optionItem->$itemKey);
+                                                                @endphp
+                                                                @if(!is_null($option->$itemKey) && $option->$itemKey !== '' && !empty($itemData) && is_array($itemData) && count($itemData) > 0)
+                                                                    <p class="text-gray-900 font-bold text-xl px-1">{{ $option->$itemKey }}</p>
+                                                                @endif
+                                                            @endfor
+                                                            <p class="text-gray-600 text-sm">{{ $optionItem->created_at->format('H:i') }}</p>
+                                                        </div>
+                                                    @endforeach
+                                                    
+                                                    <a href="{{ url('optionchange/' . $person->id . '/' . $optionItem->id) }}" class="text-stone-500">
+                                                        <i class="fa-solid fa-pencil text-stone-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
+                                                        編集
+                                                    </a>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
 
                                 <!-- トレーニング登録↓ -->
                                 @if(isset($selectedItems[$person->id]) && in_array('トレーニング', $selectedItems[$person->id]))
@@ -1252,14 +1252,9 @@
                                         <p class="font-bold text-xl ml-2">食事</p>
                                     </div>
                                     
-                                    <!-- people.blade.php -->
                                    <div class="flex items-center justify-center p-4">
-                                        
-                                        
                                         @php
                                            $lastFood = $person->foods->last();
-                                           
-
                                         @endphp
                                             @if (!$lastFood || $lastFood->created_at->diffInHours(now()) >= 6)
                                             
@@ -1345,21 +1340,21 @@
                             </div>
                         </details>
                         </form>
-                                            @else
-                                                <!-- 直近の検温結果表示 -->
-                                                <div class="flex justify-evenly">
-                                                <a href="{{ url('foodchange/'.$person->id) }}" class="relative ml-2 flex items-center">
-                                                     @csrf
-                                               
-                                                        <div class="px-1.5">
-                                                            <p class="text-gray-900 font-bold text-base">昼食:</p>
-                                                            <p class="text-gray-900 font-bold text-2xl">{{ $lastFood->lunch }}</p>
-                                                        </div>
-                                                    
-                                                        <div class="px-1.5">
-                                                            <p class="text-gray-900 font-bold text-base">間食:</p>
-                                                            <p class="text-gray-900 font-bold text-2xl">{{ $lastFood->oyatsu }}</p>
-                                                        </div>
+            @else
+            <!-- 直近の食事結果表示 -->
+            <div class="flex justify-evenly">
+                
+                    <a href="{{ route('food.change', ['people_id' => $person->id, 'id' => $lastFood->id]) }}" class="relative ml-2 flex items-center">
+                        @csrf
+                        <div class="px-1.5">
+                            <p class="text-gray-900 font-bold text-base">昼食:</p>
+                            <p class="text-gray-900 font-bold text-2xl">{{ $lastFood->lunch }}</p>
+                        </div>
+                        <div class="px-1.5">
+                            <p class="text-gray-900 font-bold text-base">間食:</p>
+                            <p class="text-gray-900 font-bold text-2xl">{{ $lastFood->oyatsu }}</p>
+                        </div>
+                      
                                                     
                                                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                                     <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>

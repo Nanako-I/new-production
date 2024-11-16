@@ -55,46 +55,38 @@
                 </div>
                 @endif
 
-                <!-- Navigation Links -->
-                <!--<div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">-->
-                <!--    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">-->
-                <!--        {{ __('Dashboard') }}-->
-                <!--    </x-nav-link>-->
-                <!--</div>-->
+                
                 @hasanyrole('super administrator|facility staff administrator|facility staff user|facility staff reader')
+                    <!-- 送迎が完成したら「今日の利用者」にして訪問予定の利用者だけ表示させる -->
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('people') ?  ' text-black' : '' }} px-4 py-2 rounded-md text-3xl font-bold max-w-4xl text-black">
                         <x-nav-link :href="url('people')" :active="request()->is('people')">
-                        {{ __('今日の利用者') }}
+                        {{ __('利用者一覧') }}
                         </x-nav-link>
                     </div>
 
-                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('peoplelist') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
-                         <!--<i class="material-icons md-48" id="face">face</i>-->
-                         <x-nav-link :href="url('/peoplelist')" :active="request()->is('peoplelist')">
-                            {{ __('利用者一覧') }}
-                        </x-nav-link>
-                    </div>
+                    <!-- <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('peoplelist') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
+                         <x-nav-link :href="url('/peoplelist')" :active="request()->is('peoplelist')"> -->
+                            <!-- {{ __('利用者一覧') }} -->
+                        <!-- </x-nav-link>
+                    </div> -->
                     
                       <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('item/{id}') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
-                         <!--<i class="material-icons md-48" id="face">face</i>-->
                          <x-nav-link :href="route('show.items', ['id' => auth()->user()->facility_staffs()->first()->id])" :active="request()->routeIs('show.items')">
                             {{ __('事業所の共通記録追加') }}
                         </x-nav-link>
                     </div>
 
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('peopleregister') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
-                         <!--<i class="material-icons md-48" id="face">face</i>-->
                          <x-nav-link :href="url('peopleregister')" :active="request()->is('peopleregister')">
                             {{ __('新規の利用者登録') }}
                         </x-nav-link>
                     </div>
                     
-                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('calendar') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
-                         <!--<i class="material-icons md-48" id="face">face</i>-->
-                         <x-nav-link :href="url('calendar')" :active="request()->is('calendar')">
-                            {{ __('カレンダー') }}
-                        </x-nav-link>
-                    </div>
+                     <!-- <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('calendar') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
+                         <x-nav-link :href="url('calendar')" :active="request()->is('calendar')"> -->
+                            <!-- {{ __('カレンダー') }} -->
+                        <!-- </x-nav-link>
+                    </div> -->
                     
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('before-invitation') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
                          <!--<i class="material-icons md-48" id="face">face</i>-->
@@ -119,7 +111,7 @@
     <div x-data="{ open: false }" @click.away="open = false" @close.stop="open = false" class="relative">
         <div @click="open = !open">
             <button class="inline-flex items-center px-3 py-2 border border-transparent text-lg leading-5 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
-                <div>{{ Auth::user()->name }}</div>
+            <div>メニュー</div>
 
                 <div class="ml-1">
                     <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -154,13 +146,15 @@
                 </form>
 
                 @hasanyrole('super administrator|facility staff administrator|facility staff user|facility staff reader')
+                <!-- 送迎が完成したら「今日の利用者」にして訪問予定の利用者だけ表示させる -->
                 <x-dropdown-link :href="url('people')" class="text-lg">
-                    {{ __('今日の利用者') }}
-                </x-dropdown-link>
-
-                <x-dropdown-link :href="url('peoplelist')" class="text-lg">
                     {{ __('利用者一覧') }}
                 </x-dropdown-link>
+                
+                <!-- 送迎が完成したら使う予定の、登録する人だけが出てくる本当の利用者一覧 -->
+                <!-- <x-dropdown-link :href="url('peoplelist')" class="text-lg">
+                    {{ __('利用者一覧') }}
+                </x-dropdown-link> -->
 
                 <x-dropdown-link :href="url('show.items')" class="text-lg">
                     {{ __('事業所の共通記録追加') }}
@@ -171,12 +165,12 @@
                 </x-dropdown-link>
 
                 <x-dropdown-link :href="url('before-invitation')" class="text-lg">
-                    {{ __('職員・保護者を招待する') }}
+                    {{ __('保護者を招待する') }}
                 </x-dropdown-link>
 
-                <x-dropdown-link :href="url('calendar')" class="text-lg">
+                <!-- <x-dropdown-link :href="url('calendar')" class="text-lg">
                     {{ __('カレンダー') }}
-                </x-dropdown-link>
+                </x-dropdown-link> -->
                 @endhasanyrole
 
                 @hasanyrole('super administrator|client family user|client family reader')
@@ -218,13 +212,15 @@
                 </form>
 
                 @hasanyrole('super administrator|facility staff administrator|facility staff user|facility staff reader')
-                <x-dropdown-link :href="url('people')" class="text-lg">
-                    {{ __('今日の利用者') }}
-                </x-dropdown-link>
 
-                <x-dropdown-link :href="url('peoplelist')" class="text-lg">
+                <!-- 送迎が完成したら「今日の利用者」にして訪問予定の利用者だけ表示させる -->
+                <x-dropdown-link :href="url('people')" class="text-lg">
                     {{ __('利用者一覧') }}
                 </x-dropdown-link>
+                
+                <!-- <x-dropdown-link :href="url('peoplelist')" class="text-lg">
+                    {{ __('利用者一覧') }}
+                </x-dropdown-link> -->
 
                 <x-dropdown-link :href="url('peopleregister')" class="text-lg">
                     {{ __('利用者の新規登録') }}
@@ -235,12 +231,12 @@
                 </x-dropdown-link>
 
                 <x-dropdown-link :href="url('before-invitation')" class="text-lg">
-                    {{ __('職員・保護者を招待する') }}
+                    {{ __('保護者を招待する') }}
                 </x-dropdown-link>
 
-                <x-dropdown-link :href="url('calendar')" class="text-lg">
+                <!-- <x-dropdown-link :href="url('calendar')" class="text-lg">
                     {{ __('カレンダー') }}
-                </x-dropdown-link>
+                </x-dropdown-link> -->
 
                 @endhasanyrole
 
@@ -407,17 +403,3 @@ close.addEventListener('click', function () {
     hamburger.style.display = "block";
 });
 </script>
-
-
-
-<!--<style>-->
-<!--.fade-enter-active, .fade-leave-active, .slide-enter-active, .slide-leave-active {-->
-<!--  transition: opacity 0.3s, transform 0.3s;-->
-<!--}-->
-<!--.fade-enter, .fade-leave-to, .slide-enter, .slide-leave-to {-->
-<!--  opacity: 0;-->
-<!--}-->
-<!--.slide-enter, .slide-leave-to {-->
-<!--  transform: translateX(-100%);-->
-<!--}-->
-<!--</style>-->

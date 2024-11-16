@@ -98,57 +98,87 @@
     </button>
     <div id="result-div"></div>
 </div>
-@php
-        $today = \Carbon\Carbon::now()->toDateString();
-        $todayOptions = \App\Models\Option::where('people_id', $person->id)
-            ->where('flag', true)
-            ->whereHas('optionItems', function($query) use ($today) {
-                $query->whereDate('created_at', $today);
-            })
-            ->get();
-    @endphp
 
-    @php
-        $todayTemperature = \App\Models\Temperature::where('people_id', $person->id)
-            ->whereDate('created_at', $today)
-            ->first();
-    @endphp
 <form action="{{ route('notebook.post', $person->id) }}" method="POST" class="w-full max-w-lg mx-auto mt-4">
     @csrf
     <div class="flex flex-col items-center my-4">
+   
         <!-- amivoiceで読み取った文字が反映される↓ -->
         <textarea id="recognitionResult" name="notebook" class="w-full max-w-lg font-bold" style="height: 300px;">
-        <div class="mt-4">
-    
+     @if($temperatureCount > 0)
+        @php
+        $temperatureString = '今日の体温は、';
+        foreach ($temperaturesOnSelectedDate as $index => $temperature) {
+            $temperatureString .= $temperature->created_at->format('H:i') . '、' . $temperature->temperature . '℃';
+            if ($index < $temperatureCount - 1) {
+                $temperatureString .= '、';
+            }
+        }
+        $temperatureString .= 'でした。';
+          @endphp
+          {{ $temperatureString }}
+      @endif
 
-    @foreach($todayOptions as $option)
-        <div class="mb-4">
-            <h3 class="text-lg font-bold">{{ $option->title }}</h3>
-            @php
-                $todayItems = $option->optionItems()
-                    ->whereDate('created_at', $today)
-                    ->first();
-            @endphp
-            @if($todayItems)
-                <p class="text-gray-600">{{ $todayItems->item1 }}</p>
-            @endif
-        </div>
-    @endforeach
-</div>
+      @php
 
-<!-- その日の体温の表示 -->
-<div class="mt-4">
+$isFirstItem = true;
+@endphp
+@if(!empty($foodsOnSelectedDate))
+    @php
+    foreach ($foodsOnSelectedDate as $food) {
+        $foodItems = [];
+        
+        if ($food->lunch == 'あり' && !empty($food->lunch_bikou)) {
+            $foodItems[] = '昼食は' . $food->lunch_bikou;
+        }
+        
+        if ($food->oyatsu == 'あり' && !empty($food->oyatsu_bikou)) {
+            $foodItems[] = 'おやつは' . $food->oyatsu_bikou;
+        }
+        
+        if (!empty($foodItems)) {
+            if (!$isFirstItem) {
+                $foodString .= '、';
+            } else {
+                $foodString = '今日の';
+            }
+            $foodString .= implode('、', $foodItems);
+            $isFirstItem = false;
+        }
+    }
     
-    
-    @if($todayTemperature)
-        <div class="mb-4">
-            <h3 class="text-lg font-bold">体温</h3>
-            <p class="text-gray-600">{{ $todayTemperature->temperature }}℃</p>
-            <p class="text-gray-500 text-sm">{{ $todayTemperature->created_at->format('H:i') }}</p>
-        </div>
+    if (!$isFirstItem) {
+        $foodString .= 'でした。';
+    }
+    @endphp
+
+    @if(!empty($foodString))
+        {{ $foodString }}
     @endif
-</div>
-
+@endif
+@if($lastOptions && $correspondingOption)
+    @php
+        $items = [];
+        for($i = 1; $i <= 5; $i++) {
+            $optionItemKey = "item{$i}";
+            $optionItem = json_decode($lastOptions->$optionItemKey);
+            $correspondingItem = $correspondingOption->$optionItemKey;
+            if(!empty($optionItem) && is_array($optionItem) && count($optionItem) > 0 && $correspondingItem) {
+                $items[] = $correspondingItem;
+            }
+        }
+    @endphp
+    @if(count($items) > 0)
+        本日行った{{ $correspondingOption->title }}は
+        @foreach($items as $index => $item)
+            {{ $item }}@if($index < count($items) - 1)と@endif
+        @endforeach
+        でした
+        @if($lastOptions->bikou !== null)
+            {{ $lastOptions->bikou }}
+        @endif
+    @endif
+@endif
         </textarea>
         <span class="recognitionResultText"></span><span class="recognitionResultInfo"></span>
     </div>

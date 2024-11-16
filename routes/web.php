@@ -434,7 +434,7 @@ Route::post('toilet/{people_id}', [ToiletController::class, 'store'])->name('toi
 Route::get('toilet/{people_id}', [ToiletController::class, 'show'])->name('toilet.show');
 Route::get('toiletedit/{people_id}', [ToiletController::class, 'edit'])->name('toilet.edit');
 
-// 血圧編集↓
+// トイレ編集↓
 Route::get('toiletchange/{people_id}/{id}', [ToiletController::class, 'change'])->name('toilet.change');
 Route::post('toiletchange/{people_id}/{id}',[ToiletController::class,'update'])->name('toilet_update');
 Route::post('toiletdestroy/{id}',[ToiletController::class,'destroy'])->name('toilet.delete');

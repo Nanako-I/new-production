@@ -79,9 +79,7 @@ class FoodController extends Controller
     ]);
     // return redirect('people/{id}/edit');
     $people = Person::all();
-//   $person = Person::findOrFail($request->people_id);
-    // return redirect()->route('food.edit', ['people_id' => $person->id]); //
-     $request->session()->regenerateToken();
+    $request->session()->regenerateToken();
     return view('people', compact('food', 'people'));
     }
 
@@ -96,20 +94,10 @@ class FoodController extends Controller
     
     $person = Person::findOrFail($id);
     $foods = $person->foods;
-//     // $foods = $person->foods;
-//     // $foods = Food::where('people_id', $people_id)->get();
-
-//     return view('people', compact('staple_foods'));
     return view('people', compact('foods'));
 }
 
-// public function change($people_id){  // 編集には、id情報 と 記事データが必要
 
-// $person = Person::findOrFail($people_id);
-//   $message = '記事の編集： '.$id;    // 表示用
-//   $food = Food::find($id);  // 編集するレコードをid情報から取得
-//   return view('edit', ['message'=>$message, 'article'=>$article]);  // 編集ページに渡す
-// }
 
 public function change(Request $request, $people_id, $id)
 // public function change(Food $food)
@@ -155,21 +143,26 @@ public function edit(Request $request, $people_id)
      * @param  \App\Models\Food  $food
      * @return \Illuminate\Http\Response
      */
-     public function update(Request $request, Food $food)
-    {
-        $person = Person::find($request->people_id);
-
-    //データ更新
-        $food = Food::find($request->id);
-        $form = $request->all();
-        $food->fill($form)->save();
-        // dd($food);
-        $people = Person::all();
-        
-        // セッショントークンを再生成
-        $request->session()->regenerateToken();
-        return view('people', compact('food', 'people'));
-    }
+    public function update(Request $request, $people_id, $id)
+{
+    $food = Food::findOrFail($id);
+    
+    // データ更新
+    $food->lunch = $request->lunch;
+    $food->lunch_bikou = $request->lunch_bikou;
+    $food->oyatsu = $request->oyatsu;
+    $food->oyatsu_bikou = $request->oyatsu_bikou;
+    $food->staple_food = $request->staple_food;
+    $food->side_dish = $request->side_dish;
+    $food->medicine = $request->medicine;
+    $food->medicine_name = $request->medicine_name;
+    $food->bikou = $request->bikou;
+    
+    $food->save();
+    
+    $people = Person::all();
+    return redirect()->route('people.show', $people_id)->with('success', '食事情報が更新されました。');
+}
     
  
   

@@ -8,11 +8,24 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-// use Google\Cloud\Speech\V1\SpeechClient;
-// use Google\Cloud\Speech\V1\RecognitionConfig;
-// use Google\Cloud\Speech\V1\RecognitionConfig\AudioEncoding;
-// use Google\Cloud\Speech\V1\StreamingRecognitionConfig;
-// use Google\Cloud\Speech\V1\StreamingRecognizeRequest;
+use App\Models\Time;
+use App\Models\Temperature;
+use App\Models\Bloodpressure;
+use App\Models\Toilet;
+use App\Models\Food;
+use App\Models\Water;
+use App\Models\Medicine;
+use App\Models\Kyuuin;
+use App\Models\Tube;
+use App\Models\Hossa;
+use App\Models\Speech;
+use App\Models\Activity;
+use App\Models\Training;
+use App\Models\Lifestyle;
+use App\Models\Creative;
+use App\Models\Record;
+use App\Models\Option;
+use App\Models\OptionItem;
 
 class NotebookController extends Controller
 {
@@ -87,12 +100,95 @@ class NotebookController extends Controller
      * @param  \App\Models\Speech  $speech
      * @return \Illuminate\Http\Response
      */
-   public function show($people_id)
+    public function show($people_id)
 {
     
 
     $person = Person::findOrFail($people_id);
     $notebooks = $person->notebooks;
+
+    $today = \Carbon\Carbon::now()->toDateString();
+    $selectedDate = request()->input('selected_date', \Carbon\Carbon::now()->toDateString());
+    $selectedDateStart = \Carbon\Carbon::parse($selectedDate)->startOfDay();    
+    $selectedDateEnd = \Carbon\Carbon::parse($selectedDate)->endOfDay();
+    
+     // 選択された日付に該当する記録をすべて取得
+     $records = Record::where('person_id', $people_id)
+     ->whereBetween('kiroku_date', [$selectedDateStart, $selectedDateEnd])
+     ->get();
+
+     $timesOnSelectedDate = $person->times ? $person->times->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]) : collect();
+
+    $foodsOnSelectedDate = $person->foods->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]);
+    $foodString = '';
+    $foodCount = count($foodsOnSelectedDate);
+    
+    $temperaturesOnSelectedDate = $person->temperatures ? $person->temperatures->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]) : collect();
+    $temperatureString = '';
+    $temperatureCount = count($temperaturesOnSelectedDate);
+    
+
+    $watersOnSelectedDate = $person->waters->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]);
+    $medicinesOnSelectedDate = $person->medicines->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]);
+    $tubesOnSelectedDate = $person->tubes->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]);
+    
+    
+
+    $bloodpressuresOnSelectedDate = $person->bloodpressures->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]);
+    $toiletsOnSelectedDate = $person->toilets->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]);
+    $kyuuinsOnSelectedDate = $person->kyuuins ? $person->kyuuins->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]) : collect();
+    $hossasOnSelectedDate = $person->hossas ? $person->hossas->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]) : collect();
+    $speechesOnSelectedDate = $person->speeches ? $person->speeches->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]) : collect();
+
+    // 選択された日付のオプションデータを取得
+    // $optionsOnSelectedDate = $person->option_items ? $person->option_items->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]) : collect();
+    $lastOptions = OptionItem::where('people_id', $people_id)
+        ->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd])
+        ->latest()
+        ->first();
+    // 対応するOptionモデルのデータを取得 
+    $correspondingOption = null;
+    if ($lastOptions) {
+    $correspondingOption = Option::where('id', $lastOptions->option_id)->first();
+    }
+
+    // hanamaruの項目↓
+    $lastTime = Time::where('people_id', $people_id)
+    ->whereDate('created_at', $selectedDate)
+    ->latest()
+    ->first();
+
+    $lastMorningActivity = Speech::where('people_id', $people_id)
+        ->whereDate('created_at', $selectedDate)
+        ->whereNotNull('morning_activity')
+        ->latest()
+        ->first();
+
+    $lastAfternoonActivity = Speech::where('people_id', $people_id)
+    ->whereDate('created_at', $selectedDate)
+    ->whereNotNull('afternoon_activity')
+    ->latest()
+    ->first();
+    
+    $lastActivity = Activity::where('people_id', $people_id)
+        ->whereDate('created_at', $selectedDate)
+        ->latest()
+        ->first();
+        
+    $lastTraining = Training::where('people_id', $people_id)
+        ->whereDate('created_at', $selectedDate)
+        ->latest()
+        ->first();
+        
+    $lastLifestyle = Lifestyle::where('people_id', $people_id)
+        ->whereDate('created_at', $selectedDate)
+        ->latest()
+        ->first();
+        
+    $lastCreative = Creative::where('people_id', $people_id)
+        ->whereDate('created_at', $selectedDate)
+        ->latest()
+        ->first();
     
 
 
@@ -108,13 +204,13 @@ class NotebookController extends Controller
     ];
     $queryString = http_build_query($data);
  
-$jsonData = json_encode($data);
+    $jsonData = json_encode($data);
 
-// dd($jsonData);
-$headers = [
-    // 'Content-Type: application/json',
-    'Authorization: Bearer ' . $jsonData
-];
+    // dd($jsonData);
+    $headers = [
+        // 'Content-Type: application/json',
+        'Authorization: Bearer ' . $jsonData
+    ];
 
     
     $curl_handle = curl_init();//curlセッションを初期化して、curlハンドルを取得
@@ -137,7 +233,7 @@ $headers = [
     curl_close($curl_handle);
   
     $people = Person::all();
-    return view('notebookwriting', ['id' => $person->id],compact('person', 'json_response'));
+    return view('notebookwriting', ['id' => $person->id],compact('person', 'json_response', 'selectedDate', 'records', 'timesOnSelectedDate','foodsOnSelectedDate','foodString','foodCount',  'watersOnSelectedDate' , 'medicinesOnSelectedDate', 'tubesOnSelectedDate',  'temperaturesOnSelectedDate', 'temperatureString', 'temperatureCount','bloodpressuresOnSelectedDate','toiletsOnSelectedDate','kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate' , 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative','lastOptions', 'correspondingOption'));
 }
 
     
