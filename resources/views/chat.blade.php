@@ -284,7 +284,7 @@
                                 @endif
                             </div>
                             <p class="text-sm font-normal {{ $chat->user_identifier == session('user_identifier') ? 'text-right' : 'text-left' }}">
-                                {{ $chat->created_at }} ＠{{ $chat->last_name }}{{ $chat->first_name }}
+                                {{ $chat->created_at }} ＠{{ $chat->user_identifier == session('user_identifier') ? session('user_name') : $chat->last_name . $chat->first_name }}
                             </p>
                         </div>
                     </li>

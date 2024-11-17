@@ -91,7 +91,7 @@
       @php
         $today = now()->format('Y-m-d'); // 今日の日付を取得（例：2023-08-07）
       @endphp
-      
+     
       <div class="flex items-center justify-center" style="padding: 20px 0;">
         <div class="flex flex-col items-center">
 
@@ -142,7 +142,7 @@
   <div class="container px-5 pb-24 mx-auto flex flex-wrap" _msthidden="10">
    <div class="flex flex-col flex-wrap lg:py-6 -mb-10 lg:w-1/2 lg:pl-12 lg:text-left text-center" _msthidden="9">
    @if (
-        collect([$timesOnSelectedDate, $foodsOnSelectedDate, $watersOnSelectedDate, $medicinesOnSelectedDate, $tubesOnSelectedDate, $temperaturesOnSelectedDate, $bloodpressuresOnSelectedDate, $toiletsOnSelectedDate, $kyuuinsOnSelectedDate, $hossasOnSelectedDate, $speechesOnSelectedDate, $lastTime, $lastMorningActivity, $lastAfternoonActivity, $lastActivity, $lastTraining, $lastLifestyle, $lastCreative])
+        collect([$timesOnSelectedDate, $foodsOnSelectedDate, $watersOnSelectedDate, $medicinesOnSelectedDate, $tubesOnSelectedDate, $temperaturesOnSelectedDate, $bloodpressuresOnSelectedDate, $toiletsOnSelectedDate, $kyuuinsOnSelectedDate, $hossasOnSelectedDate, $speechesOnSelectedDate, $lastTime, $lastMorningActivity, $lastAfternoonActivity, $lastActivity, $lastTraining, $lastLifestyle, $lastCreative, $lastNotebook])
         ->every(fn($collection) => $collection === null || $collection->isEmpty())
     ) 
         @if (\Carbon\Carbon::parse($selectedDate)->isToday())
@@ -714,12 +714,27 @@
       </div>
     @endif
 
+    @if($lastNotebook)
+      <div class="flex flex-col mb-10 lg:items-start items-center" _msthidden="3">
+        <div class="w-12 h-12 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 mb-5">
+            <i class="fa-solid fa-brush text-gray-700" style="font-size: 1.5em; transition: transform 0.2s;"></i>
+        </div>
+        <div class="flex-grow p-4" _msthidden="3">
+          <h2 class="text-gray-900 text-lg title-font font-medium mb-3" _msttexthash="204971" _msthidden="1" _msthash="743">1日の活動・様子</h2>
+            <div class="flex justify-around text-left items-start">
+              
+                <p class="text-gray-900 font-bold text-xl px-3">{{ $lastNotebook->notebook }}</p>
+         </div>
+        <hr style="border: 1px solid #666; margin: 0 auto; width: 100%;">
+      </div>
+      @endif
+
 
     @php 
-    $dataExists = collect([$foodsOnSelectedDate, $watersOnSelectedDate, $medicinesOnSelectedDate, $tubesOnSelectedDate, $temperaturesOnSelectedDate, $bloodpressuresOnSelectedDate, $toiletsOnSelectedDate, $kyuuinsOnSelectedDate, $hossasOnSelectedDate, $speechesOnSelectedDate, $lastTime, $lastMorningActivity, $lastAfternoonActivity, $lastActivity, $lastTraining, $lastLifestyle, $lastCreative])->every(fn($collection) => is_null($collection) || (is_array($collection) ? collect($collection)->isEmpty() : false));
+    $dataExists = collect([$foodsOnSelectedDate, $watersOnSelectedDate, $medicinesOnSelectedDate, $tubesOnSelectedDate, $temperaturesOnSelectedDate, $bloodpressuresOnSelectedDate, $toiletsOnSelectedDate, $kyuuinsOnSelectedDate, $hossasOnSelectedDate, $speechesOnSelectedDate, $lastTime, $lastMorningActivity, $lastAfternoonActivity, $lastActivity, $lastTraining, $lastLifestyle, $lastCreative, $lastOptions, $lastNotebook])->every(fn($collection) => is_null($collection) || (is_array($collection) ? collect($collection)->isEmpty() : false));
 @endphp
 
-@if ($dataExists)
+@if (!$dataExists)
     @php 
         $stampExists = false;
         foreach ($records as $record) {
@@ -729,7 +744,7 @@
             }
         }
     @endphp
-
+   
     @foreach ($records as $record)
         <div class="oya-stamp-box">
             <div class="stamp-box mt-3">
@@ -748,8 +763,7 @@
             <p class="text-green-600 font-bold">すでに押印済みです。</p>
         @endif
     @endforeach
-
-    @hasanyrole('client family user|client family reader')
+    
         @if (!$stampExists)
             <form id="hanko-form" action="{{ route('recordstamp.store', $person->id) }}" method="POST">
                 @csrf
@@ -759,7 +773,7 @@
                     <input type="hidden" name="people_id" value="{{ $person->id }}">
                     <input type="hidden" name="kiroku_date" value="{{ $selectedDate }}">
                     
-                    <textarea id="hanko-area" name="hanko_name" class="w-full max-w-lg font-bold" style="width: 150px; height: 50px; color: black; font-size: 20px; text-align: center;" placeholder="お名前">{{ Auth::check() ? Auth::user()->name : '' }}</textarea>
+                    <textarea id="hanko-area" name="hanko_name" class="w-full max-w-lg font-bold" style="width: 150px; height: 50px; color: black; font-size: 20px; text-align: center;" placeholder="お名前">{{ Auth::check() ? Auth::user()->last_name : '' }}</textarea>
                     <button id="hanko-btn" type="submit" class="inline-flex items-center w-32 px-6 py-3 mt-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
                         押印する
                     </button>
@@ -778,7 +792,7 @@
                 </div>	
             </div>	
         @endif
-    @endhasanyrole
+
 
     @if(session('message'))
         <div id="hanko-message" class="text-green-600 font-bold text-xl mt-4">

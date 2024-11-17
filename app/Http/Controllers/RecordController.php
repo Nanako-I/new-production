@@ -191,6 +191,16 @@ public function RecordStampshow(Request $request, $people_id)
     $hossasOnSelectedDate = $person->hossas ? $person->hossas->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]) : collect();
     $speechesOnSelectedDate = $person->speeches ? $person->speeches->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]) : collect();
 
+    $lastOptions = OptionItem::where('people_id', $people_id)
+    ->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd])
+    ->latest()
+    ->first();
+    // 対応するOptionモデルのデータを取得 
+    $correspondingOption = null;
+    if ($lastOptions) {
+    $correspondingOption = Option::where('id', $lastOptions->option_id)->first();
+    }
+
     // hanamaruの項目↓
     $lastTime = Time::where('people_id', $people_id)
     ->whereDate('created_at', $selectedDate)
@@ -228,8 +238,13 @@ public function RecordStampshow(Request $request, $people_id)
         ->whereDate('created_at', $selectedDate)
         ->latest()
         ->first();    
+    
+    $lastNotebook = Notebook::where('people_id', $people_id)	
+    ->whereDate('created_at', $selectedDate)	
+    ->latest()	
+    ->first(); 
 
-    return view('recordstamp', compact('person', 'selectedDate', 'records', 'stamps','timesOnSelectedDate','foodsOnSelectedDate',  'watersOnSelectedDate' , 'medicinesOnSelectedDate', 'tubesOnSelectedDate',  'temperaturesOnSelectedDate', 'bloodpressuresOnSelectedDate','toiletsOnSelectedDate','kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate' , 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative',));
+    return view('recordstamp', compact('person', 'selectedDate', 'records', 'stamps','timesOnSelectedDate','foodsOnSelectedDate',  'watersOnSelectedDate' , 'medicinesOnSelectedDate', 'tubesOnSelectedDate',  'temperaturesOnSelectedDate', 'bloodpressuresOnSelectedDate','toiletsOnSelectedDate','kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate' , 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative','lastOptions', 'correspondingOption', 'lastNotebook'));
 }
 
 // 家族側の押印処理↓

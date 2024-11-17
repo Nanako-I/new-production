@@ -1972,20 +1972,7 @@
                                   </div>
                                 @endif 
                                       
-                                    <!-- <div class="border-2 p-2 rounded-lg bg-white mx-2 mb-2 mt-8">
-                                          <div class="flex justify-start items-center">
-                                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-                                            <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
-                                            <i class="fa-regular fa-clipboard text-green-700" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
-                                            <p class="font-bold text-xl ml-2">連絡帳の文章作成</p>
-                                          </div>
-                                          <div class="flex justify-center mt-4">
-                                            <a href="{{ url('notebookwriting/'.$person->id) }}" class="relative">
-                                              @csrf
-                                              <i class="material-icons md-90">add</i>
-                                            </a>
-                                          </div>
-                                    </div> -->
+                                    
 
                                     <div class="border-2 p-2 rounded-lg bg-white mx-2 mb-2 mt-8">
                                           <div class="flex justify-start items-center">
@@ -2005,7 +1992,7 @@
                                                 <!-- 登録済みの場合 -->
                                                 <a href="{{ url('notebookchange/'.$person->id) }}" class="relative ml-2 flex items-center">
                                                     @csrf
-                                                    <p class="font-bold text-xl p-2">{{ $todayNotebook->notebook }}</p>
+                                                    <p class="font-bold text-xl p-2">{{ Str::limit($todayNotebook->notebook, 10, '...') }}</p>
                                                     <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s; vertical-align: middle;"></i>
                                                 </a>
                                             @else

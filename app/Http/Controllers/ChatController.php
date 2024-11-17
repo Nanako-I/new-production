@@ -77,73 +77,86 @@ class ChatController extends Controller
     //      return redirect()->route('chat.show', $conversationId);
     //  }
     public function store(Request $request, $people_id)
-{
-    \Log::info('Store method called with people_id: ' . $people_id);
-    \Log::info('Request data: ' . json_encode($request->all()));
+    {
+        \Log::info('Store method called with people_id: ' . $people_id);
+        \Log::info('Request data: ' . json_encode($request->all()));
+    
+        try {
+            $person = Person::findOrFail($people_id);
+    
+            $user = Auth::user();
+if ($user) {
+    $user_name = $user->last_name . ' ' . $user->first_name;
+    $user_identifier = $user->id;
 
-    try {
-        $person = Person::findOrFail($people_id);
-
-        $user = Auth::user();
-        if ($user) {
-            $user_name = $user->name;
-            $user_identifier = $user->id;
-        } else {
-            $user_name = 'Guest';
-            $user_identifier = Str::random(20);
+    // ユーザーが指定された役割を持っているか確認
+    if ($user->hasAnyRole(['facility staff administrator', 'facility staff user', 'facility staff reader'])) {
+        $facility = $user->facility_staffs()->first();
+        if ($facility) {
+            $user_name = $facility->facility_name;
         }
-
-        session(['user_name' => $user_name]);
-        session(['user_identifier' => $user_identifier]);
-
-        // 画像保存
-        $directory = 'sample/chat_photo';
-        $filename = null;
-        $filepath = null;
-
-        if ($request->hasFile('filename')) {
-            \Log::info('File received: ' . $request->file('filename')->getClientOriginalName());
-            
-            $request->validate(['filename' => 'image|max:2048']);
-            $filename = uniqid() . '.' . $request->file('filename')->getClientOriginalExtension();
-            
-            try {
-                $path = $request->file('filename')->storeAs($directory, $filename, 'public');
-                \Log::info('File stored at: ' . $path);
-                $filepath = 'storage/' . $directory . '/' . $filename;
-            } catch (\Exception $e) {
-                \Log::error('File storage failed: ' . $e->getMessage());
-                return response()->json(['error' => 'ファイルの保存に失敗しました。'], 500);
-            }
-        } else {
-            \Log::info('No file received in the request.');
-        }
-
-        $chat = Chat::create([
-            'people_id' => $people_id,
-            'user_name' => $user_name,
-            'user_identifier' => $user_identifier,
-            'message' => $request->message,
-            'filename' => $filename,
-            'path' => $filepath,
-        ]);
-
-        broadcast(new MessageSent($chat))->toOthers();
-
-        return response()->json([
-            'message' => $request->message,
-            'user_identifier' => $user_identifier,
-            'user_name' => $user_name,
-            'created_at' => $chat->created_at->format('Y-m-d H:i:s'),
-            'filename' => $chat->filename
-        ]);
-
-    } catch (\Exception $e) {
-        \Log::error('Error in store method: ' . $e->getMessage());
-        \Log::error('Stack trace: ' . $e->getTraceAsString());
-        return response()->json(['error' => $e->getMessage()], 500);
     }
+} else {
+    $user_name = 'Guest';
+    $user_identifier = Str::random(20);
 }
+    
+            session(['user_name' => $user_name]);
+            session(['user_identifier' => $user_identifier]);
+            \Log::info('Session user_name: ' . session('user_name'));
+            // 画像保存
+            $directory = 'sample/chat_photo';
+            $filename = null;
+            $filepath = null;
+    
+            if ($request->hasFile('filename')) {
+                \Log::info('File received: ' . $request->file('filename')->getClientOriginalName());
+                
+                $request->validate(['filename' => 'image|max:2048']);
+                $filename = uniqid() . '.' . $request->file('filename')->getClientOriginalExtension();
+                
+                try {
+                    $path = $request->file('filename')->storeAs($directory, $filename, 'public');
+                    \Log::info('File stored at: ' . $path);
+                    $filepath = 'storage/' . $directory . '/' . $filename;
+                } catch (\Exception $e) {
+                    \Log::error('File storage failed: ' . $e->getMessage());
+                    return response()->json(['error' => 'ファイルの保存に失敗しました。'], 500);
+                }
+            } else {
+                \Log::info('No file received in the request.');
+            }
+    
+            $chat = Chat::create([
+                'people_id' => $people_id,
+                'user_name' => $user_name,
+                'user_identifier' => $user_identifier,
+                'message' => $request->message,
+                'filename' => $filename,
+                'path' => $filepath,
+                'last_name' => $user ? $user->last_name : null,
+                'first_name' => $user ? $user->first_name : null,
+            ]);
+    
+            broadcast(new MessageSent($chat))->toOthers();
+    
+            return response()->json([
+                'message' => $request->message,
+                'user_identifier' => $user_identifier,
+                'user_name' => $user_name,
+                'created_at' => $chat->created_at->format('Y-m-d H:i:s'),
+                'filename' => $chat->filename,
+                'last_name' => $chat->last_name,
+                'first_name' => $chat->first_name,
+            ]);
+    
+        } catch (\Exception $e) {
+            \Log::error('Error in store method: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    
 
 
 
@@ -198,13 +211,10 @@ class ChatController extends Controller
    // データベース内の指定されたpeople_idのチャットの件数を取得
     $length = Chat::where('people_id', $people_id)->count();
 
-    // 表示するチャットメッセージの件数を設定
-    $display = 5;
 
     // 指定されたpeople_idの最新の5件のチャットメッセージを取得
     $chats = Chat::where('people_id', $people_id)
-                 ->offset($length - $display)
-                 ->limit($display)
+                 ->orderBy('created_at', 'asc')
                  ->get(['*', 'filename', 'path']);
 
     $unreadMessages = Chat::where('people_id', $people_id)

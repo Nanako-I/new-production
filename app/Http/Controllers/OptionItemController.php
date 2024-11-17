@@ -112,17 +112,20 @@ public function change(Request $request, $people_id, $id)
     $optionItem = OptionItem::findOrFail($id);
     $option = Option::where('id', $optionItem->option_id)->first();
 
-    // Get only the items that have data in the options table
     $validItems = [];
     for ($i = 1; $i <= 5; $i++) {
         $itemKey = "item{$i}";
         if (!empty($option->$itemKey)) {
+            $itemValue = json_decode($optionItem->$itemKey, true);
             $validItems[$itemKey] = [
                 'optionData' => $option->$itemKey,
-                'itemData' => json_decode($optionItem->$itemKey),
+                'itemData' => $itemValue,
+                'isChecked' => is_array($itemValue) && in_array('1', $itemValue)
             ];
         }
     }
+
+    \Log::info('Valid Items:', $validItems);
 
     return view('optionchange', compact('person', 'optionItem', 'option', 'validItems'));
 }
