@@ -252,7 +252,7 @@
 
     </head>
     <body class="font-sans antialiased" style="margin-bottom: 60px;">
-    <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div class="bg-gray-100 dark:bg-gray-900">
         <div id="chatbot">
             <div class="flex flex-col items-center">
                 <form action="{{ url('people' ) }}" method="POST" class="w-full max-w-lg">
