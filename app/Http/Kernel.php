@@ -21,6 +21,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        \App\Http\Middleware\PreventIframeEmbedding::class, // 外部サイトからの埋め込み防止用
     ];
 
     /**
@@ -66,5 +67,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'append.custom_id.roles' => \App\Http\Middleware\AppendCustomIdForRoles::class,// ログインしているユーザーが'super administrator', 'facility staff administrator', 'facility staff user', 'facility staff reader'の場合、URLの後ろにcustom_idをつける
+
     ];
 }
