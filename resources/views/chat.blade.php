@@ -80,12 +80,14 @@
 
             #chatbot-body {
                 width: 100%;
-                height: calc(100vh - 110px);
+                /* height: calc(100vh - 110px); */
+                height: calc(100vh - 60px);
                 padding-top: 10px;
                 background: #FFF;
                 box-sizing: border-box;
                 overflow-x: hidden;
-                overflow-y: scroll;
+                /* overflow-y: scroll; */
+                overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
                 -ms-overflow-style: none;
             }
