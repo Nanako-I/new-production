@@ -10,23 +10,23 @@ use Illuminate\Http\Request;
 
 class OptionController extends Controller
 {
-    public function show($id)
-{
-    $person = Person::findOrFail($id);
-    $facility = $person->people_facilities()->first();
-    $options = Option::where('people_id', $id)->get();
-    $selectedItems = OptionItem::where('people_id', $id)->pluck('item1', 'item2', 'item3', 'item4', 'item5')->toArray();
+//     public function show($id)
+// {
+//     $person = Person::findOrFail($id);
+//     $facility = $person->people_facilities()->first();
+//     $options = Option::where('people_id', $id)->get();
+//     $selectedItems = OptionItem::where('people_id', $id)->pluck('item1', 'item2', 'item3', 'item4', 'item5')->toArray();
     
-    $additionalItems = $options->map(function ($option) {
-        return [
-            'id' => $option->id,
-            'title' => $option->title,
-            'items' => $option->getItemsAsString(),
-        ];
-    })->toArray();
+//     $additionalItems = $options->map(function ($option) {
+//         return [
+//             'id' => $option->id,
+//             'title' => $option->title,
+//             'items' => $option->getItemsAsString(),
+//         ];
+//     })->toArray();
 
-    return view('people', compact('person', 'facility', 'options', 'selectedItems', 'additionalItems'));
-}
+//     return view('people', compact('person', 'facility', 'options', 'selectedItems', 'additionalItems'));
+// }
 
     public function store(Request $request, $people_id, $id)
 {

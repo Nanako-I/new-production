@@ -182,7 +182,8 @@ class PersonController extends Controller
                 ->get();
     }
 
-    return view('people', compact('people', 'selectedItems', 'personOptions', 'options', 'id'));
+    // return view('people', compact('people', 'selectedItems', 'personOptions', 'options', 'id'));
+    return redirect()->route('people.index');
 }
 
     /**
@@ -293,7 +294,8 @@ class PersonController extends Controller
 
         // 二重送信防止
         $request->session()->regenerateToken();
-        return view('people', compact('people'));
+        // return view('people', compact('people'));
+        return redirect()->route('people.index');
     }
 
 
@@ -446,8 +448,9 @@ class PersonController extends Controller
             $selectedItems[$person->id] = json_decode($person->selected_items, true) ?? [];
         }
 
-        return view('people', compact('people', 'selectedItems'))->with('success', '利用者情報が更新されました。');
-        }
+        // return view('people', compact('people', 'selectedItems'))->with('success', '利用者情報が更新されました。');
+        return redirect()->route('people.index')->with('success', '利用者情報が更新されました。');
+    }
 
     // 登録項目の選択↓
     public function showSelectedItems($people_id, $id)

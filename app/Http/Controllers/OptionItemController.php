@@ -95,7 +95,8 @@ class OptionItemController extends Controller
     // 二重送信防止
    $request->session()->regenerateToken();
 
-       return view('people', compact('people', 'selectedItems', 'options'));
+    //    return view('people', compact('people', 'selectedItems', 'options'));
+    return redirect()->route('people.index');
     }
 
 //     public function change(Request $request, $people_id, $id)
@@ -222,8 +223,8 @@ public function change(Request $request, $people_id, $id)
             ->get();
     }
 
-    //    return view('people', compact('people', 'selectedItems', 'options'));
-    return view('people', compact('people', 'selectedItems', 'options', 'personOptions', 'optionItem', 'option'));
+    // return view('people', compact('people', 'selectedItems', 'options', 'personOptions', 'optionItem', 'option'));
+    return redirect()->route('people.index');
     }
 
     /**

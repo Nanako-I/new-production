@@ -18,7 +18,7 @@ class TimeController extends Controller
     {
        $time = Time::all();
         // ('people')に$peopleが代入される
-        return view('people',compact('time'));
+        return redirect()->route('people.index');
     }
 
     /**
@@ -64,7 +64,8 @@ class TimeController extends Controller
     $people = Person::all();
      // 二重送信防止
     $request->session()->regenerateToken();
-    return view('people', compact('time', 'people'));
+    // return view('people', compact('time', 'people'));
+    return redirect()->route('people.index');
 }
 
     /**
@@ -78,7 +79,8 @@ class TimeController extends Controller
     $person = Person::findOrFail($people_id);
     $time = $person->times;
    
-    return view('people',compact('time'));
+    // return view('people',compact('time'));
+    return redirect()->route('people.index');
 }
 
     /**
@@ -147,7 +149,8 @@ class TimeController extends Controller
         // 二重送信防止
         $request->session()->regenerateToken();
 
-        return view('people', compact('time', 'people'));
+        // return view('people', compact('time', 'people'));
+        return redirect()->route('people.index');
     }
 
     /**

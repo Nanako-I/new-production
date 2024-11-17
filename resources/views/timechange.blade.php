@@ -93,7 +93,7 @@
                             </div>
                             
       
-                            <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
+                            <!-- <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
                                 <input type="checkbox" name="pick_up[]" value="迎え" @if(!empty($pick_upData)) checked @endif class="w-6 h-6">
                                 <p class="text-gray-900 font-bold text-xl px-1.5">迎え</p>
                             </div>
@@ -101,7 +101,7 @@
                             <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
                                 <input type="checkbox" name="send[]" value="送り" @if(!empty($sendData)) checked @endif class="w-6 h-6">
                                 <p class="text-gray-900 font-bold text-xl px-1.5">送り</p>
-                            </div>
+                            </div> -->
                     @endif
                     <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
                     <button type="submit" class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">

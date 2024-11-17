@@ -27,26 +27,19 @@ class FoodController extends Controller
     
     //** ↑ 上をコピー ↑ **
 }
-    // public function index()
-    // {
-    // // 
-    //     $food = Food::all();
-      
-    //     return view('people',compact('food'));
-    // }
+    
 
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-   public function create(Request $request)
-{
-    $person = Food::findOrFail($request->people_id);
-    // return redirect()->route('food.edit', ['people_id' => $person->id]);
-    // return view('people');
-    return view('people', ['people' => Person::all()]);
-}
+//    public function create(Request $request)
+// {
+//     $person = Food::findOrFail($request->people_id);
+   
+//     return view('people', ['people' => Person::all()]);
+// }
 
     /**
      * Store a newly created resource in storage.
@@ -80,7 +73,8 @@ class FoodController extends Controller
     // return redirect('people/{id}/edit');
     $people = Person::all();
     $request->session()->regenerateToken();
-    return view('people', compact('food', 'people'));
+    // return view('people', compact('food', 'people'));
+    return redirect()->route('people.index');
     }
 
     /**
@@ -89,13 +83,13 @@ class FoodController extends Controller
      * @param  \App\Models\Food  $food
      * @return \Illuminate\Http\Response
      */
-    public function showFood($id)
-{
+//     public function showFood($id)
+// {
     
-    $person = Person::findOrFail($id);
-    $foods = $person->foods;
-    return view('people', compact('foods'));
-}
+//     $person = Person::findOrFail($id);
+//     $foods = $person->foods;
+//     return view('people', compact('foods'));
+// }
 
 
 
@@ -161,7 +155,8 @@ public function edit(Request $request, $people_id)
     $food->save();
     
     $people = Person::all();
-    return redirect()->route('people.show', $people_id)->with('success', '食事情報が更新されました。');
+    // return redirect()->route('people.show', $people_id)->with('success', '食事情報が更新されました。');
+    return redirect()->route('people.index')->with('success', '食事情報が更新されました。');
 }
     
  
