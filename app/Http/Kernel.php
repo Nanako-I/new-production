@@ -65,5 +65,6 @@ class Kernel extends HttpKernel
         'signed.redirect' => \App\Http\Middleware\ValidationSignatureRedirect::class,// 追記
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'append.custom_id.roles' => \App\Http\Middleware\AppendCustomIdForRoles::class,// ログインしているユーザーが'super administrator', 'facility staff administrator', 'facility staff user', 'facility staff reader'の場合、URLの後ろにcustom_idをつける
     ];
 }

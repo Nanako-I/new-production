@@ -40,6 +40,7 @@ class PersonController extends Controller
 
         // facility_staffsメソッドからuserの情報をゲットする↓
         $facilities = $user->facility_staffs()->get();
+        $facilityIds = $facilities->pluck('id')->toArray();
 
         $roles = $user->user_roles()->get(); // これでロールが取得できる
 
@@ -51,7 +52,12 @@ class PersonController extends Controller
 
         $firstFacility = $facilities->first();
         if ($firstFacility) {
-            $people = $firstFacility->people_facilities()->get();
+            // $people = $firstFacility->people_facilities()->get();
+             // ユーザーの施設に関連付けられているpeopleを取得
+            $people = Person::whereHas('people_facilities', function ($query) use ($facilityIds) {
+                $query->whereIn('facilities.id', $facilityIds);
+            })->get();
+            // dd($people);
             // 本日の日付を取得
             $today = \Carbon\Carbon::now()->toDateString();
             // $people = $firstFacility->people_facilities()->get();
@@ -111,7 +117,8 @@ class PersonController extends Controller
     return view('people', compact('people', 'selectedItems', 'options', 'personOptions'));
     }
     else {
-        $people = collect([]); // 空のコレクションを作成
+        // $people = collect([]); // 空のコレクションを作成
+        return redirect()->route('before-login')->withErrors(['access_denied' => 'アクセス権限がありません。']);
 }
 }
 

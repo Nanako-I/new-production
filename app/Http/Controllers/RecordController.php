@@ -57,26 +57,40 @@ class RecordController extends Controller
     // 職員側の連絡帳↓
     public function show(Request $request, $people_id)
 {
-   
-    // $person = Person::findOrFail($people_id);
-    $person = Person::with(['foods', 'temperatures', 'toilets', 'waters'])->findOrFail($people_id);
+    $user = auth()->user();
+    $facilities = $user->facility_staffs()->get();
+    $facilityIds = $facilities->pluck('id')->toArray();
+
+    // 指定されたpersonがユーザーの施設に関連付けられているか確認
+    $person = Person::where('id', $people_id)
+                    ->whereHas('people_facilities', function ($query) use ($facilityIds) {
+                        $query->whereIn('facilities.id', $facilityIds);
+                    })
+                    ->firstOrFail();
+                    // dd($person);
+
+    if (!$person) {
+        // アクセス拒否
+        return redirect()->route('home')->withErrors(['access_denied' => 'アクセス権限がありません。']);
+    }
+
+    // 既存の処理を続ける
     $today = \Carbon\Carbon::now()->toDateString();
     $selectedDate = $request->input('selected_date', \Carbon\Carbon::now()->toDateString());
     $selectedDateStart = \Carbon\Carbon::parse($selectedDate)->startOfDay();    
     $selectedDateEnd = \Carbon\Carbon::parse($selectedDate)->endOfDay();
     
-     // 選択された日付に該当する記録をすべて取得
-     $records = Record::where('person_id', $people_id)
-     ->whereBetween('kiroku_date', [$selectedDateStart, $selectedDateEnd])
-     ->get();
+    // 選択された日付に該当する記録をすべて取得
+    $records = Record::where('person_id', $people_id)
+                     ->whereBetween('kiroku_date', [$selectedDateStart, $selectedDateEnd])
+                     ->get();
 
     // 各記録に対して押印情報を取得
     $stamps = [];
     foreach ($records as $record) {
-     // 各記録ごとに押印情報を取得
-     $stamp = Record::where('id', $record->id)->first();
-     $stamps[$record->id] = $stamp;
- }
+        $stamp = Record::where('id', $record->id)->first();
+        $stamps[$record->id] = $stamp;
+    }
 
     $timesOnSelectedDate = $person->times ? $person->times->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]) : collect();
     $foodsOnSelectedDate = $person->foods->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]);
