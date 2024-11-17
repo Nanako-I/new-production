@@ -27,7 +27,7 @@
                 font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, "Helvetica Neue", YuGothic, "ヒラギノ角ゴ ProN W3", Hiragino Kaku Gothic ProN, Arial, "メイリオ", Meiryo, sans-serif;
                 -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
                 tap-highlight-color: rgba(0, 0, 0, 0);
-                overflow-x: hidden;
+                overflow: hidden;
             }
 
             a {
@@ -49,6 +49,8 @@
                 -webkit-font-smoothing: none;
                 -webkit-font-smoothing: antialiased;
                 -webkit-font-smoothing: subpixel-antialiased;
+                height: 100vh;
+                width: 100vw;
             }
 
             @media screen and (min-width: 700px) {
@@ -119,6 +121,7 @@
                 bottom: 0;
                 left: 0;
                 padding: 10px;
+                z-index: 1000;
             }
 
             @media screen and (min-width: 700px) {
@@ -252,7 +255,7 @@
 
     </head>
     <body class="font-sans antialiased" style="margin-bottom: 60px;">
-    <div class="bg-gray-100 dark:bg-gray-900">
+    <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
         <div id="chatbot">
             <div class="flex flex-col items-center">
                 <form action="{{ url('people' ) }}" method="POST" class="w-full max-w-lg">
