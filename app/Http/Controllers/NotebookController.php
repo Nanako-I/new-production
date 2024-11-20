@@ -105,6 +105,7 @@ class NotebookController extends Controller
     
 
     $person = Person::findOrFail($people_id);
+    // $this->authorize('view', $person);
     $notebooks = $person->notebooks;
 
     $today = \Carbon\Carbon::now()->toDateString();

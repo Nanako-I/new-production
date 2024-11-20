@@ -58,21 +58,20 @@ class RecordController extends Controller
     public function show(Request $request, $people_id)
 {
     $user = auth()->user();
-    $facilities = $user->facility_staffs()->get();
-    $facilityIds = $facilities->pluck('id')->toArray();
+$facilities = $user->facility_staffs()->get();
+$facilityIds = $facilities->pluck('id')->toArray();
 
-    // 指定されたpersonがユーザーの施設に関連付けられているか確認
-    $person = Person::where('id', $people_id)
-                    ->whereHas('people_facilities', function ($query) use ($facilityIds) {
-                        $query->whereIn('facilities.id', $facilityIds);
-                    })
-                    ->firstOrFail();
-                    // dd($person);
+// 指定されたpersonがユーザーの施設に関連付けられているか確認
+$person = Person::where('id', $people_id)
+                ->whereHas('people_facilities', function ($query) use ($facilityIds) {
+                    $query->whereIn('facility_id', $facilityIds);
+                })
+                ->first();
 
-    if (!$person) {
-        // アクセス拒否
-        return redirect()->route('home')->withErrors(['access_denied' => 'アクセス権限がありません。']);
-    }
+// if (!$person) {
+//     // アクセス拒否
+//     return redirect()->route('home')->withErrors(['access_denied' => 'アクセス権限がありません。']);
+// }
 
     // 既存の処理を続ける
     $today = \Carbon\Carbon::now()->toDateString();

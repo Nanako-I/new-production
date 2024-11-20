@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Models\Role as SpatieRole;
 use App\Enums\Role as RoleEnum;
+use App\Scopes\FacilityScope;
 
 class Person extends Model
 {
@@ -125,14 +126,14 @@ public function foods()
         return $this->hasMany(Speech::class,'people_id');
     }
     
-    public function notebooks()
-    {
-        return $this->hasMany(Notebook::class, 'people_id');
-    }
-    
     public function notifications()
     {
         return $this->hasMany(Notification::class,'people_id');
+    }
+
+    public function notebooks()
+    {
+    return $this->hasMany(Notebook::class, 'people_id');
     }
     
     public function hogoshas()
@@ -213,4 +214,8 @@ public function foods()
         
     }
     
+    protected static function booted()
+    {
+        static::addGlobalScope(new FacilityScope);
+    }
 }

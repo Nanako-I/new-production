@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Person;
+use App\Policies\PersonPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -15,6 +17,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
+        Person::class => PersonPolicy::class,
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
     ];
 
@@ -26,14 +29,13 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
+        // Gate::define('role', function ($user) {
+        //     // ユーザーが持つ役割を取得します
+        //     $roles = $user->roles;
 
-        Gate::define('role', function ($user) {
-            // ユーザーが持つ役割を取得します
-            $roles = $user->roles;
-
-            // 役割の中に"staff"があるかどうかをチェックします
-            return $roles->contains('name', 'staff');
-        });
+        //     // 役割の中に"staff"があるかどうかをチェックします
+        //     return $roles->contains('name', 'staff');
+        // });
 
         // SuperAdministratorの場合、全ての権限無視して実行できる
         // 上記既存コードと当たるかもしれないので一旦コメントアウト
