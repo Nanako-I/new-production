@@ -12,12 +12,12 @@
                id="share-email" 
                title="Email" 
                class="text-white bg-blue-500 p-2 rounded flex items-center justify-center">
-                <i class="fas fa-envelope text-2xl"></i>
+                <i class="fas fa-envelope text-3xl"></i>
             </a>
             <button type="button" 
                     id="share-line"
                     class="text-white bg-green-500 p-2 rounded flex items-center justify-center">
-                <i class="fab fa-line text-2xl"></i>
+                <i class="fab fa-line text-3xl"></i>
             </button>
         </div>
     </div>
@@ -26,7 +26,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const shareUrl = "{!! $url !!}";
-        const defaultMessage = "新連絡帳システムのご案内です。以下のリンクから新規登録してください。有効期限は本メッセージ送信後1時間以内となります。有効期限切れの場合はその旨お知らせください:";
+        const defaultMessage = "新連絡帳システムのご案内です。以下のリンクから新規登録してください。有効期限は本メッセージ送信後24時間以内となります。有効期限切れの場合は施設管理者に再送をご依頼ください:";
 
         // Emailシェア
         document.getElementById('share-email').addEventListener('click', function (e) {
@@ -44,7 +44,7 @@
                 window.location.href = `line://msg/text/${encodeURIComponent(defaultMessage + "\n" + shareUrl)}`;
             } else {
                 const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(defaultMessage)}`;
-                window.location.href = lineShareUrl;
+                window.open(lineShareUrl, '_blank');
             }
         });
     });

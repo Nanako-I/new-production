@@ -16,7 +16,7 @@ class URLController extends Controller
     
     $url = URL::temporarySignedRoute(
         'signed.invitation', 
-        now()->addHours(1), 
+        now()->addHours(24), 
         ['signedUrl' => 'preregistrationmail']
     );
     
@@ -27,7 +27,7 @@ public function staffsendInvitation()
 {
     $url = URL::temporarySignedRoute(
         'signed.invitation_staff', 
-        now()->addHours(1),
+        now()->addHours(24),
         ['signedUrl' => 'preregistrationmail']
         
     );
