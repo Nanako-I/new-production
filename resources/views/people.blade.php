@@ -70,20 +70,33 @@
                   <div class="p-2 h-full lg:w-1/3 md:w-full flex">
                    <div class="slide height:auto  border-2 p-2 p-4 w-full md:w-64 lg:w-100 rounded-lg bg-white">
                      <style>
-                      .slide {
-                        width:100vw;
+                        .slider {
+                            display: flex;
+                            flex-wrap: wrap;
+                            justify-content: center; /* 中央揃え */
+                            gap: 10px; /* スライド間の余白 */
+                        }
+                        .slide {
+                            flex: 1 1 500px; /* 最小幅300px、最大幅は親コンテナに基づく */
+                            min-width: 400px;
+                            max-width: 600px; /* 最大幅を設定 */
+                            background: rgb(244,244,244);
+                            margin: 10px; /* スライド間の余白 */
+                        }
+                      /* .slide {
+                        width:300px;
                         background: rgb(244,244,244);
                       }
                       @media screen and (min-width: 768px){
                         .slide {
-                            width:600px;
+                            width:1000px;
                         }
                       }
                       @media screen and (min-width: 1024px){
                         .slide {
-                            width:700px;
+                            width:1300px;
                         }
-                      }
+                      } */
                      
                      </style>
                      
