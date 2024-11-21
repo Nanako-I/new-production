@@ -16,6 +16,16 @@ class PersonPolicy
             return true;
         }
 
+        // 保護者の新規登録時はポリシーを適用しない
+        if (request()->routeIs('hogosha.register')) {
+        return true;
+        }
+
+        // ユーザーがsuper administratorの場合は全ての情報を閲覧可能
+        if ($user->hasRole('super administrator')) {
+            return true;
+        }
+
         if ($user->hasRole(['facility staff administrator', 'facility staff user', 'facility staff reader'])) {
             $facilityIds = $user->facility_staffs->pluck('id')->toArray();
             return $person->people_facilities->whereIn('facility_id', $facilityIds)->isNotEmpty();

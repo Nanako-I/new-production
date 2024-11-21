@@ -214,8 +214,18 @@ public function foods()
         
     }
     
+    // protected static function booted()
+    // {
+    //     static::addGlobalScope(new FacilityScope);
+    // }
+    // リクエストのルート名を取得
     protected static function booted()
-    {
+{
+    $routeName = request()->route() ? request()->route()->getName() : null;
+    
+    // 特定のルートの場合はグローバルスコープを適用しない
+    if ($routeName !== 'hogoshanumber.store') {
         static::addGlobalScope(new FacilityScope);
     }
+}
 }

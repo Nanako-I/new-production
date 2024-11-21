@@ -29,49 +29,67 @@ class HogoshaUserController extends Controller
    }
    
    public function register(Request $request)
-{
-    try {
-        $validatedData = $request->validate([
-            'last_name' => ['required', 'string', 'max:255'],
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name_kana' => ['nullable', 'string', 'max:255'],
-            'first_name_kana' => ['nullable', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
-            'password' => [
-                'required',
-                'string',
-                'min:8',
-                'confirmed',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/' // 大文字小文字英数字含む
-            ]
-        ]);
-
-        // バリデーションが成功した場合の処理
-        $userData = [
-            'last_name' => $validatedData['last_name'],
-            'first_name' => $validatedData['first_name'],
-            'last_name_kana' => $validatedData['last_name_kana'],
-            'first_name_kana' => $validatedData['first_name_kana'],
-            'email' => $validatedData['email'],
-            // 'password' => Hash::make($validatedData['password']), // セッションに保存する時にもハッシュ化するとPWが二重でハッシュ化されてしまう
-            'password' => $validatedData['password'],
-            'terms_accepted' => session('terms_accepted', false),
-            'privacy_accepted' => session('privacy_accepted', false),
-            'terms_accepted_at' => session('terms_accepted_at'),
-            'privacy_accepted_at' => session('privacy_accepted_at')
-        ];
-
-        $request->session()->put('user_data', $userData);
-
-        return view('hogoshanumber', compact('userData'));
-
-    } catch (ValidationException $e) {
-        // バリデーションが失敗した場合の処理
-        return view('hogosharegister')
-                         ->withErrors($e->errors())
-                         ->withInput();
-    }
-}
+   {
+       try {
+           $validatedData = $request->validate([
+               'last_name' => ['required', 'string', 'max:255'],
+               'first_name' => ['required', 'string', 'max:255'],
+               'last_name_kana' => ['required', 'string', 'max:255', 'regex:/^[ァ-ヶー]+$/u'],
+               'first_name_kana' => ['required', 'string', 'max:255', 'regex:/^[ァ-ヶー]+$/u'],
+               'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
+               'password' => [
+                   'required',
+                   'string',
+                   'min:8',
+                   'confirmed',
+                   'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/' // 大文字小文字英数字含む
+               ]
+           ], [
+               'last_name.required' => '姓を入力してください。',
+               'last_name.max' => '姓は255文字以内で入力してください。',
+               'first_name.required' => '名を入力してください。',
+               'first_name.max' => '名は255文字以内で入力してください。',
+               'last_name_kana.required' => 'セイを入力してください。',
+               'last_name_kana.max' => 'セイは255文字以内で入力してください。',
+               'last_name_kana.regex' => 'セイはカタカナで入力してください。',
+               'first_name_kana.required' => 'メイを入力してください。',
+               'first_name_kana.max' => 'メイは255文字以内で入力してください。',
+               'first_name_kana.regex' => 'メイはカタカナで入力してください。',
+               'email.required' => 'メールアドレスを入力してください。',
+               'email.email' => '有効なメールアドレスを入力してください。',
+               'email.max' => 'メールアドレスは255文字以内で入力してください。',
+               'email.unique' => 'このメールアドレスは既に使用されています。',
+               'password.required' => 'パスワードを入力してください。',
+               'password.min' => 'パスワードは8文字以上で入力してください。',
+               'password.confirmed' => 'パスワードが一致しません。',
+               'password.regex' => 'パスワードは大文字、小文字、数字を含む必要があります。'
+           ]);
+   
+           // バリデーションが成功した場合の処理
+           $userData = [
+               'last_name' => $validatedData['last_name'],
+               'first_name' => $validatedData['first_name'],
+               'last_name_kana' => $validatedData['last_name_kana'],
+               'first_name_kana' => $validatedData['first_name_kana'],
+               'email' => $validatedData['email'],
+               'password' => $validatedData['password'],
+               'terms_accepted' => session('terms_accepted', false),
+               'privacy_accepted' => session('privacy_accepted', false),
+               'terms_accepted_at' => session('terms_accepted_at'),
+               'privacy_accepted_at' => session('privacy_accepted_at')
+           ];
+   
+           $request->session()->put('user_data', $userData);
+   
+           return view('hogoshanumber', compact('userData'));
+   
+       } catch (ValidationException $e) {
+           // バリデーションが失敗した場合の処理
+           return view('hogosharegister')
+                            ->withErrors($e->errors())
+                            ->withInput();
+       }
+   }
 
   public function edit(Request $request)
     {
@@ -140,9 +158,12 @@ class HogoshaUserController extends Controller
         ]);
     }
     // 受給者証番号と生年月日で人を検索
-    $person = Person::where('jukyuusha_number', $request->jukyuusha_number)
-                    ->where('date_of_birth', $request->date_of_birth)
-                    ->first();
+    Log::info('クエリ実行前');
+    $person = Person::withoutGlobalScopes()
+    ->where('jukyuusha_number', $request->jukyuusha_number)
+    ->where('date_of_birth', $request->date_of_birth)
+    ->first();
+Log::info('クエリ結果: ' . ($person ? 'データあり' : 'データなし'));
     // Log::info('検索された人物: ' . ($person ? json_encode($person) : 'なし'));
     // 人が見つかった場合
         if ($person) {
