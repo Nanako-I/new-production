@@ -91,6 +91,8 @@
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
                 -ms-overflow-style: none;
+                position: fixed;
+                bottom: 80px; /* フッターの高さ */
             }
 
             @media screen and (max-width: 700px) {
