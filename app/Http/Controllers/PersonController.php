@@ -560,27 +560,32 @@ private function getAdditionalItems($id)
 
 public function showAddItemForm($id)
 {
-    $facility = Facility::findOrFail($id);
-    
+    $user = Auth::user();
+    $facility = $user->facility_staffs()->findOrFail($id);
+    $facilityIds = [$facility->id];
+
     // 施設に関連する全てのオプションを取得
-    $options = Option::where('facility_id', $id)
-                    ->orderBy('created_at', 'desc')
-                    ->get();
+    $options = Option::whereIn('facility_id', $facilityIds)
+                     ->orderBy('option_group_id')
+                     ->get()
+                     ->groupBy('option_group_id');
     
-    $additionalItems = $options->map(function ($option) {
+    $additionalItems = $options->map(function ($groupedOptions, $groupId) {
+        $firstOption = $groupedOptions->first();
         return [
-            'id' => $option->id,
-            'title' => $option->title,
-            'items' => $option->getItemsAsString(),
-            'flag' => $option->flag,
-            'facility_id' => $option->facility_id
+            'id' => $firstOption->id,
+            'group_id' => $groupId,
+            'title' => $firstOption->title,
+            'items' => $firstOption->getItemsAsString(),
+            'flag' => $firstOption->flag,
+            'facility_id' => $firstOption->facility_id
         ];
-    })->toArray();
+    })->values()->toArray();
 
     // デフォルトで全ての項目を選択状態にする
-    $selectedItems = $options->pluck('id')->toArray();
+    $selectedItems = $options->flatten()->pluck('id')->toArray();
 
-    return view('item', compact('facility', 'id', 'additionalItems', 'selectedItems'));
+    return view('item', compact('facility','id' ,'additionalItems', 'selectedItems'));
 }
 
 
@@ -623,16 +628,18 @@ public function updateFacilityItems(Request $request, $facility_id)
 {
     $selectedItems = $request->input('selected_items', []);
     
-    // 施設に関連する全てのオプションを取得
-    $facilityOptions = Option::where('facility_id', $facility_id)->get();
+    // 施設に関連する全てのオプションを取得し、グループ化する
+    $facilityOptions = Option::where('facility_id', $facility_id)
+        ->get()
+        ->groupBy('option_group_id');
     
-    foreach ($facilityOptions as $option) {
-        if (in_array($option->id, $selectedItems)) {
-            $option->flag = 1;
-        } else {
-            $option->flag = 0;
+    foreach ($facilityOptions as $groupId => $options) {
+        $isSelected = in_array($options->first()->id, $selectedItems);
+        
+        foreach ($options as $option) {
+            $option->flag = $isSelected ? 1 : 0;
+            $option->save();
         }
-        $option->save();
     }
 
     return redirect()->back()->with('success', '記録項目が更新されました。');

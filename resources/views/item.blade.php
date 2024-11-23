@@ -42,23 +42,24 @@
                 <form action="{{ route('update.facility.items', $facility->id) }}" method="POST">
     @csrf
     @method('PATCH')
-                @if(!empty($additionalItems))
-        @foreach ($additionalItems as $item)
-        <div class="flex items-center mb-2">
-            <input type="checkbox" 
-                name="selected_items[]" 
-                value="{{ $item['id'] }}" 
-                class="form-checkbox h-5 w-5 text-gray-600"
-                {{ $item['flag'] == 1 ? 'checked' : '' }}>
-            <label class="ml-2 text-gray-700">
-                <p class="text-gray-900 font-bold text-xl px-1.5">{{ $item['title'] }}</p>
-                @if(!empty($item['items']))
-                    <p class="text-gray-500 text-base px-1.5">({{ $item['items'] }})</p>
-                @endif
-            </label>
-        </div>
-        @endforeach
-    @endif
+    @if(!empty($additionalItems))
+    @foreach ($additionalItems as $item)
+    <div class="flex items-center mb-2">
+        <input type="checkbox" 
+            name="selected_items[]" 
+            value="{{ $item['id'] }}" 
+            data-group-id="{{ $item['group_id'] }}"
+            class="form-checkbox h-5 w-5 text-gray-600"
+            {{ $item['flag'] == 1 ? 'checked' : '' }}>
+        <label class="ml-2 text-gray-700">
+            <p class="text-gray-900 font-bold text-xl px-1.5">{{ $item['title'] }}</p>
+            @if(!empty($item['items']))
+                <p class="text-gray-500 text-base px-1.5">({{ $item['items'] }})</p>
+            @endif
+        </label>
+    </div>
+    @endforeach
+@endif
 
                 <!-- 記録項目を追加するボタン -->
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
