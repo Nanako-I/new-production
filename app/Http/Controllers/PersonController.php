@@ -18,6 +18,7 @@ use Spatie\Permission\Models\Role as SpatieRole;
 use App\Enums\RoleType;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use App\Enums\PermissionType;
 use App\Enums\RoleType as RoleEnums;
@@ -221,17 +222,43 @@ class PersonController extends Controller
 
     public function store(Request $request)
     {
-        $storeData = $request->validate([
-            
-            'date_of_birth' => 'required|max:255',
+        $validator = Validator::make($request->all(), [
+            'last_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name_kana' => ['required', 'string', 'regex:/^[ァ-ヶー]+$/u'],
+            'first_name_kana' => ['required', 'string', 'regex:/^[ァ-ヶー]+$/u'],
+            'date_of_birth' => 'required|date',
             'jukyuusha_number' => 'required|digits:10',
+            'filename' => 'nullable|image|max:2048',
+        ], [
+            'last_name.required' => '姓は必須項目です。',
+            'first_name.required' => '名は必須項目です。',
+            'last_name_kana.required' => 'セイは必須項目です。',
+            'last_name_kana.regex' => 'セイはカタカナのみで入力してください。',
+            'first_name_kana.required' => 'メイは必須項目です。',
+            'first_name_kana.regex' => 'メイはカタカナのみで入力してください。',
+            'date_of_birth.required' => '生年月日は必須項目です。',
+            'date_of_birth.date' => '正しい日付形式で入力してください。',
+            'jukyuusha_number.required' => '受給者証番号は必須項目です。',
+            'jukyuusha_number.digits' => '受給者証番号は10桁の数字で入力してください。',
+            'filename.image' => '画像ファイルを選択してください。',
+            'filename.max' => '画像ファイルは2MB以下にしてください。',
         ]);
-        
+    
+        if ($validator->fails()) {
+            return redirect()->back()
+                             ->withErrors($validator)
+                             ->withInput();
+        }
+    
         $user = auth()->user();
         $facilities = $user->facility_staffs()->get();
         $firstFacility = $facilities->first();
-    // dd($firstFacility);
-        if ($firstFacility) {
+    
+        if (!$firstFacility) {
+            return redirect()->back()->withErrors(['facility' => '施設が見つかりません。']);
+        }
+    
             
             // 名前と生年月日が一致する利用者を検索
         $existingPersonByNameAndDob = $firstFacility->people_facilities()
@@ -255,7 +282,7 @@ class PersonController extends Controller
             return back()->withInput($request->all())
                          ->withErrors(['duplicate_jukyuusha_number' => '同じ受給者番号の人がすでに存在します。']);
         }
-    }
+    
    
         
 
@@ -365,7 +392,6 @@ class PersonController extends Controller
             return back()->withInput($request->all())
                          ->withErrors(['duplicate_jukyuusha_number' => '同じ受給者番号の人がすでに存在します。']);
         }
-    }
 
         $person = Person::findOrFail($id);
 
@@ -457,7 +483,7 @@ class PersonController extends Controller
         // return view('people', compact('people', 'selectedItems'))->with('success', '利用者情報が更新されました。');
         return redirect()->route('people.index')->with('success', '利用者情報が更新されました。');
     }
-
+}
     // 登録項目の選択↓
     public function showSelectedItems($people_id, $id)
 {
