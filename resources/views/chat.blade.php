@@ -297,21 +297,23 @@
                 </ul>
             </div>
 
-            <form id="chat-form" action="{{ url('chat/'.$person->id) }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="items-center" id="chatbot-footer">
-                    <input type="hidden" name="user_identifier" value="{{ session('user_identifier') }}">
-                    <input type="hidden" name="last_name" value="{{ $user_name }}">
-                    <label for="filename" style="cursor: pointer;">
-                        <i class="fa-regular fa-image mt-2" style="font-size: 2em;"></i>
-                        <input name="filename" id="filename" type="file" style="display: none;" onChange="uploadFile1()">
-                    </label>
-                    <input type="text" id="chatbot-text" class="browser-default" name="message" placeholder="テキストを入力" required
-                           style="word-wrap: break-word;" data-user-identifier="{{ session('user_identifier') }}">
-                    <button type="submit" id="chatbot-submit">送信</button>
-                </div>
-            </form>
+            
         </div>
+
+        <form id="chat-form" action="{{ url('chat/'.$person->id) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="items-center" id="chatbot-footer">
+                <input type="hidden" name="user_identifier" value="{{ session('user_identifier') }}">
+                <input type="hidden" name="last_name" value="{{ $user_name }}">
+                <label for="filename" style="cursor: pointer;">
+                    <i class="fa-regular fa-image mt-2" style="font-size: 2em;"></i>
+                    <input name="filename" id="filename" type="file" style="display: none;" onChange="uploadFile1()">
+                </label>
+                <input type="text" id="chatbot-text" class="browser-default" name="message" placeholder="テキストを入力" required
+                        style="word-wrap: break-word;" data-user-identifier="{{ session('user_identifier') }}">
+                <button type="submit" id="chatbot-submit">送信</button>
+            </div>
+        </form>
 
         <script>
             function uploadFile1() {
