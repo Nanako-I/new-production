@@ -83,6 +83,7 @@
                 /* height: calc(100vh - 110px); */
                 height: calc(100vh - 60px);
                 padding-top: 10px;
+                padding-bottom: 70px;
                 background: #FFF;
                 box-sizing: border-box;
                 overflow-x: hidden;
