@@ -23,18 +23,18 @@
         @endif
 
         @if (isset($userData))
-            <input type="" id="last_name" name="last_name" value="{{ $userData['last_name'] }}">
+            <input type="hidden" id="last_name" name="last_name" value="{{ $userData['last_name'] }}">
         
-            <input type="" id="first_name" name="first_name" value="{{ $userData['first_name'] }}">
-            <input type="" id="last_name_kana" name="last_name_kana" value="{{ $userData['last_name_kana'] }}">
-            <input type="" id="first_name_kana" name="first_name_kana" value="{{ $userData['first_name_kana'] }}">
-            <input type="" id="email" name="email" value="{{ $userData['email'] }}">
+            <input type="hidden" id="first_name" name="first_name" value="{{ $userData['first_name'] }}">
+            <input type="hidden" id="last_name_kana" name="last_name_kana" value="{{ $userData['last_name_kana'] }}">
+            <input type="hidden" id="first_name_kana" name="first_name_kana" value="{{ $userData['first_name_kana'] }}">
+            <input type="hidden" id="email" name="email" value="{{ $userData['email'] }}">
             <!-- パスワードは通常出力しないが、ここでは例として表示 -->
-            <input type="" id="password" name="password" value="{{ $userData['password'] }}">
-            <input type="" name="terms_accepted" value="{{ $userData['terms_accepted'] ? '1' : '0' }}">
-            <input type="" name="privacy_accepted" value="{{ $userData['privacy_accepted'] ? '1' : '0' }}">
-            <input type="" name="terms_accepted_at" value="{{ $userData['terms_accepted_at'] ?? '' }}">
-            <input type="" name="privacy_accepted_at" value="{{ $userData['privacy_accepted_at'] ?? '' }}">
+            <input type="hidden" id="password" name="password" value="{{ $userData['password'] }}">
+            <input type="hidden" name="terms_accepted" value="{{ $userData['terms_accepted'] ? '1' : '0' }}">
+            <input type="hidden" name="privacy_accepted" value="{{ $userData['privacy_accepted'] ? '1' : '0' }}">
+            <input type="hidden" name="terms_accepted_at" value="{{ $userData['terms_accepted_at'] ?? '' }}">
+            <input type="hidden" name="privacy_accepted_at" value="{{ $userData['privacy_accepted_at'] ?? '' }}">
         @endif
         <div class="flex items-center justify-center">
 
@@ -55,8 +55,14 @@
             @endif
             
             <div class="flex flex-col items-center justify-center">
-                <p class="text-gray-900 font-bold text-xl">ご家族の受給者証番号</p>
-                <textarea id="jukyuusha_number" name="jukyuusha_number" class="w-3/4 max-w-lg font-bold text-xl" style="height: 50px;"></textarea>
+                <p class="text-gray-900 font-bold text-xl mb-2">ご家族の受給者証番号（10桁）</p>
+                <div class="border-2 border-gray-300 rounded-md p-2 mb-4">
+                    <input type="text" id="jukyuusha_number" name="jukyuusha_number" 
+                        class="w-full text-center text-2xl font-bold tracking-widest" 
+                        maxlength="10" placeholder="0000000000" 
+                        style="letter-spacing: 0.5em;">
+                </div>
+                <div id="number-error" class="text-red-500 text-sm hidden"></div>
             </div>
             
             <div class="flex flex-col items-center justify-center pt-2">
@@ -71,4 +77,39 @@
             </div>
         </div>
      </form>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('jukyuusha_number');
+    const errorDiv = document.getElementById('number-error');
+
+    input.addEventListener('input', function(e) {
+        // 数字以外の文字を削除
+        this.value = this.value.replace(/[^0-9]/g, '');
+
+        // 10桁を超える入力を防ぐ
+        if (this.value.length > 10) {
+            this.value = this.value.slice(0, 10);
+        }
+
+        // エラーメッセージの表示/非表示
+        if (this.value.length === 10) {
+            errorDiv.classList.add('hidden');
+        } else {
+            errorDiv.textContent = '受給者証番号は10桁の数字で入力してください。';
+            errorDiv.classList.remove('hidden');
+        }
+    });
+
+        // フォーム送信時のバリデーション
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (input.value.length !== 10) {
+                e.preventDefault();
+                errorDiv.textContent = '受給者証番号は10桁の数字で入力してください。';
+                errorDiv.classList.remove('hidden');
+            }
+        });
+    });
+
+    </script>
 </x-guest-layout>
