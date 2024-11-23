@@ -296,10 +296,8 @@
                     @endforeach
                 </ul>
             </div>
-
-            
         </div>
-
+    </div>
         <form id="chat-form" action="{{ url('chat/'.$person->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="items-center" id="chatbot-footer">
@@ -394,6 +392,6 @@
                 });
             });
         </script>
-    </div>
+    <!-- </div> -->
 </body>
 </x-app-layout>
