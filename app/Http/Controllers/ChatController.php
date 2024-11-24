@@ -112,7 +112,7 @@ if ($user) {
             if ($request->hasFile('filename')) {
                 \Log::info('File received: ' . $request->file('filename')->getClientOriginalName());
                 
-                $request->validate(['filename' => 'image|max:2048']);
+                $request->validate(['filename' => 'image|max:10240']);
                 $filename = uniqid() . '.' . $request->file('filename')->getClientOriginalExtension();
                 
                 try {

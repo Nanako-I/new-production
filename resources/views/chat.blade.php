@@ -361,7 +361,7 @@
 
                 document.getElementById('chat-form').addEventListener('submit', function(e) {
                     e.preventDefault();
-                    var formData = new FormData(this);
+                    var formData = new FormData(document.getElementById('chat-form'));
 
                     const isFileSelected = document.getElementById('filename').files.length > 0;
             
