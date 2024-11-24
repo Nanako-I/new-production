@@ -80,7 +80,7 @@
 
             #chatbot-body {
                 width: 100%;
-                height: calc(100vh - 60px);
+                height: calc(100vh - 150px);
                 padding-top: 10px;
                 padding-bottom: 10px;
                 background: #FFF;
@@ -158,11 +158,11 @@
             }
 
             #chat-form {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-}
+                display: flex;
+                width: 100%;
+                justify-content: space-between;
+                align-items: center;
+            }
 
             #chatbot-text {
                 height: 40px;
