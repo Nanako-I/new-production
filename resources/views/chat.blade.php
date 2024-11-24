@@ -2,7 +2,7 @@
         <!--ヘッダー[START]-->
         <head>
             @vite(['resources/css/app.css', 'resources/js/app.js'])
-
+            <meta name="csrf-token" content="{{ csrf_token() }}">
         <!-- <link rel="stylesheet" href="{{ asset('css/app.css') }}"> -->
         <!-- <script src="{{ asset('js/app.js') }}" defer></script> -->
             <script>
@@ -396,5 +396,57 @@
             });
         </script>
     <!-- </div> -->
+
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+<script>
+     window.PUSHER_APP_KEY = "{{ env('PUSHER_APP_KEY') }}";
+     window.PUSHER_APP_CLUSTER = "{{ env('PUSHER_APP_CLUSTER') }}";
+    document.addEventListener('DOMContentLoaded', function() {
+        Pusher.logToConsole = true;
+
+        var pusher = new Pusher(window.PUSHER_APP_KEY, {
+            cluster: window.PUSHER_APP_CLUSTER,
+            encrypted: true,
+            authEndpoint: '/broadcasting/auth', // Laravelのデフォルトの認証エンドポイント
+    auth: {
+        headers: {
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    }
+        });
+
+        var channel = pusher.subscribe('private-chat-' + peopleId);
+        channel.bind('message.sent', function(data) {
+            console.log('Received message:', data);
+            window.displayMessage(data);
+        });
+
+        window.displayMessage = function(data) {
+            const chatUl = document.getElementById('chatbot-ul');
+            const li = document.createElement('li');
+            const className = data.user_identifier == window.sessionUserIdentifier ? 'self' : 'other';
+            li.classList.add(className);
+
+            li.innerHTML = `
+                <div class="message-container ${className === 'self' ? 'self-message' : 'other-message'}">
+                    <div style="overflow-wrap: break-word;">
+                        <p style="overflow-wrap: break-word;" class="text-gray-900">${data.message}</p>
+                        ${data.filename ? `<img alt="team" class="w-80 h-64" src="/storage/sample/chat_photo/${data.filename}" onerror="this.onerror=null;">` : ''}
+                    </div>
+                    <p class="text-sm font-normal ${className === 'self' ? 'text-right' : 'text-left'}">
+                        ${data.created_at} ＠${data.user_name}
+                    </p>
+                </div>
+            `;
+            chatUl.appendChild(li);
+            chatToBottom();
+        };
+
+        // function chatToBottom() {
+        //     const chatField = document.getElementById('chatbot-body');
+        //     chatField.scrollTop = chatField.scrollHeight;
+        // }
+    });
+</script>
 </body>
 </x-app-layout>

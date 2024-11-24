@@ -21,11 +21,10 @@
             @if ($errors->has('duplicate_name_dob'))
                 <div><strong>{{ $errors->first('duplicate_name_dob') }}</strong></div>
             @endif
-            @if ($errors->has('duplicate_jukyuusha_number'))
-                <div><strong>{{ $errors->first('duplicate_jukyuusha_number') }}</strong></div>
-            @elseif ($errors->has('jukyuusha_number'))
-                <div><strong>受給者証番号は10桁で入力してください。</strong></div>
-            @endif
+            @if ($errors->has('jukyuusha_number'))
+            <div class="mb-2"><strong>{{ $errors->first('jukyuusha_number') }}</strong></div>
+        @endif
+            
         </div>
     @endif
 
@@ -57,20 +56,34 @@
         </div>
 
         <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
-            <!-- <label class="block text-lg font-bold text-gray-700">名前</label> -->
-            <input name="last_name_kana" type="text" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm text-xl font-bold border-gray-300 rounded-md"  value="{{ old('last_name_kana', $person->last_name_kana) }}" placeholder="セイ">
-            <input name="first_name_kana" type="text" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm text-xl font-bold border-gray-300 rounded-md" value="{{ old('first_name_kana', $person->first_name_kana) }}" placeholder="メイ">
-        </div>
-            
-            <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
-                <label class="block text-lg font-bold text-gray-700">生年月日</label>
-                <input name="date_of_birth" type="date" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm text-xl font-bold border-gray-300 rounded-md" value="{{ old('date_of_birth', $person->date_of_birth) }}" placeholder="生年月日">
-            </div>
+            <input name="last_name_kana" type="text" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm text-xl font-bold border-gray-300 rounded-md" value="{{ old('last_name_kana', $person->last_name_kana) }}" placeholder="セイ">
+            @error('last_name_kana')
+                <div class="kana-error text-red-500 text-base font-bold mt-1">{{ $message }}</div>
+            @enderror
 
-            <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
-                <label class="block text-lg font-bold text-gray-700">受給者証番号</label>
-                <input name="jukyuusha_number" type="text" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm text-xl font-bold border-gray-300 rounded-md" value="{{ old('jukyuusha_number', $person->jukyuusha_number) }}" placeholder="受給者番号">
+            <input name="first_name_kana" type="text" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm text-xl font-bold border-gray-300 rounded-md" value="{{ old('first_name_kana', $person->first_name_kana) }}" placeholder="メイ">
+            @error('first_name_kana')
+                <div class="kana-error text-red-500 text-base font-bold mt-1">{{ $message }}</div>
+            @enderror
+        </div>
+        
+        <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
+            <label class="block text-lg font-bold text-gray-700">生年月日</label>
+            <input name="date_of_birth" type="date" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm text-xl font-bold border-gray-300 rounded-md" value="{{ old('date_of_birth', $person->date_of_birth) }}" placeholder="生年月日">
+        </div>
+        
+        
+
+      <div class="form-group mb-4 m-2 max-w-lg" style="display: flex; flex-direction: column; align-items: center;">
+            <label class="block text-lg font-bold text-gray-700">受給者証番号（数字10桁）</label>
+            <div class="border-2 border-gray-300 rounded-md p-2 mb-4 w-full">
+                <input type="text" id="jukyuusha_number" name="jukyuusha_number" 
+                    class="w-full text-center text-2xl font-bold tracking-widest" 
+                    maxlength="10" placeholder="0123456789" value="{{ old('jukyuusha_number', $person->jukyuusha_number) }}" 
+                    style="letter-spacing: 0.25em;">
             </div>
+            <div id="number-error" class="text-red-500 text-base font-bold hidden"></div>
+        </div>
 
             <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
                 <label class="block text-lg font-bold text-gray-700">医療的ケア</label>
@@ -97,6 +110,87 @@
             </div>
         </div>
     </form>
+    <script src="https://unpkg.com/vue@3.2.47/dist/vue.global.prod.js"></script>
+ <!--jquery3.6.4をCDN経由で呼び出し↓-->
+ <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
 
-    </body>
+ <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const lastNameKana = document.querySelector('input[name="last_name_kana"]');
+    const firstNameKana = document.querySelector('input[name="first_name_kana"]');
+    const kanaFields = [lastNameKana, firstNameKana];
+
+    function validateKana(input) {
+        const kanaRegex = /^[ァ-ヶー]*$/;
+        let errorDiv = input.nextElementSibling;
+        
+        if (!errorDiv || !errorDiv.classList.contains('kana-error')) {
+            errorDiv = document.createElement('div');
+            errorDiv.classList.add('kana-error', 'text-red-500', 'text-base', 'font-bold','mt-1');
+            input.parentNode.insertBefore(errorDiv, input.nextSibling);
+        }
+
+        if (!kanaRegex.test(input.value) && input.value !== '') {
+            errorDiv.textContent = 'カタカナのみを入力してください。';
+            input.classList.add('border-red-500');
+        } else {
+            errorDiv.textContent = '';
+            input.classList.remove('border-red-500');
+        }
+    }
+
+    kanaFields.forEach(field => {
+        field.addEventListener('input', function() {
+            validateKana(this);
+        });
+    });
+
+    document.querySelector('form').addEventListener('submit', function(e) {
+        kanaFields.forEach(field => {
+            validateKana(field);
+            if (field.nextElementSibling && field.nextElementSibling.textContent) {
+                e.preventDefault();
+            }
+        });
+    });
+});
+
+    document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('jukyuusha_number');
+    const errorDiv = document.getElementById('number-error');
+
+    input.addEventListener('input', function(e) {
+        // 数字以外の文字を削除
+        this.value = this.value.replace(/[^0-9]/g, '');
+
+        // 10桁を超える入力を防ぐ
+        if (this.value.length > 10) {
+            this.value = this.value.slice(0, 10);
+        }
+
+        // エラーメッセージの表示/非表示
+        if (this.value.length === 10) {
+            errorDiv.classList.add('hidden');
+        } else {
+            errorDiv.textContent = '受給者証番号は10桁の数字で入力してください。';
+            errorDiv.classList.remove('hidden');
+        }
+    });
+
+        // フォーム送信時のバリデーション
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (input.value.length !== 10) {
+                e.preventDefault();
+                errorDiv.textContent = '受給者証番号は10桁の数字で入力してください。';
+                errorDiv.classList.remove('hidden');
+            }
+        });
+    });
+
+ document.getElementById('filename').addEventListener('click', function() {
+        // 選択されたファイルに対する処理を追加する（例: アップロード処理など）
+        console.log('ファイルが選択されました:', this.files[0].name);
+    });
+  </script>
+</body>
 </x-app-layout>

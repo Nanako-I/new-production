@@ -37,6 +37,7 @@
     font-family: 'Noto Sans JP', sans-serif; /* フォントをArialに設定 */
   background: linear-gradient(135deg, rgb(209, 253, 255,0.5), rgb(253, 219, 146,1));
   }
+  
   </style>
         <!--// 処理-->
         
@@ -75,28 +76,27 @@
                             flex-wrap: wrap;
                             justify-content: center; /* 中央揃え */
                             gap: 10px; /* スライド間の余白 */
+                            overflow-x: scroll; /* 水平方向にスクロール可能 */
+                            white-space: nowrap; /* 子要素を横並びにする */
+                            display: flex; /* 子要素を横並びにする */
                         }
+
+                        
                         .slide {
-                            flex: 1 1 500px; /* 最小幅300px、最大幅は親コンテナに基づく */
-                            min-width: 400px;
-                            max-width: 600px; /* 最大幅を設定 */
-                            background: rgb(244,244,244);
-                            margin: 10px; /* スライド間の余白 */
-                        }
-                      /* .slide {
-                        width:300px;
+                        width:100vw;
                         background: rgb(244,244,244);
+                        
                       }
                       @media screen and (min-width: 768px){
                         .slide {
-                            width:1000px;
+                            width:600px;
                         }
                       }
                       @media screen and (min-width: 1024px){
                         .slide {
-                            width:1300px;
+                            width:700px;
                         }
-                      } */
+                      }
                      
                      </style>
                      
@@ -157,6 +157,11 @@
                                             </a>
                                         </div>
                                     </div>
+
+
+                 
+
+                                    
 
 
                                     <!-- 利用時間など↓ -->
@@ -2054,6 +2059,10 @@
         
     </div>
   </div>
+  <!-- 右矢印ボタン -->
+  <button id="scrollRight" class="absolute right-0 z-10 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r">
+    &gt;
+</button>
 <!--</section>-->
 </div>
  
@@ -2062,7 +2071,36 @@
 </body>
 </html>
 <script>
+    const slider = document.querySelector('.slider');
+const scrollRightButton = document.getElementById('scrollRight');
 
+scrollRightButton.addEventListener('click', function() {
+    // alert('クリック');
+    slider.scrollBy({
+        left: 300,
+        behavior: 'smooth'
+    });
+});
+// document.addEventListener('DOMContentLoaded', function() {
+//     const slider = document.querySelector('.slider');
+//     const scrollLeftButton = document.getElementById('scrollLeft');
+//     const scrollRightButton = document.getElementById('scrollRight');
+
+//     scrollLeftButton.addEventListener('click', function() {
+//         slider.scrollBy({
+//             left: -300, // スクロール量を調整
+//             behavior: 'smooth'
+//         });
+//     });
+
+//     scrollRightButton.addEventListener('click', function() {
+//         alert('クリック'); // ここを修正：クォーテーションで囲む
+//         slider.scrollBy({
+//             left: 300, // スクロール量を調整
+//             behavior: 'smooth'
+//         });
+//     });
+// });
 
  const startBtn = document.querySelector('#start-btn');
 const stopBtn = document.querySelector('#stop-btn');

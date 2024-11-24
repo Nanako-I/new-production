@@ -19,6 +19,8 @@ use App\Enums\RoleType;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\MessageBag;
 use Carbon\Carbon;
 use App\Enums\PermissionType;
 use App\Enums\RoleType as RoleEnums;
@@ -358,45 +360,98 @@ class PersonController extends Controller
     
     //  利用者情報更新
     public function update(Request $request, $id)
-    {
-        $request->validate([
-            'date_of_birth' => 'required|date',
-            'jukyuusha_number' => 'required|digits:10',
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'last_name' => 'required|string|max:255',
+        'first_name' => 'required|string|max:255',
+        'last_name_kana' => ['required', 'string', 'regex:/^[ァ-ヶー]+$/u'],
+        'first_name_kana' => ['required', 'string', 'regex:/^[ァ-ヶー]+$/u'],
+        'date_of_birth' => 'required|date',
+        'jukyuusha_number' => [
+            'required',
+            'digits:10',
+            Rule::unique('people', 'jukyuusha_number')->ignore($id), // 現在の利用者を除外
+        ],
+        'filename' => 'nullable|image|max:2048',
+    ], [
+        'last_name.required' => '姓は必須項目です。',
+        'first_name.required' => '名は必須項目です。',
+        'last_name_kana.required' => 'セイは必須項目です。',
+        'last_name_kana.regex' => 'セイはカタカナのみで入力してください。',
+        'first_name_kana.required' => 'メイは必須項目です。',
+        'first_name_kana.regex' => 'メイはカタカナのみで入力してください。',
+        'date_of_birth.required' => '生年月日は必須項目です。',
+        'date_of_birth.date' => '正しい日付形式で入力してください。',
+        'jukyuusha_number.required' => '受給者証番号は必須項目です。',
+        'jukyuusha_number.digits' => '受給者証番号は10桁の数字で入力してください。',
+        'jukyuusha_number.unique' => 'この受給者証番号は既に登録されています。',
+        'filename.image' => '画像ファイルを選択してください。',
+        'filename.max' => '画像ファイルは2MB以下にしてください。',
+    ]);
+    if ($validator->fails()) {
+        $errors = $validator->errors();
+        
+        // 受給者証番号のエラーメッセージを調整
+        if ($errors->has('jukyuusha_number')) {
+            $jukyuushaErrors = $errors->get('jukyuusha_number');
+            if (in_array('この受給者証番号は既に登録されています。', $jukyuushaErrors)) {
+                // 新しいMessageBagインスタンスを作成し、必要なエラーメッセージのみを追加
+                $newErrors = new MessageBag();
+                foreach ($errors->messages() as $key => $messages) {
+                    if ($key !== 'jukyuusha_number') {
+                        $newErrors->add($key, $messages[0]);
+                    }
+                }
+                $newErrors->add('jukyuusha_number', 'この受給者証番号は既に登録されています。');
+                $errors = $newErrors;
+            }
+        }
+    
+        return redirect()->back()
+                         ->withErrors($errors)
+                         ->withInput();
+    }
 
-        $user = auth()->user();
-        $facilities = $user->facility_staffs()->get();
-        $firstFacility = $facilities->first();
-    // dd($firstFacility);
-        if ($firstFacility) {
-            
-            // 名前と生年月日が一致する利用者を検索
+    $user = auth()->user();
+    $facilities = $user->facility_staffs()->get();
+    $firstFacility = $facilities->first();
+
+    if (!$firstFacility) {
+        return back()->withErrors(['error' => '施設情報が見つかりません。']);
+    }
+        $person = Person::findOrFail($id);
+
+        // 名前と生年月日が一致する利用者を検索（現在の利用者を除く）
         $existingPersonByNameAndDob = $firstFacility->people_facilities()
+            ->where('people.id', '!=', $id)
             ->where('last_name', $request->last_name)
             ->where('first_name', $request->first_name)
             ->where('date_of_birth', $request->date_of_birth)
             ->first();
 
-        // 受給者番号が一致する利用者を検索
-        $existingPersonByJukyuushaNumber = $firstFacility->people_facilities()
-            ->where('jukyuusha_number', $request->jukyuusha_number)
-            ->first();
-            // 名前と生年月日が一致する場合
+        // 名前と生年月日が一致する場合
         if ($existingPersonByNameAndDob) {
             return back()->withInput($request->all())
                          ->withErrors(['duplicate_name_dob' => '同じ名前と生年月日の人がすでに存在します。']);
         }
 
-        // 受給者番号が一致する場合
-        if ($existingPersonByJukyuushaNumber) {
-            return back()->withInput($request->all())
-                         ->withErrors(['duplicate_jukyuusha_number' => '同じ受給者番号の人がすでに存在します。']);
-        }
+        // 受給者番号が一致する利用者を検索（現在の利用者を除く）
+        // 受給者番号が一致する利用者を検索（現在の利用者を除く）
+$existingPersonByJukyuushaNumber = $firstFacility->people_facilities()
+->where('people.id', '!=', $id)
+->where('jukyuusha_number', $request->jukyuusha_number)
+->exists(); // データの存在のみ確認
 
-        $person = Person::findOrFail($id);
+// 受給者番号が一致する場合
+if ($existingPersonByJukyuushaNumber) {
+\Log::info('同じ受給者番号の利用者が存在:', ['jukyuusha_number' => $request->jukyuusha_number]);
+return back()->withInput($request->all())
+             ->withErrors(['duplicate_jukyuusha_number' => '同じ受給者番号の人がすでに存在します。']);
+}
+
 
         //   画像保存
-        $directory = 'sample';
+        $directory = 'sample/person_photo';
         $filename = $person->filename; // 更新しない場合既存のファイル名を保持
         $filepath = $person->path; // 既存のパスを保持
     
@@ -483,7 +538,8 @@ class PersonController extends Controller
         // return view('people', compact('people', 'selectedItems'))->with('success', '利用者情報が更新されました。');
         return redirect()->route('people.index')->with('success', '利用者情報が更新されました。');
     }
-}
+
+
     // 登録項目の選択↓
     public function showSelectedItems($people_id, $id)
 {

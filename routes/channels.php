@@ -15,4 +15,9 @@ use Illuminate\Support\Facades\Broadcast;
 
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
+
+Broadcast::channel('chat-{people_id}', function ($user, $people_id) {
+        
+        return $user->people()->where('id', $people_id)->exists();
+    });
 });
