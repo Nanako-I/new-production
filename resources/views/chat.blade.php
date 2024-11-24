@@ -93,6 +93,7 @@
                 -ms-overflow-style: none;
                 position: fixed;
                 bottom: 80px; /* フッターの高さ */
+                top: 80PX;
             }
 
             @media screen and (max-width: 700px) {
@@ -111,6 +112,14 @@
 
             #chatbot-body::-webkit-scrollbar {
                 display: none;
+            }
+
+            .chat-header {
+                padding: 10px;
+                background-color: #f0f0f0;
+                text-align: center;
+                font-weight: bold;
+                z-index: 1000;
             }
 
             #chatbot-footer {
@@ -397,7 +406,7 @@
         </script>
     <!-- </div> -->
 
-    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+    <!-- <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
 <script>
      window.PUSHER_APP_KEY = "{{ env('PUSHER_APP_KEY') }}";
      window.PUSHER_APP_CLUSTER = "{{ env('PUSHER_APP_CLUSTER') }}";
@@ -442,11 +451,11 @@
             chatToBottom();
         };
 
-        // function chatToBottom() {
-        //     const chatField = document.getElementById('chatbot-body');
-        //     chatField.scrollTop = chatField.scrollHeight;
-        // }
-    });
-</script>
+        function chatToBottom() {
+            const chatField = document.getElementById('chatbot-body');
+            chatField.scrollTop = chatField.scrollHeight;
+        }
+    }); -->
+<!-- </script> -->
 </body>
 </x-app-layout>
