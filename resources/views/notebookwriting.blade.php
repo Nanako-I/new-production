@@ -104,38 +104,31 @@
     <div class="flex flex-col items-center my-4">
    
         <!-- amivoiceで読み取った文字が反映される↓ -->
-        <textarea id="recognitionResult" name="notebook" class="w-full max-w-lg font-bold" style="height: 300px;">
-     @if($temperatureCount > 0)
-        @php
-        $temperatureString = '今日の体温は、';
-        foreach ($temperaturesOnSelectedDate as $index => $temperature) {
-            $temperatureString .= $temperature->created_at->format('H:i') . '、' . $temperature->temperature . '℃';
-            if ($index < $temperatureCount - 1) {
-                $temperatureString .= '、';
-            }
+        <textarea id="recognitionResult" name="notebook" class="w-full max-w-lg font-bold" style="height: 300px;">@php
+$output = '';
+if($temperatureCount > 0) {
+    $temperatureString = '今日の体温は、';
+    foreach ($temperaturesOnSelectedDate as $index => $temperature) {
+        $temperatureString .= $temperature->created_at->format('H:i') . '、' . $temperature->temperature . '℃';
+        if ($index < $temperatureCount - 1) {
+            $temperatureString .= '、';
         }
-        $temperatureString .= 'でした。';
-          @endphp
-          {{ $temperatureString }}
-      @endif
-
-      @php
+    }
+    $temperatureString .= 'でした。';
+    $output .= $temperatureString;
+}
 
 $isFirstItem = true;
-@endphp
-@if(!empty($foodsOnSelectedDate))
-    @php
+if(!empty($foodsOnSelectedDate)) {
+    $foodString = '';
     foreach ($foodsOnSelectedDate as $food) {
         $foodItems = [];
-        
         if ($food->lunch == 'あり' && !empty($food->lunch_bikou)) {
             $foodItems[] = '昼食は' . $food->lunch_bikou;
         }
-        
         if ($food->oyatsu == 'あり' && !empty($food->oyatsu_bikou)) {
             $foodItems[] = 'おやつは' . $food->oyatsu_bikou;
         }
-        
         if (!empty($foodItems)) {
             if (!$isFirstItem) {
                 $foodString .= '、';
@@ -146,40 +139,32 @@ $isFirstItem = true;
             $isFirstItem = false;
         }
     }
-    
     if (!$isFirstItem) {
         $foodString .= 'でした。';
     }
-    @endphp
+    $output .= $foodString;
+}
 
-    @if(!empty($foodString))
-        {{ $foodString }}
-    @endif
-@endif
-@if($lastOptions && $correspondingOption)
-    @php
-        $items = [];
-        for($i = 1; $i <= 5; $i++) {
-            $optionItemKey = "item{$i}";
-            $optionItem = json_decode($lastOptions->$optionItemKey);
-            $correspondingItem = $correspondingOption->$optionItemKey;
-            if(!empty($optionItem) && is_array($optionItem) && count($optionItem) > 0 && $correspondingItem) {
-                $items[] = $correspondingItem;
-            }
+if($lastOptions && $correspondingOption) {
+    $items = [];
+    for($i = 1; $i <= 5; $i++) {
+        $optionItemKey = "item{$i}";
+        $optionItem = json_decode($lastOptions->$optionItemKey);
+        $correspondingItem = $correspondingOption->$optionItemKey;
+        if(!empty($optionItem) && is_array($optionItem) && count($optionItem) > 0 && $correspondingItem) {
+            $items[] = $correspondingItem;
         }
-    @endphp
-    @if(count($items) > 0)
-        本日行った{{ $correspondingOption->title }}は
-        @foreach($items as $index => $item)
-            {{ $item }}@if($index < count($items) - 1)と@endif
-        @endforeach
-        でした
-        @if($lastOptions->bikou !== null)
-            {{ $lastOptions->bikou }}
-        @endif
-    @endif
-@endif
-        </textarea>
+    }
+    if(count($items) > 0) {
+        $output .= '本日行った' . $correspondingOption->title . 'は';
+        $output .= implode('と', $items) . 'でした。';
+        if($lastOptions->bikou !== null) {
+            $output .= $lastOptions->bikou;
+        }
+    }
+}
+echo trim($output);
+@endphp</textarea>
         <span class="recognitionResultText"></span><span class="recognitionResultInfo"></span>
     </div>
     <div class="flex justify-center my-2">

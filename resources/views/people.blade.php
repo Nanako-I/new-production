@@ -74,7 +74,7 @@
                         .slider {
                             display: flex;
                             flex-wrap: wrap;
-                            justify-content: center; /* 中央揃え */
+                            justify-content: left; /* 中央揃え */
                             gap: 10px; /* スライド間の余白 */
                             overflow-x: scroll; /* 水平方向にスクロール可能 */
                             white-space: nowrap; /* 子要素を横並びにする */
@@ -484,6 +484,9 @@
                                   </div>
                                   @endif
 
+                                 
+
+
                                   @php 
                                     $lastOptionItem = $person->option_items()->latest()->first();
                                 @endphp
@@ -537,6 +540,7 @@
                                                         
                                                         <input type="hidden" name="people_id" value="{{ $person->id }}">
                                                         <input type="hidden" name="option_id" value="{{ $option->id }}">
+                                                        <input type="hidden" name="has_input" value="0" id="has_input_{{ $option->id }}">
 
                                                         <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
                                                             @for($i = 1; $i <= 5; $i++)
@@ -544,7 +548,7 @@
                                                                     $itemKey = "item{$i}";
                                                                 @endphp
                                                                 @if(!is_null($option->$itemKey) && $option->$itemKey !== '')
-                                                                    <input type="checkbox" name="item{{ $i }}" value="1" class="w-6 h-6">
+                                                                    <input type="checkbox" name="item{{ $i }}" value="1" class="w-6 h-6 option-checkbox" data-option-id="{{ $option->id }}">
                                                                     <p class="text-gray-900 font-bold text-xl px-1.5">{{ $option->$itemKey }}</p>
                                                                 @endif
                                                             @endfor
@@ -552,15 +556,20 @@
 
                                                         <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
                                                             <p class="text-gray-900 font-bold text-xl">備考</p>
-                                                            <textarea id="bikou" name="bikou" class="w-3/4 max-w-lg font-bold" style="height: 200px;"></textarea>
+                                                            <textarea id="bikou_{{ $option->id }}" name="bikou" class="w-3/4 max-w-lg font-bold option-bikou" style="height: 200px;" data-option-id="{{ $option->id }}"></textarea>
                                                         </div>
                                                         <div class="my-2" style="display: flex; justify-content: center; align-items: center; max-width: 300px;">
                                                             <button type="submit" class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
                                                                 送信
-                                                            </button>
-                                                        </div>
-                                                    </details>
-                                                </form>
+                                                                </button>
+                                                            </div>
+                                                            @if($errors->has('error_'.$option->id))
+                                                                <div class="text-red-500 font-bold mt-2">
+                                                                    {{ $errors->first('error_'.$option->id) }}
+                                                                </div>
+                                                            @endif
+                                                        </details>
+                                                    </form>
                                             @else
                                                 <div class="flex flex-col items-center">
                                                     @foreach($todayItems as $optionItem)
@@ -588,7 +597,37 @@
                                     </div>
                                 @endforeach
                             @endif
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const forms = document.querySelectorAll('form[action^="{{ route('options.item.store', ['people_id' => $person->id, 'id' => ':id']) }}"]'.replace(':id', ''));
+                                    
+                                    forms.forEach(form => {
+                                        const checkboxes = form.querySelectorAll('.option-checkbox');
+                                        const bikou = form.querySelector('.option-bikou');
+                                        const hasInputField = form.querySelector('input[name="has_input"]');
 
+                                        form.addEventListener('submit', function(e) {
+                                            updateHasInput();
+                                            if (hasInputField.value === '0') {
+                                                e.preventDefault();
+                                                alert('チェックボックス、もしくは備考欄に入力してください。');
+                                            }
+                                        });
+
+                                        checkboxes.forEach(checkbox => {
+                                            checkbox.addEventListener('change', updateHasInput);
+                                        });
+
+                                        bikou.addEventListener('input', updateHasInput);
+
+                                        function updateHasInput() {
+                                            let hasChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+                                            let hasBikou = bikou.value.trim() !== '';
+                                            hasInputField.value = (hasChecked || hasBikou) ? '1' : '0';
+                                        }
+                                    });
+                                });
+                                </script>
                                 <!-- トレーニング登録↓ -->
                                 @if(isset($selectedItems[$person->id]) && in_array('トレーニング', $selectedItems[$person->id]))
                         　    　　  <div class="border-2 p-2 rounded-lg bg-white m-2">
@@ -1124,7 +1163,7 @@
                                             <p class="text-gray-900 font-bold text-xl">昼食</p>
                                                 <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
                                                     <select name="lunch" class="mx-1 my-1.5" style="width: 6rem;">
-                                                        <option value="selected">選択</option>
+                                                        <option value="登録なし">選択</option>
                                                         <option value="あり">あり</option>
                                                         <option value="なし">なし</option>
                                                     </select>
@@ -1140,7 +1179,7 @@
                                             <p class="text-gray-900 font-bold text-xl">間食</p>
                                                 <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
                                                     <select name="oyatsu" class="mx-1 my-1.5" style="width: 6rem;">
-                                                        <option value="selected">選択</option>
+                                                        <option value="登録なし">選択</option>
                                                         <option value="あり">あり</option>
                                                         <option value="なし">なし</option>
                                                     </select>

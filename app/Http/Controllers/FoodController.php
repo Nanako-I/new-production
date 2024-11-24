@@ -50,12 +50,25 @@ class FoodController extends Controller
     public function store(Request $request)
     {
        $storeData = $request->validate([
-            // 'food' => 'required|max:255',
-            // 'staple_food' => 'required|max:255',
-            // 'side_dish' => 'required|max:255',
-            // 'medicine' => 'required|max:255',
-        ]);
-        // バリデーションした内容を保存する↓
+        'lunch' => 'required_without_all:lunch_bikou,oyatsu,oyatsu_bikou',
+        'lunch_bikou' => 'required_without_all:lunch,oyatsu,oyatsu_bikou',
+        'oyatsu' => 'required_without_all:lunch,lunch_bikou,oyatsu_bikou',
+        'oyatsu_bikou' => 'required_without_all:lunch,lunch_bikou,oyatsu',
+    ], [
+        'lunch.required_without_all' => '昼食、昼食備考、おやつ、おやつ備考のいずれかを入力してください。',
+        'lunch_bikou.required_without_all' => '昼食、昼食備考、おやつ、おやつ備考のいずれかを入力してください。',
+        'oyatsu.required_without_all' => '昼食、昼食備考、おやつ、おやつ備考のいずれかを入力してください。',
+        'oyatsu_bikou.required_without_all' => '昼食、昼食備考、おやつ、おやつ備考のいずれかを入力してください。',
+    ]);
+
+    // チェックボックスや選択肢の値をクリーンアップ
+    $lunch = $request->lunch === '登録なし' ? null : $request->lunch;
+    $oyatsu = $request->oyatsu === '登録なし' ? null : $request->oyatsu;
+
+    // 少なくとも1つのフィールドが入力されているか確認
+    if (!$lunch && !$request->lunch_bikou && !$oyatsu && !$request->oyatsu_bikou) {
+        return redirect()->back()->withErrors(['input_required' => '昼食、昼食備考、おやつ、おやつ備考のいずれかを入力してください。'])->withInput();
+    }
         
         $food = Food::create([
         'people_id' => $request->people_id,

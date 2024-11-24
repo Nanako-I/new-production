@@ -25,30 +25,37 @@ use App\Enums\Role as RoleEnum;
 
 class OptionItemController extends Controller
 {
-  public function store($people_id, $id, Request $request)
-  {
-      $request->validate([
-        'people_id' => 'required|exists:people,id',
-        'option_id' => 'required|exists:options,id',
-        'item1' => 'nullable|boolean',
-        'item2' => 'nullable|boolean',
-        'item3' => 'nullable|boolean',
-        'item4' => 'nullable|boolean',
-        'item5' => 'nullable|boolean',
-        'bikou' => 'nullable|string',
-      ]);
-  
+    public function store($people_id, $id, Request $request)
+    {
+        $request->validate([
+            'people_id' => 'required|exists:people,id',
+            'option_id' => 'required|exists:options,id',
+            'item1' => 'nullable|boolean',
+            'item2' => 'nullable|boolean',
+            'item3' => 'nullable|boolean',
+            'item4' => 'nullable|boolean',
+            'item5' => 'nullable|boolean',
+            'bikou' => 'nullable|string',
+            'has_input' => 'required|boolean',
+        ]);
+    
+        if ($request->has_input == false) {
+            return redirect()->back()
+                ->withErrors(['error_'.$request->option_id => 'チェックもしくは備考欄に入力してください。'])
+                ->withInput();
+        }
+    
+        OptionItem::create([
+            'people_id' => $request->people_id,
+            'option_id' => $request->option_id,
+            'item1' => $request->has('item1') ? json_encode([$request->item1]) : null,
+            'item2' => $request->has('item2') ? json_encode([$request->item2]) : null,
+            'item3' => $request->has('item3') ? json_encode([$request->item3]) : null,
+            'item4' => $request->has('item4') ? json_encode([$request->item4]) : null,
+            'item5' => $request->has('item5') ? json_encode([$request->item5]) : null,
+            'bikou' => $request->bikou,
+        ]);
 
-    OptionItem::create([
-      'people_id' => $request->people_id,
-      'option_id' => $request->option_id,
-      'item1' => $request->has('item1') ? json_encode([$request->item1]) : null,
-      'item2' => $request->has('item2') ? json_encode([$request->item2]) : null,
-      'item3' => $request->has('item3') ? json_encode([$request->item3]) : null,
-      'item4' => $request->has('item4') ? json_encode([$request->item4]) : null,
-      'item5' => $request->has('item5') ? json_encode([$request->item5]) : null,
-      'bikou' => $request->bikou,
-  ]);
 
   // ログインしているユーザーの情報↓
   $user = auth()->user();

@@ -714,6 +714,33 @@
       </div>
     @endif
 
+    @if($lastOptions && $correspondingOption)
+    <div class="flex flex-col mb-10 lg:items-start items-center">
+        <div class="w-12 h-12 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 mb-5">
+            <i class="fa-solid fa-people-group text-gray-700" style="font-size: 1.5em; transition: transform 0.2s;"></i>
+        </div>
+        <div class="flex-grow p-4">
+            <h2 class="text-gray-900 text-lg title-font font-medium mb-3">{{ $correspondingOption->title }}</h2>
+            <div class="flex justify-around text-left items-start">
+                @for($i = 1; $i <= 5; $i++)
+                    @php
+                        $optionItemKey = "item{$i}";
+                        $optionItem = json_decode($lastOptions->$optionItemKey);
+                        $correspondingItem = $correspondingOption->$optionItemKey;
+                    @endphp
+                    @if(!empty($optionItem) && is_array($optionItem) && count($optionItem) > 0 && $correspondingItem)
+                        <p class="text-gray-900 font-bold text-xl px-3">{{ $correspondingItem }}</p>
+                    @endif
+                @endfor
+            </div>
+            @if($lastOptions->bikou !== null)
+                <p class="text-gray-900 font-bold text-xl px-3">{{ $lastOptions->bikou }}</p>
+            @endif
+        </div>
+        <hr style="border: 1px solid #666; margin: 0 auto; width: 100%;">
+    </div>
+@endif
+
     @if($lastNotebook)
       <div class="flex flex-col mb-10 lg:items-start items-center" _msthidden="3">
         <div class="w-12 h-12 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 mb-5">
