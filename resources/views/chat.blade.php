@@ -130,6 +130,7 @@
                 background: #FFF;
                 border-top: 1.5px solid #EEE;
                 position: fixed;
+                
                 bottom: 0;
                 left: 0;
                 padding: 10px;
@@ -155,6 +156,13 @@
                     margin-bottom: 0;
                 }
             }
+
+            #chat-form {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
 
             #chatbot-text {
                 height: 40px;
@@ -266,7 +274,8 @@
         </style>
 
     </head>
-    <body class="font-sans antialiased" style="margin-bottom: 60px;">
+    <body class="font-sans antialiased" >
+    <!-- <body class="font-sans antialiased" style="margin-bottom: 60px;"> -->
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
         <div id="chatbot">
             <div class="flex flex-col items-center">
@@ -308,9 +317,10 @@
             </div>
         </div>
     </div>
+    <div id="chatbot-footer">
         <form id="chat-form" action="{{ url('chat/'.$person->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <div class="items-center" id="chatbot-footer">
+            
                 <input type="hidden" name="user_identifier" value="{{ session('user_identifier') }}">
                 <input type="hidden" name="last_name" value="{{ $user_name }}">
                 <label for="filename" style="cursor: pointer;">
@@ -320,8 +330,9 @@
                 <input type="text" id="chatbot-text" class="browser-default" name="message" placeholder="テキストを入力" required
                         style="word-wrap: break-word;" data-user-identifier="{{ session('user_identifier') }}">
                 <button type="submit" id="chatbot-submit">送信</button>
-            </div>
+           
         </form>
+    </div>
 
         <script>
             function uploadFile1() {
