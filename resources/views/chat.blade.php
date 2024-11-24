@@ -80,21 +80,19 @@
 
             #chatbot-body {
                 width: 100%;
-                /* height: calc(100vh - 110px); */
                 height: calc(100vh - 60px);
                 padding-top: 10px;
-                padding-bottom: 80px;
+                padding-bottom: 10px;
                 background: #FFF;
                 box-sizing: border-box;
                 overflow-x: hidden;
-                /* overflow-y: scroll; */
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
-                -ms-overflow-style: none;
-                position: fixed;
-                bottom: 80px; /* フッターの高さ */
-                top: 80PX;
+                position: absolute;
+                top: 0;
+                bottom: 80px;
             }
+
 
             @media screen and (max-width: 700px) {
                 #chatbot-body {
