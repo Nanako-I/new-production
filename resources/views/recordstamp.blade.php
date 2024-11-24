@@ -143,7 +143,7 @@
    <div class="flex flex-col flex-wrap lg:py-6 -mb-10 lg:w-1/2 lg:pl-12 lg:text-left text-center" _msthidden="9">
    @if (
         collect([$timesOnSelectedDate, $foodsOnSelectedDate, $watersOnSelectedDate, $medicinesOnSelectedDate, $tubesOnSelectedDate, $temperaturesOnSelectedDate, $bloodpressuresOnSelectedDate, $toiletsOnSelectedDate, $kyuuinsOnSelectedDate, $hossasOnSelectedDate, $speechesOnSelectedDate, $lastTime, $lastMorningActivity, $lastAfternoonActivity, $lastActivity, $lastTraining, $lastLifestyle, $lastCreative, $lastNotebook])
-        ->every(fn($collection) => $collection === null || $collection->isEmpty())
+        ->every(fn($collection) => $collection === null || $collection->count() === 0)
     ) 
         @if (\Carbon\Carbon::parse($selectedDate)->isToday())
             <p class="font-bold text-2xl">まだ事業所にて本日の記録が取られておりません。しばらくお待ちください。</p>
@@ -220,7 +220,7 @@
             </div>
             
             <div class="flex justify-start text-left items-start">
-                <p class="text-gray-900 font-bold text-xl px-3">{{ $food->oyatsu == 'あり' ? '間食' : ($lastFood->oyatsu != 'なし' ? $food->oyatsu : '') }}</p>
+                <p class="text-gray-900 font-bold text-xl px-3">{{ $food->oyatsu == 'あり' ? '間食' : ($food->oyatsu != 'なし' ? $food->oyatsu : '') }}</p>
                 <p class="text-gray-900 font-bold text-xl px-3">{{ $food->oyatsu_bikou }}</p>
             </div>
           @endforeach
@@ -758,7 +758,8 @@
 
 
     @php 
-    $dataExists = collect([$foodsOnSelectedDate, $watersOnSelectedDate, $medicinesOnSelectedDate, $tubesOnSelectedDate, $temperaturesOnSelectedDate, $bloodpressuresOnSelectedDate, $toiletsOnSelectedDate, $kyuuinsOnSelectedDate, $hossasOnSelectedDate, $speechesOnSelectedDate, $lastTime, $lastMorningActivity, $lastAfternoonActivity, $lastActivity, $lastTraining, $lastLifestyle, $lastCreative, $lastOptions, $lastNotebook])->every(fn($collection) => is_null($collection) || (is_array($collection) ? collect($collection)->isEmpty() : false));
+    $dataExists = collect([$foodsOnSelectedDate, $watersOnSelectedDate, $medicinesOnSelectedDate, $tubesOnSelectedDate, $temperaturesOnSelectedDate, $bloodpressuresOnSelectedDate, $toiletsOnSelectedDate, $kyuuinsOnSelectedDate, $hossasOnSelectedDate, $speechesOnSelectedDate, $lastTime, $lastMorningActivity, $lastAfternoonActivity, $lastActivity, $lastTraining, $lastLifestyle, $lastCreative, $lastOptions, $lastNotebook])->every(fn($collection) => is_null($collection) || count($collection) === 0
+    );
 @endphp
 
 @if (!$dataExists)
