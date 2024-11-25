@@ -71,43 +71,71 @@
         @endforeach
     </div>
     </a>
-                    @php
-                if ($person->medical_care == 1) {
-                    $items = [
-                        ['name' => '体温'],
-                        ['name' => 'トイレ', 'details' => '尿量・便量・便状態・便通処置・写真'],
-                        ['name' => '水分摂取', 'details' => '水分摂取の時間'],
-                        ['name' => '内服', 'details' => '内服の時間'],
-                        ['name' => '注入', 'details' => '注入の時間・写真'],
-                        ['name' => '血圧・脈・SpO2'],
-                        ['name' => '吸引', 'details' => '吸引の時間・写真'],
-                        ['name' => '発作', 'details' => '発作が起きた時間・様子・動画']
-                    ];
-                } else {
-                    $items = [
-                        ['name' => '体温'],
-                        ['name' => '食事', 'details' => '昼食・メニュー・おやつ・おやつのメニュー'],
-                        
-                    ];
-                }
-                @endphp
+    @php
+$selectedItemsData = json_decode($person->selected_items, true) ?? [];
+$selectedOptionIds = array_column(array_filter($selectedItemsData, function($item) {
+    return !isset($item['fixed']) || !$item['fixed'];
+}), 'id');
+$selectedFixedItems = array_column(array_filter($selectedItemsData, function($item) {
+    return isset($item['fixed']) && $item['fixed'];
+}), 'title');
 
-                @foreach($items as $item)
-                    <div class="flex flex-row items-center my-3">
-                        <input type="checkbox" 
-                            name="selected_items[]" 
-                            value="{{ $item['name'] }}" 
-                            {{ in_array($item['name'], $selectedItems) ? 'checked' : '' }} 
-                            class="w-6 h-6">
-                        <p class="text-gray-900 font-bold text-xl px-1.5">{{ $item['name'] }}</p>
-                        @if(isset($item['details']))
-                            <p class="text-gray-500 text-base px-1.5">{{ $item['details'] }}</p>
-                        @endif
-                    </div>
-                @endforeach
+if ($person->medical_care == 1) {
+    $items = [
+        ['name' => '体温'],
+        ['name' => 'トイレ', 'details' => '尿量・便量・便状態・便通処置・写真'],
+        ['name' => '水分摂取', 'details' => '水分摂取の時間'],
+        ['name' => '内服', 'details' => '内服の時間'],
+        ['name' => '注入', 'details' => '注入の時間・写真'],
+        ['name' => '血圧・脈・SpO2'],
+        ['name' => '吸引', 'details' => '吸引の時間・写真'],
+        ['name' => '発作', 'details' => '発作が起きた時間・様子・動画']
+    ];
+} else {
+    $items = [
+        ['name' => '体温'],
+        ['name' => '食事', 'details' => '昼食・メニュー・おやつ・おやつのメニュー'],
+    ];
+}
+@endphp
 
+<div class="bg-white p-4 rounded-lg mb-6">
+    <h3 class="text-lg font-semibold text-gray-700 mb-4">記録項目</h3>
 
+    <!-- オプション項目 -->
+    @foreach ($additionalItems as $item)
+        @if(!$item['option_group_id'])
+            <div class="flex flex-row items-center my-3">
+                <input type="checkbox" 
+                    name="selected_options[]" 
+                    value="{{ $item['id'] }}" 
+                    {{ in_array($item['id'], $selectedOptionIds) ? 'checked' : '' }} 
+                    class="w-6 h-6 item-checkbox"
+                    data-flag="{{ $item['flag'] ?? 0 }}">
+                <p class="text-gray-900 font-bold text-xl px-1.5">{{ $item['title'] }}</p>
+                <p class="text-gray-500 text-base px-1.5">{{ $item['items'] }}</p>
+            </div>
+        @endif
+    @endforeach
+
+    <!-- 固定項目 -->
+    @foreach($items as $item)
+        <div class="flex flex-row items-center my-3">
+            <input type="checkbox" 
+                name="selected_fixed_items[]" 
+                value="{{ $item['name'] }}" 
+                {{ in_array($item['name'], $selectedFixedItems) ? 'checked' : '' }}
+                class="w-6 h-6 item-checkbox"
+                data-flag="{{ in_array($item['name'], $selectedFixedItems) ? 1 : 0 }}">
+            <p class="text-gray-900 font-bold text-xl px-1.5">{{ $item['name'] }}</p>
+            @if(isset($item['details']))
+                <p class="text-gray-500 text-base px-1.5">{{ $item['details'] }}</p>
+            @endif
+        </div>
+    @endforeach
 </div>
+
+
 
 
 

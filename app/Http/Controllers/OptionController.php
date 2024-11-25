@@ -58,7 +58,7 @@ class OptionController extends Controller
     for ($i = 0; $i < 5; $i++) {
         $option->{"item" . ($i + 1)} = $request->item[$i] ?? null;
     }
-    $option->flag = false;
+    $option->flag = true;
 
     $option->save();
 

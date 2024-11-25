@@ -555,60 +555,56 @@ return back()->withInput($request->all())
             'title' => $option->title,
             'items' => $option->getItemsAsString(),
             'flag' => $option->flag,
+            'option_group_id' => $option->option_group_id ?? null,
         ];
     })->toArray();
 
     return view('select_item', compact('person', 'facility', 'selectedItems', 'additionalItems', 'id'));
 }
 
-public function updateSelectedItems(Request $request, $id)  
+public function updateSelectedItems(Request $request, $id)
 {
     $person = Person::findOrFail($id);
-    $selectedItems = $request->input('selected_items', []); // チェックされた項目を取得
-    // dd($selectedItems);
-    $selectedAdditionalItems = $request->input('selected_additional_items', []); // チェックされた追加項目を取得
-    // dd($selectedAdditionalItems);
-    
-    $additionalItems = DB::table('options')->where('people_id', $id)->get(['id', 'title']);
-
-    // dd($additionalItems);
-    // selected_items と selected_additional_items をマージして JSON エンコード
-    // チェックされた追加項目のみを取得する
-  
-    $filteredAdditionalItems = [];
-    foreach ($additionalItems as $item) {
-        if (in_array($item->id, $selectedAdditionalItems)) {
-            $filteredAdditionalItems[] = $item->id;
-        }
-    }
-
-    // selected_items と フィルタリングされた selected_additional_items をマージ
-    $combinedSelectedItems = array_merge($selectedItems, $filteredAdditionalItems);
-    // dd($combinedSelectedItems);
-    // JSON 形式で保存
-    $person->selected_items = json_encode(array_unique($combinedSelectedItems), JSON_UNESCAPED_UNICODE); 
-    $person->save();
-    
-    
-    // $selectedItems に追加項目を追加または削除
-    $selectedItemIds = array_merge(
-        $selectedItems,
-        $selectedAdditionalItems
-    );
-
-    // JSON 形式で保存
-    $person->selected_items = json_encode(array_unique($selectedItemIds), JSON_UNESCAPED_UNICODE);
-    $person->save();
+    $selectedOptions = $request->input('selected_options', []); // チェックされたオプション項目を取得
+    $selectedFixedItems = $request->input('selected_fixed_items', []); // チェックされた固定項目を取得
 
     // オプションを取得し、フラグを更新
     $options = Option::where('people_id', $id)->get();
     foreach ($options as $option) {
-        $option->flag = in_array($option->id, $selectedItemIds) ? 1 : 0;
+        $option->flag = in_array($option->id, $selectedOptions) ? 1 : 0;
         $option->save();
     }
 
+    // 選択された項目のデータを準備（オプションと固定項目の両方）
+    $selectedItemsData = array_merge(
+        Option::whereIn('id', $selectedOptions)->select('id', 'title')->get()
+            ->map(function($item) {
+                return ['id' => $item->id, 'title' => $item->title, 'fixed' => false];
+            })->toArray(),
+        array_map(function($item) {
+            return ['id' => 'fixed_' . $item, 'title' => $item, 'fixed' => true];
+        }, $selectedFixedItems)
+    );
+    // dd($selectedItemsData);
+
+    // JSON 形式で保存
+    $person->selected_items = json_encode($selectedItemsData, JSON_UNESCAPED_UNICODE);
+    $person->save();
+    $savedPerson = Person::find($id);
+    // dd('保存後のデータ:', json_decode($savedPerson->selected_items, true));
+
     return redirect()->route('people.index', $person->id)->with('success', '記録項目が更新されました。');
 }
+
+
+
+
+
+
+
+
+
+
 
 // 新しく項目を追加するメソッド
 private function getAdditionalItems($id)

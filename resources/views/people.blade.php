@@ -300,14 +300,28 @@
                                                     @endif
                                                 </div>
                                             </div>
+                                  <!-- すでにこちらで作った記録項目の登録を希望の場合はビューに反映させる↓ -->
+                                    @once
+                                        @php
+                                        if (!function_exists('hasFixedItem')) {
+                                            function hasFixedItem($items, $itemName) {
+                                                return collect($items)->contains(function ($item) use ($itemName) {
+                                                    return $item['id'] === "fixed_$itemName" && $item['fixed'] === true;
+                                                });
+                                            }
+                                        }
+                                        @endphp
+                                    @endonce
 
-
-                                        
-
+                                    @php
+                                    $items = $selectedItems[$person->id] ?? [];
+                                    $hasFixedTemperature = hasFixedItem($items, '体温');
+                                    $hasFixedMeal = hasFixedItem($items, '食事');
+                                    @endphp
 
 
                                 <!-- 体温登録↓ -->
-                        @if(isset($selectedItems[$person->id]) && in_array('体温', $selectedItems[$person->id]))
+                                @if($hasFixedTemperature)
                         　    　　  <div class="border-2 p-2 rounded-lg bg-white m-2">
                                     <div class="flex justify-start items-center">
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
@@ -1102,7 +1116,7 @@
                                          @endif
                                     
                        <!-- 食事登録↓ -->
-                       @if(isset($selectedItems[$person->id]) && in_array('食事', $selectedItems[$person->id]))
+                       @if($hasFixedMeal)
                         　    　 <div class="border-2 p-2 rounded-lg bg-white m-2">
                                     <div class="flex justify-start items-center">
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
