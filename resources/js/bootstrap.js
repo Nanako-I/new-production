@@ -1,25 +1,11 @@
 import _ from 'lodash';
 window._ = _;
 
-/**
- * We'll load the axios HTTP library which allows us to easily issue requests
- * to our Laravel back-end. This library automatically handles sending the
- * CSRF token as a header based on the value of the "XSRF" token cookie.
- */
-
 import axios from 'axios';
 window.axios = axios;
-
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
-/**
- * Echo exposes an expressive API for subscribing to channels and listening
- * for events that are broadcast by Laravel. Echo and event broadcasting
- * allows your team to easily build robust real-time web applications.
- */
-
 import Echo from 'laravel-echo';
-
 import Pusher from 'pusher-js';
 window.Pusher = Pusher;
 
@@ -35,18 +21,11 @@ window.Echo = new Echo({
     enabledTransports: ['ws', 'wss'],
 });
 
-
-
-    Pusher.logToConsole = true;
-
-    window.Echo.channel('chat-1')
-    .listen('MessageSent', (e) => {
-        console.log('新しいメッセージを受信:', e);
-        updateChatUI(e);
-    });
+Pusher.logToConsole = true;
 
 // チャットUIを更新する関数
 function updateChatUI(message) {
+    console.log('Updating chat UI with:', message);
     const chatContainer = document.getElementById('chat-messages');
     if (chatContainer) {
         const messageElement = document.createElement('div');
@@ -63,20 +42,21 @@ function updateChatUI(message) {
     }
 }
 
-// Pusher接続状態の変更をログに記録
-window.Echo.connector.pusher.connection.bind('state_change', function(states) {
-    console.log('Pusher接続状態:', states.current);
-});
-// import Echo from 'laravel-echo';
+if (window.Echo) {
+    window.Echo.channel('chat-1')
+        .subscribed(() => {
+            console.log('Subscribed to chat-1 channel');
+        })
+        .listen('.MessageSent', (e) => {
+            console.log('新しいメッセージを受信:', e);
+            updateChatUI(e);
+        })
+        .error((error) => {
+            console.error('Channel error:', error);
+        });
 
-// window.Pusher = require('pusher-js');
-
-// window.Echo = new Echo({
-//     broadcaster: 'pusher',
-//     key: process.env.MIX_PUSHER_APP_KEY,
-//     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-//     forceTLS: false,
-//     wsHost: 'localhost',
-//     wsPort: 6001,
-// });
-
+    // Pusher接続状態の変更をログに記録
+    window.Echo.connector.pusher.connection.bind('state_change', function(states) {
+        console.log('Pusher接続状態:', states.current);
+    });
+}
