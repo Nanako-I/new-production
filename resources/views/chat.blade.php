@@ -445,6 +445,10 @@
             displayMessage(data);
         });
 
+        channel.bind_global(function(eventName, data) {
+            console.log(`Received event "${eventName}":`, data);
+        });
+
         function displayMessage(data) {
             const chatUl = document.getElementById('chatbot-ul');
             const li = document.createElement('li');

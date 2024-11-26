@@ -42,6 +42,8 @@ class MessageSent implements ShouldBroadcast
     public function broadcastAs()
     {
         return 'message.sent';
+        Log::info("Broadcasting event as: " . $eventName);
+        return $eventName;
     }
 
     public function broadcastWith()
