@@ -35,6 +35,38 @@ window.Echo = new Echo({
     enabledTransports: ['ws', 'wss'],
 });
 
+
+
+    Pusher.logToConsole = true;
+
+    window.Echo.channel('chat-1')
+    .listen('MessageSent', (e) => {
+        console.log('新しいメッセージを受信:', e);
+        updateChatUI(e);
+    });
+
+// チャットUIを更新する関数
+function updateChatUI(message) {
+    const chatContainer = document.getElementById('chat-messages');
+    if (chatContainer) {
+        const messageElement = document.createElement('div');
+        messageElement.className = 'message';
+        messageElement.innerHTML = `
+            <strong>${message.last_name} ${message.first_name}:</strong>
+            <span>${message.message}</span>
+            <small>${message.created_at}</small>
+        `;
+        chatContainer.appendChild(messageElement);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    } else {
+        console.warn('チャットコンテナが見つかりません');
+    }
+}
+
+// Pusher接続状態の変更をログに記録
+window.Echo.connector.pusher.connection.bind('state_change', function(states) {
+    console.log('Pusher接続状態:', states.current);
+});
 // import Echo from 'laravel-echo';
 
 // window.Pusher = require('pusher-js');

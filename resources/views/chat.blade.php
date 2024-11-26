@@ -440,7 +440,7 @@
             console.log('Successfully subscribed to channel chat-' + peopleId);
         });
 
-        channel.bind('message.sent', function(data) {
+        channel.bind('MessageSent', function(data) {
             console.log('Received message:', data);
             displayMessage(data);
         });
