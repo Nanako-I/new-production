@@ -36,27 +36,27 @@ class MessageSent implements ShouldBroadcast
     public function broadcastOn()
     {
         \Log::info('Broadcasting on channel: chat-' . $this->chat->people_id);
-        return new PrivateChannel('chat-'.$this->chat->people_id);
+        return new Channel('chat-'.$this->chat->people_id); // Channelを使用
     }
 
     public function broadcastAs()
     {
-        return 'event-'.$this->chat->people_id;
+        return 'message.sent';
     }
-
 
     public function broadcastWith()
     {
         return [
-            'chat' => $this->chat,
+            'id' => $this->chat->id,
+            'people_id' => $this->chat->people_id,
             'user_name' => $this->chat->user_name,
             'user_identifier' => $this->chat->user_identifier,
             'message' => $this->chat->message,
             'filename' => $this->chat->filename,
             'path' => $this->chat->path,
             'created_at' => $this->chat->created_at->toDateTimeString(),
+            'last_name' => $this->chat->last_name,
+            'first_name' => $this->chat->first_name,
         ];
-
-
     }
 }

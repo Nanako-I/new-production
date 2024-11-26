@@ -85,26 +85,25 @@ class ChatController extends Controller
             $person = Person::findOrFail($people_id);
     
             $user = Auth::user();
-if ($user) {
-    $user_name = $user->last_name . ' ' . $user->first_name;
-    $user_identifier = $user->id;
-
-    // ユーザーが指定された役割を持っているか確認
-    if ($user->hasAnyRole(['facility staff administrator', 'facility staff user', 'facility staff reader'])) {
-        $facility = $user->facility_staffs()->first();
-        if ($facility) {
-            $user_name = $facility->facility_name;
-        }
-    }
-} else {
-    $user_name = 'Guest';
-    $user_identifier = Str::random(20);
-}
+            if ($user) {
+                $user_name = $user->last_name . ' ' . $user->first_name;
+                $user_identifier = $user->id;
+    
+                if ($user->hasAnyRole(['facility staff administrator', 'facility staff user', 'facility staff reader'])) {
+                    $facility = $user->facility_staffs()->first();
+                    if ($facility) {
+                        $user_name = $facility->facility_name;
+                    }
+                }
+            } else {
+                $user_name = 'Guest';
+                $user_identifier = Str::random(20);
+            }
     
             session(['user_name' => $user_name]);
             session(['user_identifier' => $user_identifier]);
             \Log::info('Session user_name: ' . session('user_name'));
-            // 画像保存
+    
             $directory = 'sample/chat_photo';
             $filename = null;
             $filepath = null;
@@ -138,17 +137,19 @@ if ($user) {
                 'first_name' => $user ? $user->first_name : null,
             ]);
     
-            broadcast(new MessageSent($chat))->toOthers();
-    
-            return response()->json([
-                'message' => $request->message,
-                'user_identifier' => $user_identifier,
-                'user_name' => $user_name,
-                'created_at' => $chat->created_at->format('Y-m-d H:i:s'),
-                'filename' => $chat->filename,
-                'last_name' => $chat->last_name,
-                'first_name' => $chat->first_name,
-            ]);
+            \Log::info('About to broadcast MessageSent event for chat ID: ' . $chat->id);
+                broadcast(new MessageSent($chat))->toOthers();
+                \Log::info('Broadcast method called for MessageSent event');
+                    
+                return response()->json([
+                    'message' => $request->message,
+                    'user_identifier' => $user_identifier,
+                    'user_name' => $user_name,
+                    'created_at' => $chat->created_at->format('Y-m-d H:i:s'),
+                    'filename' => $chat->filename,
+                    'last_name' => $chat->last_name,
+                    'first_name' => $chat->first_name,
+                ]);
     
         } catch (\Exception $e) {
             \Log::error('Error in store method: ' . $e->getMessage());
