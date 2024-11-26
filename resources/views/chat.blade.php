@@ -415,7 +415,7 @@
         </script>
     <!-- </div> -->
 
-    <!-- <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
 <script>
      window.PUSHER_APP_KEY = "{{ env('PUSHER_APP_KEY') }}";
      window.PUSHER_APP_CLUSTER = "{{ env('PUSHER_APP_CLUSTER') }}";
@@ -433,11 +433,11 @@
     }
         });
 
-        var channel = pusher.subscribe('private-chat-' + peopleId);
-        channel.bind('message.sent', function(data) {
-            console.log('Received message:', data);
-            window.displayMessage(data);
-        });
+        var channel = pusher.subscribe('chat-' + peopleId);
+channel.bind('message.sent', function(data) {
+    console.log('Received message:', data);
+    window.displayMessage(data);
+});
 
         window.displayMessage = function(data) {
             const chatUl = document.getElementById('chatbot-ul');
@@ -464,7 +464,7 @@
             const chatField = document.getElementById('chatbot-body');
             chatField.scrollTop = chatField.scrollHeight;
         }
-    }); -->
-<!-- </script> -->
+    }); 
+ </script>
 </body>
 </x-app-layout>

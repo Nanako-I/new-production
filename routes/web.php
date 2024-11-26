@@ -568,7 +568,8 @@ Route::post('bath/{people_id}/edit', [BathController::class,'store'])->name('chi
 Route::get('childbathchange/{people_id}', [BathController::class, 'change'])->name('childbath.change');
 Route::post('childbathchange/{people_id}',[BathController::class,'update'])->name('childbath.update');
 
-// 連絡帳機能
+// 連絡機能
+Broadcast::routes(['middleware' => ['web', 'auth']]);
 Route::get('chat/{people_id}', [ChatController::class, 'show'])->name('chat.show');
 Route::post('chat/{people_id}', [ChatController::class, 'store'])->name('chat.store');
 
