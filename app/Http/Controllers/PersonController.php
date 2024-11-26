@@ -320,6 +320,8 @@ class PersonController extends Controller
         // 現在ログインしているユーザーが属する施設にpeople（利用者）を紐づける↓
         // syncWithoutDetaching＝完全重複以外は、重複OK
         $newpeople->people_facilities()->syncWithoutDetaching($firstFacility->id);
+         // 既存の記録項目を新規利用者に紐づける
+        $this->linkExistingOptionsToNewPerson($newpeople, $firstFacility);
 
         if ($firstFacility) {
             $people = $firstFacility->people_facilities()->get();
@@ -332,6 +334,29 @@ class PersonController extends Controller
         // return view('people', compact('people'));
         return redirect()->route('people.index');
     }
+
+    private function linkExistingOptionsToNewPerson(Person $newPerson, Facility $facility)
+{
+    // 施設の既存の記録項目グループを取得（NULLでないもののみ）
+    $existingOptionGroups = Option::where('facility_id', $facility->id)
+        ->whereNotNull('option_group_id')
+        ->select('option_group_id')
+        ->distinct()
+        ->get();
+
+    foreach ($existingOptionGroups as $group) {
+        // グループ内の最初の記録項目を取得
+        $sampleOption = Option::where('option_group_id', $group->option_group_id)
+            ->first();
+
+        if ($sampleOption) {
+            // 新しい利用者用の記録項目を作成
+            $newOption = $sampleOption->replicate();
+            $newOption->people_id = $newPerson->id;
+            $newOption->save();
+        }
+    }
+}
 
 
     /**
@@ -559,7 +584,15 @@ return back()->withInput($request->all())
         ];
     })->toArray();
 
-    return view('select_item', compact('person', 'facility', 'selectedItems', 'additionalItems', 'id'));
+    $facilityItems = array_filter($additionalItems, function($item) {
+        return $item['option_group_id'] !== null;
+    });
+
+    $individualItems = array_filter($additionalItems, function($item) {
+        return $item['option_group_id'] === null;
+    });
+
+    return view('select_item', compact('person', 'facility', 'additionalItems' ,'selectedItems', 'facilityItems', 'individualItems', 'id'));
 }
 
 public function updateSelectedItems(Request $request, $id)

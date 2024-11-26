@@ -46,79 +46,76 @@
                         <input type="hidden" name="people_id" value="{{ $person->id }}">
                     </div>
 
-                    <!-- 記録項目の表示 -->
-
-                    <div class="bg-gray-50 p-4 rounded-lg mb-6">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-700">施設共通の記録項目</h3>
-            <a href="{{ route('item.index', ['facility' => $facility->id]) }}" 
-               class="inline-flex items-center px-4 py-2 bg-blue-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:border-blue-700 focus:ring ring-blue-300 disabled:opacity-25 transition ease-in-out duration-150">
-                <i class="fas fa-edit mr-2"></i>
-                施設共通の記録項目を編集
-            </a>
-        </div>
-        
-        @foreach ($additionalItems as $item)
-            <div class="flex flex-row items-center my-3 pl-4">
-                <div class="w-6 h-6 flex items-center justify-center">
-                    @if($item['flag'] == 1)
-                        <i class="fas fa-check text-green-500"></i>
-                    @endif
-                </div>
-                <p class="text-gray-900 font-bold text-xl px-1.5">{{ $item['title'] }}</p>
-                <p class="text-gray-500 text-base px-1.5">{{ $item['items'] }}</p>
-            </div>
-        @endforeach
+                   <!-- 施設共通の記録項目 -->
+<div class="bg-gray-50 p-4 rounded-lg mb-6">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-700">施設共通の記録項目</h3>
+        <a href="{{ route('item.index', ['facility' => $facility->id]) }}" 
+           class="inline-flex items-center px-4 py-2 bg-blue-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:border-blue-700 focus:ring ring-blue-300 disabled:opacity-25 transition ease-in-out duration-150">
+            <i class="fas fa-edit mr-2"></i>
+            施設共通の記録項目を編集
+        </a>
     </div>
+    
+    @foreach ($facilityItems as $item)
+        <div class="flex flex-row items-center my-3 pl-4">
+            <div class="w-6 h-6 flex items-center justify-center">
+                @if($item['flag'] == 1)
+                    <i class="fas fa-check text-green-500"></i>
+                @endif
+            </div>
+            <p class="text-gray-900 font-bold text-xl px-1.5">{{ $item['title'] }}</p>
+            <p class="text-gray-500 text-base px-1.5">{{ $item['items'] }}</p>
+        </div>
+    @endforeach
+</div>
     </a>
     @php
-$selectedItemsData = json_decode($person->selected_items, true) ?? [];
-$selectedOptionIds = array_column(array_filter($selectedItemsData, function($item) {
-    return !isset($item['fixed']) || !$item['fixed'];
-}), 'id');
-$selectedFixedItems = array_column(array_filter($selectedItemsData, function($item) {
-    return isset($item['fixed']) && $item['fixed'];
-}), 'title');
+        $selectedItemsData = json_decode($person->selected_items, true) ?? [];
+        $selectedOptionIds = array_column(array_filter($selectedItemsData, function($item) {
+            return !isset($item['fixed']) || !$item['fixed'];
+        }), 'id');
+        $selectedFixedItems = array_column(array_filter($selectedItemsData, function($item) {
+            return isset($item['fixed']) && $item['fixed'];
+        }), 'title');
 
-if ($person->medical_care == 1) {
-    $items = [
-        ['name' => '体温'],
-        ['name' => 'トイレ', 'details' => '尿量・便量・便状態・便通処置・写真'],
-        ['name' => '水分摂取', 'details' => '水分摂取の時間'],
-        ['name' => '内服', 'details' => '内服の時間'],
-        ['name' => '注入', 'details' => '注入の時間・写真'],
-        ['name' => '血圧・脈・SpO2'],
-        ['name' => '吸引', 'details' => '吸引の時間・写真'],
-        ['name' => '発作', 'details' => '発作が起きた時間・様子・動画']
-    ];
-} else {
-    $items = [
-        ['name' => '体温'],
-        ['name' => '食事', 'details' => '昼食・メニュー・おやつ・おやつのメニュー'],
-    ];
-}
-@endphp
+        if ($person->medical_care == 1) {
+            $items = [
+                ['name' => '体温'],
+                ['name' => 'トイレ', 'details' => '尿量・便量・便状態・便通処置・写真'],
+                ['name' => '水分摂取', 'details' => '水分摂取の時間'],
+                ['name' => '内服', 'details' => '内服の時間'],
+                ['name' => '注入', 'details' => '注入の時間・写真'],
+                ['name' => '血圧・脈・SpO2'],
+                ['name' => '吸引', 'details' => '吸引の時間・写真'],
+                ['name' => '発作', 'details' => '発作が起きた時間・様子・動画']
+            ];
+        } else {
+            $items = [
+                ['name' => '体温'],
+                ['name' => '食事', 'details' => '昼食・メニュー・おやつ・おやつのメニュー'],
+            ];
+        }
+        @endphp
 
-<div class="bg-white p-4 rounded-lg mb-6">
+<!-- 個人の記録項目 -->
+<div class="bg-white p-4 rounded-lg mb-6" id="individual-items-container">
     <h3 class="text-lg font-semibold text-gray-700 mb-4">記録項目</h3>
 
-    <!-- オプション項目 -->
-    @foreach ($additionalItems as $item)
-        @if(!$item['option_group_id'])
-            <div class="flex flex-row items-center my-3">
-                <input type="checkbox" 
-                    name="selected_options[]" 
-                    value="{{ $item['id'] }}" 
-                    {{ in_array($item['id'], $selectedOptionIds) ? 'checked' : '' }} 
-                    class="w-6 h-6 item-checkbox"
-                    data-flag="{{ $item['flag'] ?? 0 }}">
-                <p class="text-gray-900 font-bold text-xl px-1.5">{{ $item['title'] }}</p>
-                <p class="text-gray-500 text-base px-1.5">{{ $item['items'] }}</p>
-            </div>
-        @endif
+    @foreach ($individualItems as $item)
+        <div class="flex flex-row items-center my-3">
+            <input type="checkbox" 
+                name="selected_options[]" 
+                value="{{ $item['id'] }}" 
+                {{ $item['flag'] == 1 || in_array($item['id'], $selectedOptionIds) ? 'checked' : '' }} 
+                class="w-6 h-6 item-checkbox"
+                data-flag="{{ $item['flag'] ?? 0 }}">
+            <p class="text-gray-900 font-bold text-xl px-1.5">{{ $item['title'] }}</p>
+            <p class="text-gray-500 text-base px-1.5">{{ $item['items'] }}</p>
+        </div>
     @endforeach
 
-    <!-- 固定項目 -->
+    <!-- 固定項目 (unchanged) -->
     @foreach($items as $item)
         <div class="flex flex-row items-center my-3">
             <input type="checkbox" 
@@ -319,6 +316,43 @@ if ($person->medical_care == 1) {
         })
         .catch(error => {
             // エラーメッセージの表示
+            console.error(error);
+            formErrorMessage.classList.remove('hidden');
+            formErrorMessage.textContent = error.response?.data?.message || 'エラーが発生しました。再度お試しください。';
+        });
+    }
+
+    function addNewItem(item) {
+    const itemsContainer = document.getElementById('individual-items-container');
+    const newItemHTML = `
+        <div class="flex flex-row items-center my-3">
+            <input type="checkbox" 
+                name="selected_options[]" 
+                value="${item.id}" 
+                ${item.flag == 1 ? 'checked' : ''} 
+                class="w-6 h-6 item-checkbox"
+                data-flag="${item.flag || 0}">
+            <p class="text-gray-900 font-bold text-xl px-1.5">${item.title}</p>
+            <p class="text-gray-500 text-base px-1.5">${item.items}</p>
+        </div>
+    `;
+    itemsContainer.insertAdjacentHTML('beforeend', newItemHTML);
+}
+
+    // Modify the submitForm function
+    function submitForm(formData) {
+        axios.post('/options', formData, {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => {
+            alert(response.data.message);
+            addNewItem(response.data.item); // Add the new item to the list
+            closeModal();
+        })
+        .catch(error => {
             console.error(error);
             formErrorMessage.classList.remove('hidden');
             formErrorMessage.textContent = error.response?.data?.message || 'エラーが発生しました。再度お試しください。';
