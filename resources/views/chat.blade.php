@@ -418,28 +418,34 @@
     <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
 <script>
      window.PUSHER_APP_KEY = "{{ env('PUSHER_APP_KEY') }}";
-     window.PUSHER_APP_CLUSTER = "{{ env('PUSHER_APP_CLUSTER') }}";
+    window.PUSHER_APP_CLUSTER = "{{ env('PUSHER_APP_CLUSTER') }}";
+    
     document.addEventListener('DOMContentLoaded', function() {
         Pusher.logToConsole = true;
 
         var pusher = new Pusher(window.PUSHER_APP_KEY, {
             cluster: window.PUSHER_APP_CLUSTER,
-            encrypted: true,
-            authEndpoint: '/broadcasting/auth', // Laravelのデフォルトの認証エンドポイント
-    auth: {
-        headers: {
-            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    }
+            forceTLS: true,
+            authEndpoint: '/broadcasting/auth',
+            auth: {
+                headers: {
+                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            }
         });
 
         var channel = pusher.subscribe('chat-' + peopleId);
-channel.bind('message.sent', function(data) {
-    console.log('Received message:', data);
-    window.displayMessage(data);
-});
 
-        window.displayMessage = function(data) {
+        channel.bind('pusher:subscription_succeeded', function() {
+            console.log('Successfully subscribed to channel chat-' + peopleId);
+        });
+
+        channel.bind('message.sent', function(data) {
+            console.log('Received message:', data);
+            displayMessage(data);
+        });
+
+        function displayMessage(data) {
             const chatUl = document.getElementById('chatbot-ul');
             const li = document.createElement('li');
             const className = data.user_identifier == window.sessionUserIdentifier ? 'self' : 'other';
@@ -458,7 +464,7 @@ channel.bind('message.sent', function(data) {
             `;
             chatUl.appendChild(li);
             chatToBottom();
-        };
+        }
 
         function chatToBottom() {
             const chatField = document.getElementById('chatbot-body');
