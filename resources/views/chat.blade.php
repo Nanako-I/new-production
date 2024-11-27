@@ -277,7 +277,9 @@
     <body class="font-sans antialiased" >
     <!-- <body class="font-sans antialiased" style="margin-bottom: 60px;"> -->
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-        <div id="chatbot">
+        <div id="chatbot"
+            data-user-identifier="{{ session('user_identifier') }}"
+            data-user-name="{{ session('user_name') }}">>
             <div class="flex flex-col items-center">
                 <form action="{{ url('people' ) }}" method="POST" class="w-full max-w-lg">
                     @method('PATCH')
@@ -290,7 +292,7 @@
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
             <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
             <div id="chatbot-body">
-                <ul id="chatbot-ul">
+            <ul id="chatbot-ul" class="chat-messages">
                     @foreach ($chats as $chat)
                     <li class="{{ $chat->user_identifier == session('user_identifier') ? 'self' : 'other' }}">
                         <div class="message-container {{ $chat->user_identifier == session('user_identifier') ? 'self-message' : 'other-message' }}">

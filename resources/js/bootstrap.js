@@ -24,16 +24,27 @@ window.Echo = new Echo({
 Pusher.logToConsole = true;
 
 // チャットUIを更新する関数
+// チャットUIを更新する関数
 function updateChatUI(message) {
     console.log('Updating chat UI with:', message);
-    const chatContainer = document.getElementById('chat-messages');
+    const chatContainer = document.getElementById('chatbot-ul');
     if (chatContainer) {
-        const messageElement = document.createElement('div');
-        messageElement.className = 'message';
+        const messageElement = document.createElement('li');
+        const chatbotContainer = document.getElementById('chatbot');
+        const sessionUserIdentifier = chatbotContainer.dataset.userIdentifier;
+        const sessionUserName = chatbotContainer.dataset.userName;
+
+        messageElement.className = message.user_identifier === sessionUserIdentifier ? 'self' : 'other';
         messageElement.innerHTML = `
-            <strong>${message.last_name} ${message.first_name}:</strong>
-            <span>${message.message}</span>
-            <small>${message.created_at}</small>
+            <div class="message-container ${messageElement.className}-message">
+                <div style="overflow-wrap: break-word;">
+                    <p style="overflow-wrap: break-word;" class="text-gray-900">${message.message}</p>
+                    ${message.filename ? `<img alt="team" class="w-80 h-64" src="/storage/sample/chat_photo/${message.filename}" onerror="this.onerror=null;">` : ''}
+                </div>
+                <p class="text-sm font-normal ${messageElement.className === 'self' ? 'text-right' : 'text-left'}">
+                    ${message.created_at} ＠${message.user_identifier === sessionUserIdentifier ? sessionUserName : message.last_name + message.first_name}
+                </p>
+            </div>
         `;
         chatContainer.appendChild(messageElement);
         chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -41,6 +52,40 @@ function updateChatUI(message) {
         console.warn('チャットコンテナが見つかりません');
     }
 }
+
+// DOMContentLoaded イベントリスナー
+document.addEventListener('DOMContentLoaded', function() {
+    const chatbotContainer = document.getElementById('chatbot');
+    
+    if (chatbotContainer) {
+        // Echo の設定
+        if (window.Echo) {
+            window.Echo.channel('chat-1')
+                .subscribed(() => {
+                    console.log('Subscribed to chat-1 channel');
+                })
+                .listen('.MessageSent', (e) => {
+                    console.log('新しいメッセージを受信:', e);
+                    updateChatUI(e);
+                })
+                .error((error) => {
+                    console.error('Channel error:', error);
+                });
+
+            // Pusher接続状態の変更をログに記録
+            window.Echo.connector.pusher.connection.bind('state_change', function(states) {
+                console.log('Pusher接続状態:', states.current);
+            });
+        } else {
+            console.warn('Echo が定義されていません');
+        }
+    } else {
+        console.error('チャットボットコンテナが見つかりません');
+    }
+});
+
+    // 以下、他の初期化コードなど
+
 
 if (window.Echo) {
     window.Echo.channel('chat-1')
