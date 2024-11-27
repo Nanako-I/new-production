@@ -35,14 +35,10 @@ return [
         'pusher' => [
             'driver' => 'pusher',
             'key' => env('PUSHER_APP_KEY'),
-            //'key' => "e5f439b12032cb8f7894",
             'secret' => env('PUSHER_APP_SECRET'),
-            //'secret' => "67e5919f5f17937bf3b6",
             'app_id' => env('PUSHER_APP_ID'),
-            //'app_id' => 1837219,
             'options' => [
                 'cluster' => env('PUSHER_APP_CLUSTER'),
-                //'cluster' => "mt1",
                 'useTLS' => true,
                 'host' =>env('PUSHER_HOST') ?: 'api-'.env('PUSHER_APP_CLUSTER', 'ap3').'.pusher.com',
                 'port' => env('PUSHER_PORT'),
