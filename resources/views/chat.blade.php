@@ -411,11 +411,10 @@
                     .catch(error => {
                         console.error('Error:', error);
                         alert('メッセージの送信に失敗しました。');
-                    });
+                    }, { once: true });
                 });
             });
         </script>
-    <!-- </div> -->
 
     <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
 <script>
