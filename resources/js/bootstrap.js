@@ -23,7 +23,6 @@ window.Echo = new Echo({
 Pusher.logToConsole = true;
 
 // チャットUIを更新する関数
-// チャットUIを更新する関数
 function updateChatUI(message) {
     console.log('Updating chat UI with:', message);
     const chatContainer = document.getElementById('chatbot-ul');
@@ -83,4 +82,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
- 
+function scrollToBottom() {
+    const chatContainer = document.getElementById('chatbot-body');
+    if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+}
+
+// Call scrollToBottom when the page loads
+document.addEventListener('DOMContentLoaded', scrollToBottom);
