@@ -83,24 +83,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-    // 以下、他の初期化コードなど
-
-
-if (window.Echo) {
-    window.Echo.channel('chat-1')
-        .subscribed(() => {
-            console.log('Subscribed to chat-1 channel');
-        })
-        .listen('.MessageSent', (e) => {
-            console.log('新しいメッセージを受信:', e);
-            updateChatUI(e);
-        })
-        .error((error) => {
-            console.error('Channel error:', error);
-        });
-
-    // Pusher接続状態の変更をログに記録
-    window.Echo.connector.pusher.connection.bind('state_change', function(states) {
-        console.log('Pusher接続状態:', states.current);
-    });
-}
+ 

@@ -124,6 +124,7 @@ class ChatController extends Controller
                  \Log::info('Broadcast method called for MessageSent event');
                      
                  return response()->json([
+                     'id' => $chat->id,
                      'message' => $request->message,
                      'user_identifier' => $user_identifier,
                      'user_name' => $user_name,
