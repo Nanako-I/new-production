@@ -404,9 +404,9 @@
                             if (data.error) {
                                 throw new Error(data.error);
                             }
-                            // if (!document.querySelector(`li[data-message-id="${data.id}"]`)) {
-                            //     window.displayMessage(data);
-                            // }
+                            if (!document.querySelector(`li[data-message-id="${data.id}"]`)) {
+                                window.displayMessage(data);
+                            }
                             document.getElementById('chatbot-text').value = '';
                             document.getElementById('filename').value = '';
                         })
@@ -447,9 +447,9 @@
 
         channel.bind('MessageSent', function(data) {
             console.log('Received message:', data);
-            // if (!document.querySelector(`li[data-message-id="${data.id}"]`)) {
-            //     displayMessage(data);
-            // }
+            if (!document.querySelector(`li[data-message-id="${data.id}"]`)) {
+                displayMessage(data);
+            }
         });
 
         channel.bind_global(function(eventName, data) {
