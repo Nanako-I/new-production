@@ -24,14 +24,15 @@ Pusher.logToConsole = true;
 
 // チャットUIを更新する関数
 function updateChatUI(message) {
+    console.log('Updating chat UI with:', message);
     const chatContainer = document.getElementById('chatbot-ul');
-    if (!document.querySelector(`li[data-message-id="${message.id}"]`)) {
+    if (chatContainer) {
         const messageElement = document.createElement('li');
-        const sessionUserIdentifier = document.getElementById('chatbot').dataset.userIdentifier;
-        const sessionUserName = document.getElementById('chatbot').dataset.userName;
+        const chatbotContainer = document.getElementById('chatbot');
+        const sessionUserIdentifier = chatbotContainer.dataset.userIdentifier;
+        const sessionUserName = chatbotContainer.dataset.userName;
 
         messageElement.className = message.user_identifier === sessionUserIdentifier ? 'self' : 'other';
-        messageElement.setAttribute('data-message-id', message.id);
         messageElement.innerHTML = `
             <div class="message-container ${messageElement.className}-message">
                 <div style="overflow-wrap: break-word;">
@@ -45,6 +46,8 @@ function updateChatUI(message) {
         `;
         chatContainer.appendChild(messageElement);
         chatContainer.scrollTop = chatContainer.scrollHeight;
+    } else {
+        console.warn('チャットコンテナが見つかりません');
     }
 }
 
