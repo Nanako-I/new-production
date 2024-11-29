@@ -87,8 +87,14 @@ class ChatController extends Controller
      
              if ($request->hasFile('filename')) {
                  \Log::info('File received: ' . $request->file('filename')->getClientOriginalName());
+                 $request->validate(['filename' => 'image|max:20480']);
+                 $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'heic'];
+                $originalExtension = strtolower($request->file('filename')->getClientOriginalExtension());
+
+                if (!in_array($originalExtension, $allowedExtensions)) {
+                    return response()->json(['error' => 'サポートされていないファイルタイプです'], 400);
+                }
                  
-                 $request->validate(['filename' => 'image|max:10240']);
                  $originalExtension = $request->file('filename')->getClientOriginalExtension();
      
                  if (strtolower($originalExtension) === 'heic') {
