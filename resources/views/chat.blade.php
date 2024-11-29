@@ -355,66 +355,70 @@
 
                 window.displayMessage = function(data) {
                     const chatUl = document.getElementById('chatbot-ul');
-                    const li = document.createElement('li');
-                    const className = data.user_identifier == userIdentifier ? 'self' : 'other';
-                    li.classList.add(className);
-                    
-                    const lastName = data.last_name || '';
-                    const firstName = data.first_name || '';
-                    const createdAt = data.created_at || '';
-                    const message = data.message || '';
-                    
-                    li.innerHTML = `
-                        <div class="message-container ${className === 'self' ? 'self-message' : 'other-message'}">
-                            <div style="overflow-wrap: break-word;">
-                                <p style="overflow-wrap: break-word;" class="text-gray-900">${message}</p>
-                                ${data.filename ? `<img alt="team" class="w-80 h-64" src="/storage/sample/chat_photo/${data.filename}" onerror="this.onerror=null;">` : ''}
+                    if (!document.querySelector(`li[data-message-id="${data.id}"]`)) {
+                        const li = document.createElement('li');
+                        const className = data.user_identifier == window.sessionUserIdentifier ? 'self' : 'other';
+                        li.classList.add(className);
+                        li.setAttribute('data-message-id', data.id);
+
+                        li.innerHTML = `
+                            <div class="message-container ${className === 'self' ? 'self-message' : 'other-message'}">
+                                <div style="overflow-wrap: break-word;">
+                                    <p style="overflow-wrap: break-word;" class="text-gray-900">${data.message}</p>
+                                    ${data.filename ? `<img alt="team" class="w-80 h-64" src="/storage/sample/chat_photo/${data.filename}" onerror="this.onerror=null;">` : ''}
+                                </div>
+                                <p class="text-sm font-normal ${className === 'self' ? 'text-right' : 'text-left'}">
+                                    ${data.created_at} ＠${data.last_name}${data.first_name}
+                                </p>
                             </div>
-                            <p class="text-sm font-normal ${className === 'self' ? 'text-right' : 'text-left'}">
-                                ${createdAt} ＠${lastName}${firstName}
-                            </p>
-                        </div>
-                    `;
-                    chatUl.appendChild(li);
-                    chatToBottom();
+                        `;
+                        chatUl.appendChild(li);
+                        chatToBottom();
+                    }
                 };
 
-                document.getElementById('chat-form').addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    var formData = new FormData(document.getElementById('chat-form'));
+                const chatForm = document.getElementById('chat-form');
+                if (chatForm) {
+                    chatForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        var formData = new FormData(chatForm);
 
-                    const isFileSelected = document.getElementById('filename').files.length > 0;
-            
-                    if (isFileSelected) {
-                        formData.append('message', '写真が送信されました');
-                    }
+                        const isFileSelected = document.getElementById('filename').files.length > 0;
 
-                    fetch(this.action, {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
+                        if (isFileSelected) {
+                            formData.append('message', '写真が送信されました');
                         }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Data:', data);
-                        if (data.error) {
-                            throw new Error(data.error);
-                        }
-                        window.displayMessage(data);
-                        document.getElementById('chatbot-text').value = '';
-                        document.getElementById('filename').value = '';
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('メッセージの送信に失敗しました。');
+
+                        fetch(this.action, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Data:', data);
+                            if (data.error) {
+                                throw new Error(data.error);
+                            }
+                            // if (!document.querySelector(`li[data-message-id="${data.id}"]`)) {
+                            //     window.displayMessage(data);
+                            // }
+                            document.getElementById('chatbot-text').value = '';
+                            document.getElementById('filename').value = '';
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('メッセージの送信に失敗しました。');
+                        });
                     }, { once: true });
-                });
+                }
             });
         </script>
+    <!-- </div> -->
 
     <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
 <script>
@@ -443,7 +447,9 @@
 
         channel.bind('MessageSent', function(data) {
             console.log('Received message:', data);
-            displayMessage(data);
+            // if (!document.querySelector(`li[data-message-id="${data.id}"]`)) {
+            //     displayMessage(data);
+            // }
         });
 
         channel.bind_global(function(eventName, data) {
