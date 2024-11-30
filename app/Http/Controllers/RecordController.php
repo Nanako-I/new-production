@@ -57,7 +57,7 @@ class RecordController extends Controller
     // 職員側の連絡帳↓
     public function show(Request $request, $people_id)
 {
-    $user = auth()->user();
+$user = auth()->user();
 $facilities = $user->facility_staffs()->get();
 $facilityIds = $facilities->pluck('id')->toArray();
 
@@ -105,15 +105,15 @@ $person = Person::where('id', $people_id)
 
     // 選択された日付のオプションデータを取得
     // $optionsOnSelectedDate = $person->option_items ? $person->option_items->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]) : collect();
-    $lastOptions = OptionItem::where('people_id', $people_id)
-        ->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd])
-        ->latest()
-        ->first();
-    // 対応するOptionモデルのデータを取得 
-    $correspondingOption = null;
-    if ($lastOptions) {
-    $correspondingOption = Option::where('id', $lastOptions->option_id)->first();
+    $optionItems = OptionItem::where('people_id', $people_id)
+    ->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd])
+    ->get();
+
+    $correspondingOptions = [];
+    foreach ($optionItems as $optionItem) {
+        $correspondingOptions[$optionItem->id] = Option::find($optionItem->option_id);
     }
+    $correspondingOption = $correspondingOptions[$optionItem->id];
 
     // hanamaruの項目↓
     $lastTime = Time::where('people_id', $people_id)
@@ -158,7 +158,7 @@ $person = Person::where('id', $people_id)
     ->latest()
     ->first();  
 
-    return view('recordedit', compact('person', 'selectedDate', 'records', 'stamps','timesOnSelectedDate','foodsOnSelectedDate',  'watersOnSelectedDate' , 'medicinesOnSelectedDate', 'tubesOnSelectedDate',  'temperaturesOnSelectedDate', 'bloodpressuresOnSelectedDate','toiletsOnSelectedDate','kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate' , 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative','lastOptions', 'correspondingOption', 'lastNotebook'));
+    return view('recordedit', compact('person', 'selectedDate', 'records', 'stamps','timesOnSelectedDate','foodsOnSelectedDate',  'watersOnSelectedDate' , 'medicinesOnSelectedDate', 'tubesOnSelectedDate',  'temperaturesOnSelectedDate', 'bloodpressuresOnSelectedDate','toiletsOnSelectedDate','kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate' , 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative', 'optionItems', 'correspondingOptions','correspondingOption', 'lastNotebook'));
 }
 
     /**
@@ -204,16 +204,16 @@ public function RecordStampshow(Request $request, $people_id)
     $hossasOnSelectedDate = $person->hossas ? $person->hossas->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]) : collect();
     $speechesOnSelectedDate = $person->speeches ? $person->speeches->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]) : collect();
 
-    $lastOptions = OptionItem::where('people_id', $people_id)
-    ->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd])
-    ->latest()
-    ->first();
-    // 対応するOptionモデルのデータを取得 
-    $correspondingOption = null;
-    if ($lastOptions) {
-    // $correspondingOption = Option::where('id', $lastOptions->option_id)->first();
-    $correspondingOption = Option::find($lastOptions->option_id);
+    $optionItems = OptionItem::where('people_id', $people_id)
+        ->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd])
+        ->get();
+
+    $correspondingOptions = [];
+    foreach ($optionItems as $optionItem) {
+        $correspondingOptions[$optionItem->id] = Option::find($optionItem->option_id);
     }
+
+    $correspondingOption = $correspondingOptions[$optionItem->id];
 
     // hanamaruの項目↓
     $lastTime = Time::where('people_id', $people_id)
@@ -254,11 +254,11 @@ public function RecordStampshow(Request $request, $people_id)
         ->first();    
     
     $lastNotebook = Notebook::where('people_id', $people_id)	
-    ->whereDate('created_at', $selectedDate)	
+    ->whereDate('created_at', $selectedDate)
     ->latest()	
     ->first(); 
 
-    return view('recordstamp', compact('person', 'selectedDate', 'records', 'stamps','timesOnSelectedDate','foodsOnSelectedDate',  'watersOnSelectedDate' , 'medicinesOnSelectedDate', 'tubesOnSelectedDate',  'temperaturesOnSelectedDate', 'bloodpressuresOnSelectedDate','toiletsOnSelectedDate','kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate' , 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative','lastOptions', 'correspondingOption', 'lastNotebook'));
+    return view('recordstamp', compact('person', 'selectedDate', 'records', 'stamps','timesOnSelectedDate','foodsOnSelectedDate',  'watersOnSelectedDate' , 'medicinesOnSelectedDate', 'tubesOnSelectedDate',  'temperaturesOnSelectedDate', 'bloodpressuresOnSelectedDate','toiletsOnSelectedDate','kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate' , 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative','optionItems', 'correspondingOptions','correspondingOption', 'lastNotebook'));
 }
 
 // 家族側の押印処理↓

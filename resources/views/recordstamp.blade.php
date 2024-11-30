@@ -142,7 +142,7 @@
   <div class="container px-5 pb-24 mx-auto flex flex-wrap" _msthidden="10">
    <div class="flex flex-col flex-wrap lg:py-6 -mb-10 lg:w-1/2 lg:pl-12 lg:text-left text-center" _msthidden="9">
    @if (
-        collect([$timesOnSelectedDate, $foodsOnSelectedDate, $watersOnSelectedDate, $medicinesOnSelectedDate, $tubesOnSelectedDate, $temperaturesOnSelectedDate, $bloodpressuresOnSelectedDate, $toiletsOnSelectedDate, $kyuuinsOnSelectedDate, $hossasOnSelectedDate, $speechesOnSelectedDate, $lastTime, $lastMorningActivity, $lastAfternoonActivity, $lastActivity, $lastTraining, $lastLifestyle, $lastCreative, $lastNotebook])
+        collect([$foodsOnSelectedDate, $watersOnSelectedDate, $medicinesOnSelectedDate, $tubesOnSelectedDate, $temperaturesOnSelectedDate, $bloodpressuresOnSelectedDate, $toiletsOnSelectedDate, $kyuuinsOnSelectedDate, $hossasOnSelectedDate, $speechesOnSelectedDate, $lastTime, $lastMorningActivity, $lastAfternoonActivity, $lastActivity, $lastTraining, $lastLifestyle, $lastCreative, $optionItems, $correspondingOption, $lastNotebook])
         ->every(fn($collection) => $collection === null || $collection->count() === 0)
     ) 
         @if (\Carbon\Carbon::parse($selectedDate)->isToday())
@@ -714,31 +714,33 @@
       </div>
     @endif
 
-    @if($lastOptions && $correspondingOption)
-    <div class="flex flex-col mb-10 lg:items-start items-center">
-        <div class="w-12 h-12 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 mb-5">
-            <i class="fa-solid fa-people-group text-gray-700" style="font-size: 1.5em; transition: transform 0.2s;"></i>
-        </div>
-        <div class="flex-grow p-4">
-            <h2 class="text-gray-900 text-lg title-font font-medium mb-3">{{ $correspondingOption->title }}</h2>
-            <div class="flex justify-around text-left items-start">
-                @for($i = 1; $i <= 5; $i++)
-                    @php
-                        $optionItemKey = "item{$i}";
-                        $optionItem = json_decode($lastOptions->$optionItemKey);
-                        $correspondingItem = $correspondingOption->$optionItemKey;
-                    @endphp
-                    @if($optionItem && is_array($optionItem) && !empty($optionItem) && $correspondingItem)
-                        <p class="text-gray-900 font-bold text-xl px-3">{{ $correspondingItem }}</p>
-                    @endif
-                @endfor
+    @if($optionItems->isNotEmpty())
+    @foreach($optionItems as $optionItem)
+        <div class="flex flex-col mb-10 lg:items-start items-center">
+            <div class="w-12 h-12 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 mb-5">
+                <i class="fa-solid fa-people-group text-gray-700" style="font-size: 1.5em; transition: transform 0.2s;"></i>
             </div>
-            @if($lastOptions->bikou !== null)
-                <p class="text-gray-900 font-bold text-xl px-3">{{ $lastOptions->bikou }}</p>
-            @endif
+            <div class="flex-grow p-4">
+                <h2 class="text-gray-900 text-lg title-font font-medium mb-3">{{ $correspondingOption->title }}</h2>
+                <div class="flex justify-around text-left items-start">
+                    @for($i = 1; $i <= 5; $i++)
+                        @php
+                            $optionItemKey = "item{$i}";
+                            $optionItemValue = json_decode($optionItem->$optionItemKey);
+                            $correspondingItemValue = $correspondingOption->$optionItemKey;
+                        @endphp
+                        @if(!empty($optionItemValue) && is_array($optionItemValue) && count($optionItemValue) > 0 && $correspondingItemValue)
+                            <p class="text-gray-900 font-bold text-xl px-3">{{ $correspondingItemValue }}</p>
+                        @endif
+                    @endfor
+                </div>
+                @if($optionItem->bikou !== null)
+                    <p class="text-gray-900 font-bold text-xl px-3">{{ $optionItem->bikou }}</p>
+                @endif
+            </div>
+            <hr style="border: 1px solid #666; margin: 0 auto; width: 100%;">
         </div>
-        <hr style="border: 1px solid #666; margin: 0 auto; width: 100%;">
-    </div>
+    @endforeach
 @endif
 
     @if($lastNotebook)
@@ -758,7 +760,7 @@
 
 
     @php 
-    $dataExists = collect([$foodsOnSelectedDate, $watersOnSelectedDate, $medicinesOnSelectedDate, $tubesOnSelectedDate, $temperaturesOnSelectedDate, $bloodpressuresOnSelectedDate, $toiletsOnSelectedDate, $kyuuinsOnSelectedDate, $hossasOnSelectedDate, $speechesOnSelectedDate, $lastTime, $lastMorningActivity, $lastAfternoonActivity, $lastActivity, $lastTraining, $lastLifestyle, $lastCreative, $lastOptions, $lastNotebook])->every(fn($collection) => is_null($collection) || count($collection) === 0
+    $dataExists = collect([$foodsOnSelectedDate, $watersOnSelectedDate, $medicinesOnSelectedDate, $tubesOnSelectedDate, $temperaturesOnSelectedDate, $bloodpressuresOnSelectedDate, $toiletsOnSelectedDate, $kyuuinsOnSelectedDate, $hossasOnSelectedDate, $speechesOnSelectedDate, $lastTime, $lastMorningActivity, $lastAfternoonActivity, $lastActivity, $lastTraining, $lastLifestyle, $lastCreative, $optionItems, $correspondingOption, $lastNotebook])->every(fn($collection) => is_null($collection) || count($collection) === 0
     );
 @endphp
 
