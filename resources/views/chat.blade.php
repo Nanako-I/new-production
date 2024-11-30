@@ -97,7 +97,18 @@
 
             @media screen and (max-width: 700px) {
                 #chatbot-body {
-                    height: calc(100vh - 60px);
+                width: 100%;
+                height: calc(100vh - 150px);
+                padding-top: 10px;
+                padding-bottom: 10px;
+                background: #FFF;
+                box-sizing: border-box;
+                overflow-x: hidden;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                position: absolute;
+                top: 0;
+                bottom: 80px;
                 }
             }
 
@@ -206,13 +217,15 @@
             #chatbot-ul {
                 padding: 0;
                 list-style: none;
+                max-height: 80vh;
+                padding-bottom: 80px;
             }
 
             @media screen and (min-width: 700px) {
                 #chatbot-ul {
                     max-width: 80%;
                     margin: 15%;
-                    padding-bottom: 60px;
+                    
                 }
             }
 
