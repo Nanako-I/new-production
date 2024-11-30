@@ -728,7 +728,7 @@
                         $optionItem = json_decode($lastOptions->$optionItemKey);
                         $correspondingItem = $correspondingOption->$optionItemKey;
                     @endphp
-                    @if(!empty($optionItem) && is_array($optionItem) && count($optionItem) > 0 && $correspondingItem)
+                    @if($optionItem && is_array($optionItem) && !empty($optionItem) && $correspondingItem)
                         <p class="text-gray-900 font-bold text-xl px-3">{{ $correspondingItem }}</p>
                     @endif
                 @endfor
