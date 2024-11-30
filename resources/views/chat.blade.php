@@ -212,6 +212,7 @@
                 #chatbot-ul {
                     max-width: 80%;
                     margin: 15%;
+                    padding-bottom: 60px;
                 }
             }
 
