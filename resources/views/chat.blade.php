@@ -95,7 +95,7 @@
             }
 
 
-            @media screen and (max-width: 700px) {
+            /* @media screen and (max-width: 700px) {
                 #chatbot-body {
                 width: 100%;
                 height: calc(100vh - 150px);
@@ -110,7 +110,22 @@
                 top: 0;
                 bottom: 80px;
                 }
-            }
+            } */
+            #chatbot-body {
+    width: 100%;
+    height: calc(100vh - 180px); /* 画面の高さから80pxを引いた値 */
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background: #FFF;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+}
 
             #chatbot-body.chatbot-body-zoom {
                 width: 100%;
