@@ -211,7 +211,8 @@ public function RecordStampshow(Request $request, $people_id)
     // 対応するOptionモデルのデータを取得 
     $correspondingOption = null;
     if ($lastOptions) {
-    $correspondingOption = Option::where('id', $lastOptions->option_id)->first();
+    // $correspondingOption = Option::where('id', $lastOptions->option_id)->first();
+    $correspondingOption = Option::find($lastOptions->option_id);
     }
 
     // hanamaruの項目↓
