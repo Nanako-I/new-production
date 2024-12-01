@@ -214,10 +214,12 @@ public function foods()
         
     }
     
-    // protected static function booted()
-    // {
-    //     static::addGlobalScope(new FacilityScope);
-    // }
+    public function records_confirm()
+    {
+        return $this->hasMany(RecordConfirm::class,'people_id');
+        
+    }
+
     // リクエストのルート名を取得
     protected static function booted()
 {

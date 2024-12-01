@@ -22,6 +22,7 @@ use App\Models\Record;
 use App\Models\Option;
 use App\Models\OptionItem;
 use App\Models\Notebook;
+use App\Models\RecordConfirm;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -56,22 +57,17 @@ class RecordController extends Controller
 
     // 職員側の連絡帳↓
     public function show(Request $request, $people_id)
-{
-$user = auth()->user();
-$facilities = $user->facility_staffs()->get();
-$facilityIds = $facilities->pluck('id')->toArray();
+    {
+    $user = auth()->user();
+    $facilities = $user->facility_staffs()->get();
+    $facilityIds = $facilities->pluck('id')->toArray();
 
-// 指定されたpersonがユーザーの施設に関連付けられているか確認
-$person = Person::where('id', $people_id)
-                ->whereHas('people_facilities', function ($query) use ($facilityIds) {
-                    $query->whereIn('facility_id', $facilityIds);
-                })
-                ->first();
-
-// if (!$person) {
-//     // アクセス拒否
-//     return redirect()->route('home')->withErrors(['access_denied' => 'アクセス権限がありません。']);
-// }
+    // 指定されたpersonがユーザーの施設に関連付けられているか確認
+    $person = Person::where('id', $people_id)
+                    ->whereHas('people_facilities', function ($query) use ($facilityIds) {
+                        $query->whereIn('facility_id', $facilityIds);
+                    })
+                    ->first();
 
     // 既存の処理を続ける
     $today = \Carbon\Carbon::now()->toDateString();
@@ -83,13 +79,23 @@ $person = Person::where('id', $people_id)
     $records = Record::where('person_id', $people_id)
                      ->whereBetween('kiroku_date', [$selectedDateStart, $selectedDateEnd])
                      ->get();
+    // 職員が確定ボタンを押印したか情報取得
+    $isConfirmed = RecordConfirm::where('person_id', $people_id)
+    ->whereDate('kiroku_date', $selectedDate)
+    ->where('is_confirmed', true)
+    ->exists();
+
+    
 
     // 各記録に対して押印情報を取得
     $stamps = [];
-    foreach ($records as $record) {
-        $stamp = Record::where('id', $record->id)->first();
-        $stamps[$record->id] = $stamp;
-    }
+        if ($records !== null) {
+            foreach ($records as $record) {
+                // 各記録ごとに押印情報を取得
+                $stamp = Record::where('id', $record->id)->first();
+                $stamps[$record->id] = $stamp;
+            }
+        }
 
     $timesOnSelectedDate = $person->times ? $person->times->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]) : collect();
     $foodsOnSelectedDate = $person->foods->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]);
@@ -113,7 +119,7 @@ $person = Person::where('id', $people_id)
     foreach ($optionItems as $optionItem) {
         $correspondingOptions[$optionItem->id] = Option::find($optionItem->option_id);
     }
-    $correspondingOption = $correspondingOptions[$optionItem->id];
+    // $correspondingOption = $correspondingOptions[$optionItem->id];
 
     // hanamaruの項目↓
     $lastTime = Time::where('people_id', $people_id)
@@ -158,8 +164,65 @@ $person = Person::where('id', $people_id)
     ->latest()
     ->first();  
 
-    return view('recordedit', compact('person', 'selectedDate', 'records', 'stamps','timesOnSelectedDate','foodsOnSelectedDate',  'watersOnSelectedDate' , 'medicinesOnSelectedDate', 'tubesOnSelectedDate',  'temperaturesOnSelectedDate', 'bloodpressuresOnSelectedDate','toiletsOnSelectedDate','kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate' , 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative', 'optionItems', 'correspondingOptions','correspondingOption', 'lastNotebook'));
+    $hasData = collect([
+        $timesOnSelectedDate,
+        $foodsOnSelectedDate,
+        $watersOnSelectedDate,
+        $medicinesOnSelectedDate,
+        $tubesOnSelectedDate,
+        $temperaturesOnSelectedDate,
+        $bloodpressuresOnSelectedDate,
+        $toiletsOnSelectedDate,
+        $kyuuinsOnSelectedDate,
+        $hossasOnSelectedDate,
+        $speechesOnSelectedDate,
+        $lastTime,
+        $lastMorningActivity,
+        $lastAfternoonActivity,
+        $lastActivity,
+        $lastTraining,
+        $lastLifestyle,
+        $lastCreative,
+        $optionItems,
+        $correspondingOptions,
+        $lastNotebook
+    ])
+    ->filter(function($item) {
+        if (is_array($item)) {
+            return !empty($item);
+        } elseif ($item instanceof \Illuminate\Support\Collection) {
+            return $item->isNotEmpty();
+        } elseif (is_object($item)) {
+            return $item !== null;
+        }
+        return false;
+    })
+    ->isNotEmpty();
+
+    return view('recordedit', compact('person', 'selectedDate', 'records', 'stamps', 'timesOnSelectedDate', 'foodsOnSelectedDate', 'watersOnSelectedDate', 'medicinesOnSelectedDate', 'tubesOnSelectedDate', 'temperaturesOnSelectedDate', 'bloodpressuresOnSelectedDate', 'toiletsOnSelectedDate', 'kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate', 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative', 'optionItems', 'correspondingOptions', 'lastNotebook', 'isConfirmed', 'hasData'));
+    }
+
+    // 職員側で連絡帳を確定させるボタン
+    public function confirmRecord(Request $request, $people_id)
+{
+    $selectedDate = $request->input('selected_date');
+
+    $record = RecordConfirm::where('person_id', $people_id)
+                    ->whereDate('kiroku_date', $selectedDate)
+                    ->first();
+
+    if (!$record) {
+        $record = new RecordConfirm();
+        $record->person_id = $people_id;
+        $record->kiroku_date = $selectedDate;
+    }
+
+    $record->is_confirmed = true;
+    $record->save();
+
+    return redirect()->back()->with('message', '記録が確定されました。');
 }
+
 
     /**
      * Display the specified resource.
@@ -170,34 +233,36 @@ $person = Person::where('id', $people_id)
 // 家族側の連絡帳画面↓
 public function RecordStampshow(Request $request, $people_id)
 {
-   
-    // $person = Person::findOrFail($people_id);
     $person = Person::with(['foods', 'temperatures', 'toilets', 'waters'])->findOrFail($people_id);
     $today = \Carbon\Carbon::now()->toDateString();
     $selectedDate = $request->input('selected_date', \Carbon\Carbon::now()->toDateString());
     $selectedDateStart = \Carbon\Carbon::parse($selectedDate)->startOfDay();    
     $selectedDateEnd = \Carbon\Carbon::parse($selectedDate)->endOfDay();
     
-     // 選択された日付に該当する記録をすべて取得
-     $records = Record::where('person_id', $people_id)
-     ->whereBetween('kiroku_date', [$selectedDateStart, $selectedDateEnd])
-     ->get();
+    // 選択された日付に該当する記録をすべて取得
+    $records = Record::where('person_id', $people_id)
+        ->whereDate('kiroku_date', $selectedDate)
+        ->get();
+
+        
+    // 職員が選択された日付を確定しているか情報を取得
+    $isConfirmed = RecordConfirm::where('person_id', $people_id)
+    ->whereDate('kiroku_date', $selectedDate)
+    ->where('is_confirmed', true)
+    ->exists();
 
     // 各記録に対して押印情報を取得
     $stamps = [];
     foreach ($records as $record) {
-     // 各記録ごとに押印情報を取得
-     $stamp = Record::where('id', $record->id)->first();
-     $stamps[$record->id] = $stamp;
- }
+        $stamps[$record->id] = $record;
+    }
+
     $timesOnSelectedDate = $person->times ? $person->times->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]) : collect();
     $foodsOnSelectedDate = $person->foods->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]);
     $watersOnSelectedDate = $person->waters->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]);
     $medicinesOnSelectedDate = $person->medicines->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]);
     $tubesOnSelectedDate = $person->tubes->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]);
-    // $temperaturesOnSelectedDate = $person->temperatures->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]);
     $temperaturesOnSelectedDate = $person->temperatures ? $person->temperatures->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]) : collect();
-    // dd($temperaturesOnSelectedDate);
     $bloodpressuresOnSelectedDate = $person->bloodpressures->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]);
     $toiletsOnSelectedDate = $person->toilets->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]);
     $kyuuinsOnSelectedDate = $person->kyuuins ? $person->kyuuins->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]) : collect();
@@ -213,13 +278,13 @@ public function RecordStampshow(Request $request, $people_id)
         $correspondingOptions[$optionItem->id] = Option::find($optionItem->option_id);
     }
 
-    $correspondingOption = $correspondingOptions[$optionItem->id];
+    $correspondingOption = $optionItems->isNotEmpty() ? $correspondingOptions[$optionItems->first()->id] : null;
 
     // hanamaruの項目↓
     $lastTime = Time::where('people_id', $people_id)
-    ->whereDate('created_at', $selectedDate)
-    ->latest()
-    ->first();
+        ->whereDate('created_at', $selectedDate)
+        ->latest()
+        ->first();
 
     $lastMorningActivity = Speech::where('people_id', $people_id)
         ->whereDate('created_at', $selectedDate)
@@ -228,10 +293,10 @@ public function RecordStampshow(Request $request, $people_id)
         ->first();
 
     $lastAfternoonActivity = Speech::where('people_id', $people_id)
-    ->whereDate('created_at', $selectedDate)
-    ->whereNotNull('afternoon_activity')
-    ->latest()
-    ->first();
+        ->whereDate('created_at', $selectedDate)
+        ->whereNotNull('afternoon_activity')
+        ->latest()
+        ->first();
     
     $lastActivity = Activity::where('people_id', $people_id)
         ->whereDate('created_at', $selectedDate)
@@ -254,12 +319,29 @@ public function RecordStampshow(Request $request, $people_id)
         ->first();    
     
     $lastNotebook = Notebook::where('people_id', $people_id)	
-    ->whereDate('created_at', $selectedDate)
-    ->latest()	
-    ->first(); 
+        ->whereDate('created_at', $selectedDate)
+        ->latest()	
+        ->first(); 
 
-    return view('recordstamp', compact('person', 'selectedDate', 'records', 'stamps','timesOnSelectedDate','foodsOnSelectedDate',  'watersOnSelectedDate' , 'medicinesOnSelectedDate', 'tubesOnSelectedDate',  'temperaturesOnSelectedDate', 'bloodpressuresOnSelectedDate','toiletsOnSelectedDate','kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate' , 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative','optionItems', 'correspondingOptions','correspondingOption', 'lastNotebook'));
+    // $isConfirmed = $records->isNotEmpty() ? $records->first()->is_confirmed : false;
+    $today = now()->toDateString();
+    $isToday = $selectedDate === $today;
+    $isPast = $selectedDate < $today;
+
+    $stampExists = false;
+        foreach ($records as $record) {
+            if (isset($stamps[$record->id])) {
+                $stampExists = true;
+                break;
+            }
+        }
+
+    return view('recordstamp', compact('person', 'selectedDate', 'records', 'stamps', 'timesOnSelectedDate', 'foodsOnSelectedDate', 'watersOnSelectedDate', 'medicinesOnSelectedDate', 'tubesOnSelectedDate', 'temperaturesOnSelectedDate', 'bloodpressuresOnSelectedDate', 'toiletsOnSelectedDate', 'kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate', 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative', 'optionItems', 'correspondingOptions', 'correspondingOption', 'lastNotebook', 'isConfirmed','today', 'isToday', 'isPast', 'stampExists'));
 }
+
+
+
+
 
 // 家族側の押印処理↓
 public function storeStamp(Request $request, $id)

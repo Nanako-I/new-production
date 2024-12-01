@@ -112,12 +112,44 @@
             表示
           </button>  
      </form> 
-      @if(!$stampExists)
-          <p class="text-red-600 font-bold text-xl mt-2">{{ $selectedDate }}の記録は、まだご家族の確認・押印がされていません。</p>
+     @if(!$isConfirmed)
+            @if($hasData)
+                <form method="POST" action="{{ route('record.confirm', ['people_id' => $person->id]) }}" class="w-full mt-4">
+                    @csrf
+                    <input type="hidden" name="selected_date" value="{{ $selectedDate }}">
+                    <button type="submit" class="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm text-xl">
+                        この内容でご家族に送信する
+                    </button>
+                </form>
+            @else
+                @if(\Carbon\Carbon::parse($selectedDate)->isToday())
+                    <p class="font-bold text-2xl text-center my-4">本日は記録が取られておりません</p>
+                @else
+                    <p class="font-bold text-2xl text-center my-4">{{ $selectedDate }}は記録が取られておりません</p>
+                @endif
+            @endif
+        @else
+            <div class="bg-green-50 text-green-700 px-6 py-3 rounded-lg font-medium text-center text-xl">
+                この日の記録はご家族に送信済です。
+            </div>
+        @endif
+
+        
+      @if(!$stampExists && $isConfirmed)
+      <div class="bg-red-50 text-red-600 px-6 py-3 rounded-lg font-medium text-center text-xl">
+        {{ $selectedDate }}の記録は、まだご家族の確認・押印がされていません。
+      </div>
       @endif
     </div>
   </div>
   
+  
+
+  @if(session('message'))
+      <div class="mt-4 p-4 bg-green-100 text-green-700 border border-green-400 rounded-md">
+          {{ session('message') }}
+      </div>
+  @endif
    
       <div class="flex justify-end "> 
         <div class="flex-col"> 
@@ -714,32 +746,39 @@
 
     @if($optionItems->isNotEmpty())
     @foreach($optionItems as $optionItem)
-        <div class="flex flex-col mb-10 lg:items-start items-center">
-            <div class="w-12 h-12 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 mb-5">
-                <i class="fa-solid fa-people-group text-gray-700" style="font-size: 1.5em; transition: transform 0.2s;"></i>
-            </div>
-            <div class="flex-grow p-4">
-                <h2 class="text-gray-900 text-lg title-font font-medium mb-3">{{ $correspondingOption->title }}</h2>
-                <div class="flex justify-around text-left items-start">
-                    @for($i = 1; $i <= 5; $i++)
-                        @php
-                            $optionItemKey = "item{$i}";
-                            $optionItemValue = json_decode($optionItem->$optionItemKey);
-                            $correspondingItemValue = $correspondingOption->$optionItemKey;
-                        @endphp
-                        @if(!empty($optionItemValue) && is_array($optionItemValue) && count($optionItemValue) > 0 && $correspondingItemValue)
-                            <p class="text-gray-900 font-bold text-xl px-3">{{ $correspondingItemValue }}</p>
-                        @endif
-                    @endfor
+        @php
+            $correspondingOption = $correspondingOptions[$optionItem->id] ?? null;
+        @endphp
+        @if($correspondingOption)
+            <div class="flex flex-col mb-10 lg:items-start items-center">
+                <div class="w-12 h-12 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 mb-5">
+                    <i class="fa-solid fa-people-group text-gray-700" style="font-size: 1.5em; transition: transform 0.2s;"></i>
                 </div>
-                @if($optionItem->bikou !== null)
-                    <p class="text-gray-900 font-bold text-xl px-3">{{ $optionItem->bikou }}</p>
-                @endif
+                <div class="flex-grow p-4">
+                    <h2 class="text-gray-900 text-lg title-font font-medium mb-3">{{ $correspondingOption->title }}</h2>
+                    <div class="flex justify-around text-left items-start">
+                        @for($i = 1; $i <= 5; $i++)
+                            @php
+                                $optionItemKey = "item{$i}";
+                                $optionItemValue = json_decode($optionItem->$optionItemKey);
+                                $correspondingItemValue = $correspondingOption->$optionItemKey;
+                            @endphp
+                            @if(!empty($optionItemValue) && is_array($optionItemValue) && count($optionItemValue) > 0 && $correspondingItemValue)
+                                <p class="text-gray-900 font-bold text-xl px-3">{{ $correspondingItemValue }}</p>
+                            @endif
+                        @endfor
+                    </div>
+                    @if($optionItem->bikou !== null)
+                        <p class="text-gray-900 font-bold text-xl px-3">{{ $optionItem->bikou }}</p>
+                    @endif
+                </div>
+                <hr style="border: 1px solid #666; margin: 0 auto; width: 100%;">
             </div>
-            <hr style="border: 1px solid #666; margin: 0 auto; width: 100%;">
-        </div>
+        @endif
     @endforeach
 @endif
+
+
 
 
       @if($lastNotebook)

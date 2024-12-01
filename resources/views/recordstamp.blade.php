@@ -106,10 +106,29 @@
           </button>
         
      </form> 
-    </div>
-  </div>
-  
-   
+    
+            @if($stampExists && $isConfirmed)
+                <p class="bg-green-50 text-green-700 px-6 py-3 rounded-lg font-medium text-center text-xl">
+                    ご確認・押印ありがとうございます
+                </p>
+            @elseif($isToday && !$isConfirmed)
+                <p class="font-bold text-xl text-center my-4">
+                    事業所にて本日の記録が取られておりません。本日利用されている方はしばらくお待ちください。
+                </p>
+            @elseif($isPast && !$isConfirmed)
+                <p class="font-bold text-xl text-center my-4">
+                    {{ $selectedDate }}は事業所にて記録が登録されていません。
+                </p>
+            @elseif($isConfirmed && !$stampExists)
+                <div class="bg-green-50 text-green-700 px-6 py-3 rounded-lg font-medium text-center text-xl">
+                    ご確認後、下部の「押印する」ボタンを押してください
+                </div>
+            @endif
+          </div>
+        </div>
+
+  <!-- 職員側で確定するボタンが押された場合（is_confirmedがtrue）の場合に下記表示させる -->
+    @if($isConfirmed)
       <div class="flex justify-end "> 
         <div class="flex-col"> 
         <!-- <a href="{{ route('pdf', ['people_id' => $person->id, 'selected_date' => $selectedDate]) }}">
@@ -141,17 +160,6 @@
 <section class="text-gray-600 body-font mx-auto" _msthidden="10">
   <div class="container px-5 pb-24 mx-auto flex flex-wrap" _msthidden="10">
    <div class="flex flex-col flex-wrap lg:py-6 -mb-10 lg:w-1/2 lg:pl-12 lg:text-left text-center" _msthidden="9">
-   @if (
-        collect([$foodsOnSelectedDate, $watersOnSelectedDate, $medicinesOnSelectedDate, $tubesOnSelectedDate, $temperaturesOnSelectedDate, $bloodpressuresOnSelectedDate, $toiletsOnSelectedDate, $kyuuinsOnSelectedDate, $hossasOnSelectedDate, $speechesOnSelectedDate, $lastTime, $lastMorningActivity, $lastAfternoonActivity, $lastActivity, $lastTraining, $lastLifestyle, $lastCreative, $optionItems, $correspondingOption, $lastNotebook])
-        ->every(fn($collection) => $collection === null || $collection->count() === 0)
-    ) 
-        @if (\Carbon\Carbon::parse($selectedDate)->isToday())
-            <p class="font-bold text-2xl">まだ事業所にて本日の記録が取られておりません。しばらくお待ちください。</p>
-        @elseif (\Carbon\Carbon::parse($selectedDate)->isYesterday() || \Carbon\Carbon::parse($selectedDate)->isBefore(now()->subDay()))
-            <p class="font-bold text-2xl">{{ $selectedDate }}は事業所にて記録が登録されていません。</p>
-        @endif
-    @endif
-
 
     @if ($timesOnSelectedDate->count() > 0)
    <div class="flex flex-col mb-10 lg:items-start items-center" _msthidden="3">
@@ -764,17 +772,7 @@
     );
 @endphp
 
-@if (!$dataExists)
-    @php 
-        $stampExists = false;
-        foreach ($records as $record) {
-            if (isset($stamps[$record->id])) {
-                $stampExists = true;
-                break;
-            }
-        }
-    @endphp
-   
+@if (!$dataExists)   
     @foreach ($records as $record)
         <div class="oya-stamp-box">
             <div class="stamp-box mt-3">
@@ -831,6 +829,7 @@
     @endif
 @endif
 
+@endif
 
 
 <script>

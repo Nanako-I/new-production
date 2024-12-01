@@ -505,6 +505,8 @@ Route::get('/speech/{id}/edit', 'SpeechController@edit')->name('speech.edit');
 
 // 連絡帳(職員側)↓
 Route::get('record/{people_id}/edit', [RecordController::class, 'show'])->name('record.edit');
+// 連絡帳(職員側が連絡帳の中身を確定させる)↓
+Route::post('/record/{people_id}/confirm', [RecordController::class, 'confirmRecord'])->name('record.confirm');
 
 // 連絡帳の文章作成↓
 Route::get('notebookwriting/{people_id}', [NotebookController::class, 'show'])->name('notebook.show');
