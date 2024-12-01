@@ -91,7 +91,7 @@ class NotebookController extends Controller
     ]);
    $people = Person::all();
    $request->session()->regenerateToken();
-    return view('people', compact('notebook', 'people'));
+   return redirect()->route('people.index')->with('success', '文章が正常に登録されました。');
     }
 
     /**
@@ -143,14 +143,22 @@ class NotebookController extends Controller
 
     // 選択された日付のオプションデータを取得
     // $optionsOnSelectedDate = $person->option_items ? $person->option_items->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd]) : collect();
-    $lastOptions = OptionItem::where('people_id', $people_id)
-        ->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd])
-        ->latest()
-        ->first();
-    // 対応するOptionモデルのデータを取得 
-    $correspondingOption = null;
-    if ($lastOptions) {
-    $correspondingOption = Option::where('id', $lastOptions->option_id)->first();
+    // $lastOptions = OptionItem::where('people_id', $people_id)
+    //     ->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd])
+    //     ->latest()
+    //     ->first();
+    // // 対応するOptionモデルのデータを取得 
+    // $correspondingOption = null;
+    // if ($lastOptions) {
+    // $correspondingOption = Option::where('id', $lastOptions->option_id)->first();
+    // }
+    $optionItems = OptionItem::where('people_id', $people_id)
+    ->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd])
+    ->get();
+
+    $correspondingOptions = [];
+    foreach ($optionItems as $optionItem) {
+        $correspondingOptions[$optionItem->id] = Option::find($optionItem->option_id);
     }
 
     // hanamaruの項目↓
@@ -234,7 +242,7 @@ class NotebookController extends Controller
     curl_close($curl_handle);
   
     $people = Person::all();
-    return view('notebookwriting', ['id' => $person->id],compact('person', 'json_response', 'selectedDate', 'records', 'timesOnSelectedDate','foodsOnSelectedDate','foodString','foodCount',  'watersOnSelectedDate' , 'medicinesOnSelectedDate', 'tubesOnSelectedDate',  'temperaturesOnSelectedDate', 'temperatureString', 'temperatureCount','bloodpressuresOnSelectedDate','toiletsOnSelectedDate','kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate' , 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative','lastOptions', 'correspondingOption'));
+    return view('notebookwriting', ['id' => $person->id],compact('person', 'json_response', 'selectedDate', 'records', 'timesOnSelectedDate','foodsOnSelectedDate','foodString','foodCount',  'watersOnSelectedDate' , 'medicinesOnSelectedDate', 'tubesOnSelectedDate',  'temperaturesOnSelectedDate', 'temperatureString', 'temperatureCount','bloodpressuresOnSelectedDate','toiletsOnSelectedDate','kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate' , 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative','optionItems', 'correspondingOptions'));
 }
 
     
@@ -261,15 +269,18 @@ class NotebookController extends Controller
 }
 
 
-public function change(Request $request, $people_id)
-{
-    $person = Person::findOrFail($people_id);
+public function change(Request $request, $people_id, $id)
+// public function change(Food $food)
+    {
+        
+        $person = Person::findOrFail($people_id);
+        $lastNotebook = Notebook::findOrFail($id);
     
     // その日の最後のnotebookを取得
-    $lastNotebook = $person->notebooks()
-        ->whereDate('created_at', now()->toDateString())
-        ->latest()
-        ->first();
+    // $lastNotebook = $person->notebooks()
+    //     ->whereDate('created_at', now()->toDateString())
+    //     ->latest()
+    //     ->first();
 
 $url = 'https://acp-api.amivoice.com/issue_service_authorization';
     
@@ -321,19 +332,20 @@ $headers = [
      * @param  \App\Models\Speech  $speech
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Notebook $notebook)
+    public function update(Request $request, $people_id, $id)
     {
       //データ更新
-        $person = Person::find($request->people_id);
-        $notebook->people_id = $person->id;
-        $notebook->notebook = $request->notebook;
-        
-        $notebook->save();
-        
-        $people = Person::all();
-        
-        return view('people', compact('notebook', 'people'));
-    }
+      $person = Person::find($request->people_id);
+      $notebook = Notebook::findOrFail($id);
+    
+    // データ更新
+    $notebook->notebook = $request->notebook;
+    
+    
+    $notebook->save();
+    
+    return redirect()->route('people.index')->with('success', '更新されました。');
+}
     
     
    

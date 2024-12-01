@@ -145,24 +145,29 @@ if(!empty($foodsOnSelectedDate)) {
     $output .= $foodString;
 }
 
-if($lastOptions && $correspondingOption) {
-    $items = [];
-    for($i = 1; $i <= 5; $i++) {
-        $optionItemKey = "item{$i}";
-        $optionItem = json_decode($lastOptions->$optionItemKey);
-        $correspondingItem = $correspondingOption->$optionItemKey;
-        if(!empty($optionItem) && is_array($optionItem) && count($optionItem) > 0 && $correspondingItem) {
-            $items[] = $correspondingItem;
-        }
-    }
-    if(count($items) > 0) {
-        $output .= '本日行った' . $correspondingOption->title . 'は';
-        $output .= implode('と', $items) . 'でした。';
-        if($lastOptions->bikou !== null) {
-            $output .= $lastOptions->bikou;
-        }
-    }
-}
+foreach ($optionItems as $optionItem) {
+      if (isset($correspondingOptions[$optionItem->id])) {
+          $correspondingOption = $correspondingOptions[$optionItem->id];
+          $items = [];
+          for ($i = 1; $i <= 5; $i++) {
+              $optionItemKey = "item{$i}";
+              $optionItemValue = json_decode($optionItem->$optionItemKey);
+              $correspondingItemValue = $correspondingOption->$optionItemKey;
+              if (!empty($optionItemValue) && is_array($optionItemValue) && count($optionItemValue) > 0 && $correspondingItemValue) {
+                  $items[] = $correspondingItemValue;
+              }
+          }
+
+          if (count($items) > 0) {
+              $output .= $correspondingOption->title . 'は';
+              $output .= implode('と', $items) . 'でした。';
+              if ($optionItem->bikou !== null) {
+                  $output .= $optionItem->bikou;
+              }
+          }
+      }
+  }
+
 echo trim($output);
 @endphp</textarea>
         <span class="recognitionResultText"></span><span class="recognitionResultInfo"></span>

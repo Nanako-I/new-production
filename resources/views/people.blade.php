@@ -2061,7 +2061,8 @@
                                             
                                             @if ($todayNotebook)
                                                 <!-- 登録済みの場合 -->
-                                                <a href="{{ url('notebookchange/'.$person->id) }}" class="relative ml-2 flex items-center">
+                                                <a href="{{ route('notebook.change', ['people_id' => $person->id, 'id' => $todayNotebook->id]) }}" class="relative ml-2 flex items-center">
+                                                <!-- <a href="{{ url('notebookchange/'.$person->id) }}" class="relative ml-2 flex items-center"> -->
                                                     @csrf
                                                     <p class="font-bold text-xl p-2">{{ Str::limit($todayNotebook->notebook, 10, '...') }}</p>
                                                     <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s; vertical-align: middle;"></i>

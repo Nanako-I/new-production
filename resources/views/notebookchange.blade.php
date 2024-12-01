@@ -112,7 +112,8 @@
                 </button>
                 <div id="result-div"></div>
           </div>
-          <form action="{{ route('notebook_update', $person->id) }}" method="POST" class="w-full max-w-lg mx-auto mt-4">
+          <form action="{{ route('notebook_update', ['people_id' => $person->id, 'id' => $lastNotebook->id]) }}" method="POST" class="w-full max-w-lg mx-auto mt-4">
+          
       @csrf
         <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
             <div class="flex flex-col items-center w-full my-4">

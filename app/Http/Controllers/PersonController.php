@@ -461,7 +461,6 @@ class PersonController extends Controller
         }
 
         // 受給者番号が一致する利用者を検索（現在の利用者を除く）
-        // 受給者番号が一致する利用者を検索（現在の利用者を除く）
 $existingPersonByJukyuushaNumber = $firstFacility->people_facilities()
 ->where('people.id', '!=', $id)
 ->where('jukyuusha_number', $request->jukyuusha_number)

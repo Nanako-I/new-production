@@ -513,8 +513,8 @@ Route::get('notebookwriting/{people_id}', [NotebookController::class, 'show'])->
 Route::post('notebookwriting/{people_id}', [NotebookController::class,'store'])->name('notebook.post');
 
 // 編集↓
-Route::get('notebookchange/{people_id}', [NotebookController::class, 'change'])->name('notebook.change');
-Route::post('notebookchange/{people_id}',[NotebookController::class,'update'])->name('notebook_update');
+Route::get('notebookchange/{people_id}/{id}', [NotebookController::class, 'change'])->name('notebook.change');
+Route::post('notebookchange/{people_id}/{id}',[NotebookController::class,'update'])->name('notebook_update');
 
 // 連絡帳(保護者側)↓
 Route::get('recordstamp/{people_id}', [RecordController::class, 'RecordStampshow'])->name('recordstamp.edit');
