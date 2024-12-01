@@ -337,6 +337,7 @@ public function RecordStampshow(Request $request, $people_id)
         }
 
     $dataExists = collect([
+        $timesOnSelectedDate
         $foodsOnSelectedDate, 
         $watersOnSelectedDate, 
         $medicinesOnSelectedDate, 
@@ -372,7 +373,7 @@ public function RecordStampshow(Request $request, $people_id)
         }
     });
 
-    return view('recordstamp', compact('person', 'selectedDate', 'records', 'stamps', 'timesOnSelectedDate', 'foodsOnSelectedDate', 'watersOnSelectedDate', 'medicinesOnSelectedDate', 'tubesOnSelectedDate', 'temperaturesOnSelectedDate', 'bloodpressuresOnSelectedDate', 'toiletsOnSelectedDate', 'kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate', 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative', 'optionItems', 'correspondingOptions', 'correspondingOption', 'lastNotebook', 'isConfirmed','today', 'isToday', 'isPast', 'stampExists'));
+    return view('recordstamp', compact('person', 'selectedDate', 'records', 'stamps', 'timesOnSelectedDate', 'foodsOnSelectedDate', 'watersOnSelectedDate', 'medicinesOnSelectedDate', 'tubesOnSelectedDate', 'temperaturesOnSelectedDate', 'bloodpressuresOnSelectedDate', 'toiletsOnSelectedDate', 'kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate', 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative', 'optionItems', 'correspondingOptions', 'correspondingOption', 'lastNotebook', 'isConfirmed','today', 'isToday', 'isPast', 'stampExists','dataExists'));
 }
 
 
