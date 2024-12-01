@@ -766,12 +766,6 @@
       </div>
       @endif
 
-
-    @php 
-    $dataExists = collect([$foodsOnSelectedDate, $watersOnSelectedDate, $medicinesOnSelectedDate, $tubesOnSelectedDate, $temperaturesOnSelectedDate, $bloodpressuresOnSelectedDate, $toiletsOnSelectedDate, $kyuuinsOnSelectedDate, $hossasOnSelectedDate, $speechesOnSelectedDate, $lastTime, $lastMorningActivity, $lastAfternoonActivity, $lastActivity, $lastTraining, $lastLifestyle, $lastCreative, $optionItems, $correspondingOption, $lastNotebook])->every(fn($collection) => is_null($collection) || count($collection) === 0
-    );
-@endphp
-
 @if (!$dataExists)   
     @foreach ($records as $record)
         <div class="oya-stamp-box">

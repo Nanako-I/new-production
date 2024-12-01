@@ -336,6 +336,42 @@ public function RecordStampshow(Request $request, $people_id)
             }
         }
 
+    $dataExists = collect([
+        $foodsOnSelectedDate, 
+        $watersOnSelectedDate, 
+        $medicinesOnSelectedDate, 
+        $tubesOnSelectedDate, 
+        $temperaturesOnSelectedDate, 
+        $bloodpressuresOnSelectedDate, 
+        $toiletsOnSelectedDate, 
+        $kyuuinsOnSelectedDate, 
+        $hossasOnSelectedDate, 
+        $speechesOnSelectedDate, 
+        $lastTime, 
+        $lastMorningActivity, 
+        $lastAfternoonActivity, 
+        $lastActivity, 
+        $lastTraining, 
+        $lastLifestyle, 
+        $lastCreative, 
+        $optionItems, 
+        $correspondingOption, 
+        $correspondingOptions, 
+        $lastNotebook
+    ])->every(function($item) {
+        if (is_null($item)) {
+            return true;
+        } elseif (is_array($item) || $item instanceof Countable) {
+            return count($item) === 0;
+        } elseif ($item instanceof \Illuminate\Database\Eloquent\Model) {
+            return false; // If it's a model instance, it exists
+        } elseif ($item instanceof \Illuminate\Support\Collection) {
+            return $item->isEmpty();
+        } else {
+            return empty($item);
+        }
+    });
+
     return view('recordstamp', compact('person', 'selectedDate', 'records', 'stamps', 'timesOnSelectedDate', 'foodsOnSelectedDate', 'watersOnSelectedDate', 'medicinesOnSelectedDate', 'tubesOnSelectedDate', 'temperaturesOnSelectedDate', 'bloodpressuresOnSelectedDate', 'toiletsOnSelectedDate', 'kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'speechesOnSelectedDate', 'lastTime', 'lastMorningActivity', 'lastAfternoonActivity', 'lastActivity', 'lastTraining', 'lastLifestyle', 'lastCreative', 'optionItems', 'correspondingOptions', 'correspondingOption', 'lastNotebook', 'isConfirmed','today', 'isToday', 'isPast', 'stampExists'));
 }
 
