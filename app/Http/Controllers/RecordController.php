@@ -337,7 +337,7 @@ public function RecordStampshow(Request $request, $people_id)
         }
 
     $dataExists = collect([
-        $timesOnSelectedDate
+        $timesOnSelectedDate,
         $foodsOnSelectedDate, 
         $watersOnSelectedDate, 
         $medicinesOnSelectedDate, 
