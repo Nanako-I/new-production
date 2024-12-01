@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
 use App\Enums\PermissionType;
 use App\Enums\RoleType as RoleEnums;
@@ -353,6 +354,10 @@ class PersonController extends Controller
             // 新しい利用者用の記録項目を作成
             $newOption = $sampleOption->replicate();
             $newOption->people_id = $newPerson->id;
+            // flagが1の場合は、新しいオプションでもflagを1に設定
+            if ($sampleOption->flag == 1) {
+                $newOption->flag = 1;
+                }
             $newOption->save();
         }
     }
@@ -375,14 +380,29 @@ class PersonController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    // 利用者情報更新画面の表示↓
-    public function edit($id)
-{
-    $person = Person::findOrFail($id);
-    return view('peopleedit', compact('person'));
-}
+   // 利用者情報更新画面の表示↓
+   public function edit($id)
+   {
+       try {
+           $person = Person::findOrFail($id);
+           
+           // ユーザーに関連する施設を取得
+           $user = Auth::user();
+            $facility = $user->facility_staffs()->first();
+   
+           $url = URL::temporarySignedRoute(
+               'signed.invitation', 
+               now()->addHours(24), 
+               ['signedUrl' => 'preregistrationmail']
+           );
+   
+           return view('peopleedit', compact('person', 'facility', 'url'));
+       } catch (\Exception $e) {
+           return redirect()->route('dashboard')->with('error', '利用者が見つかりません。');
+       }
+   }
 
-    
+
     //  利用者情報更新
     public function update(Request $request, $id)
 {
@@ -600,8 +620,11 @@ public function updateSelectedItems(Request $request, $id)
     $selectedOptions = $request->input('selected_options', []); // チェックされたオプション項目を取得
     $selectedFixedItems = $request->input('selected_fixed_items', []); // チェックされた固定項目を取得
 
-    // オプションを取得し、フラグを更新
-    $options = Option::where('people_id', $id)->get();
+    // 施設全体に紐づく記録項目以外の個人の記録項目を取得し、フラグを更新
+    $options = Option::where('people_id', $id)
+    ->whereNull('option_group_id')
+    ->get();
+
     foreach ($options as $option) {
         $option->flag = in_array($option->id, $selectedOptions) ? 1 : 0;
         $option->save();

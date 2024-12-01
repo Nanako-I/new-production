@@ -57,15 +57,15 @@
         </a>
     </div>
     
-    @foreach ($facilityItems as $item)
+    @foreach ($facilityItems as $facilityItem)
         <div class="flex flex-row items-center my-3 pl-4">
             <div class="w-6 h-6 flex items-center justify-center">
-                @if($item['flag'] == 1)
+                @if($facilityItem['flag'] == 1)
                     <i class="fas fa-check text-green-500"></i>
                 @endif
             </div>
-            <p class="text-gray-900 font-bold text-xl px-1.5">{{ $item['title'] }}</p>
-            <p class="text-gray-500 text-base px-1.5">{{ $item['items'] }}</p>
+            <p class="text-gray-900 font-bold text-xl px-1.5">{{ $facilityItem['title'] }}</p>
+            <p class="text-gray-500 text-base px-1.5">{{ $facilityItem['items'] }}</p>
         </div>
     @endforeach
 </div>

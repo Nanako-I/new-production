@@ -25,15 +25,27 @@
                         <input type="hidden" name="facility_id" value="{{ $facility->id }}">
                     </div>
                     
-                    @foreach($medicalCareNeeds as $need)
+                    @php
+                    $options = [
+                        'medical_care_majority' => 'はい',
+                        'medical_care_minority' => '少数だがいる',
+                        'no_medical_care' => 'いない'
+                    ];
+                    @endphp
+
+                    @foreach($options as $value => $label)
                         <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
-                            <input type="checkbox" name="selected_items[]" value="{{ $need->name }}" {{ in_array($need->name, $selectedItems) ? 'checked' : '' }} class="w-6 h-6">
-                            <p class="text-gray-900 font-bold text-xl px-1.5">{{ $need->name }}</p>
+                            <input type="radio"
+                                name="medical_care_need_id"
+                                value="{{ $value }}"
+                                {{ $selectedValue == $value ? 'checked' : '' }}
+                                class="w-6 h-6">
+                            <p class="text-gray-900 font-bold text-xl px-1.5">{{ $label }}</p>
                         </div>
                     @endforeach
                 </div>
                 <div class="flex items-center justify-center mt-4">
-                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xl text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
                         登録
                     </button>
                 </div>

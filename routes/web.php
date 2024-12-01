@@ -136,6 +136,7 @@ Route::get('/facilityregister', [FacilityController::class, 'create'])->name('fa
 Route::post('facilityregister', [FacilityController::class, 'store'])->name('facilityregister.store');
 
 Route::resource('people', PersonController::class);
+Route::post('/people/{person}/associate-line-account', [PersonController::class, 'associateLineAccount'])->name('associate.line.account');
 
 // 認証されていないユーザー向けのビュー
 Route::get('/before-login', function () {
@@ -159,16 +160,8 @@ Route::post('/admin/terms-agreement', [TermsAgreementController::class, 'storeAd
 // 施設管理者の登録
 Route::view('/register', 'register');
 
-
+ // invitaionビューから署名つきURLを送る場合↓
 Route::get('/invitation', [URLController::class, 'sendInvitation'])->name('invitation');
-
-// Route::get('invitation/{signedUrl}', function (Request $request) {
-//     if (! $request->hasValidSignature()) {
-//         abort(403, 'このURLは有効期限切れです。施設管理者に招待URLの再送を依頼してください。');
-//     }
-//     return view('preregistrationmail');
-// })->name('signed.invitation');
-
 
 Route::get('/before-invitation', [BeforeInvitationController::class, 'registrationConfirmation'])->name('before-invitation');
 
@@ -185,6 +178,7 @@ Route::get('custom_id_entryform/{facilityId}', [BeforeInvitationController::clas
 
 // 施設に医療的ケアの利用者がいるか選択する↓
 Route::patch('/medical_care_needs', [FacilityController::class, 'updateMedicalCareNeeds'])->name('update.medical.care.needs');
+Route::get('/medical_care_needs', [FacilityController::class, 'showMedicalCare'])->name('show.medical.care.needs');
 
 //管理者が職員を招待する前に職員IDを入力・確認する↓
 Route::get('custom_id_entryform/{facilityId}', [CustomIDController::class, 'entryForm'])->name('custom_id.entryform');

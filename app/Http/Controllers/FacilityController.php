@@ -6,6 +6,7 @@ use App\Models\Facility;
 use App\Models\MedicalCareNeed;
 use App\Models\User;
 use App\Models\Role;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Providers\RouteServiceProvider;
 use Spatie\Permission\Traits\HasRoles;
@@ -65,21 +66,47 @@ class FacilityController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-     public function updateMedicalCareNeeds(Request $request)
-    {
-        $facilityId = $request->input('facility_id');
-        $selectedItems = $request->input('selected_items', []);
+     public function showMedicalCare()
+{
+    $user = Auth::user();
+    $facility = $user->facility_staffs()->first();
 
-        // MedicalCareNeedモデルから対応するIDを取得
-        $medicalCareNeeds = MedicalCareNeed::whereIn('name', $selectedItems)->pluck('id')->toArray();
-
-        // 中間テーブルに登録（多対多のリレーションを使う）
-        $facility = Facility::findOrFail($facilityId);
-        $facility->medicalCareNeeds()->sync($medicalCareNeeds); // 選択されたものだけを登録
-
-        return redirect()->back()->with('success', '医療的ケアの情報が更新されました。');
+    if (!$facility) {
+        return redirect()->route('dashboard')->with('error', '所属する施設が見つかりません。');
     }
 
+    $options = [
+        'medical_care_majority' => 'はい',
+        'medical_care_minority' => '少数だがいる',
+        'no_medical_care' => 'いない'
+    ];
 
+    // 施設に関連付けられた医療的ケアニーズを取得
+    $selectedItem = $facility->medicalCareNeeds()->first();
+    $selectedValue = $selectedItem ? $selectedItem->name : 'no_medical_care';
 
+    return view('medical_care_needs', compact('facility', 'options', 'selectedValue'));
+}
+
+    public function updateMedicalCareNeeds(Request $request)
+{
+    $facilityId = $request->input('facility_id');
+    $medicalCareStatus = $request->input('medical_care_need_id');
+
+    $facility = Facility::findOrFail($facilityId);
+
+    // medical_care_needsテーブルから対応するIDを取得
+    $medicalCareNeed = MedicalCareNeed::where('name', $medicalCareStatus)->first();
+
+    if ($medicalCareNeed) {
+        // 既存の関連をすべて削除し、新しい関連を追加
+        $facility->medicalCareNeeds()->sync([$medicalCareNeed->id]);
+    } else {
+        // 選択されたステータスに対応するMedicalCareNeedが存在しない場合、
+        // すべての関連を削除
+        $facility->medicalCareNeeds()->detach();
+    }
+
+    return redirect()->route('people.index')->with('success', '更新されました。');
+}
 }

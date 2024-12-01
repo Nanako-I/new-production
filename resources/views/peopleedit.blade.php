@@ -39,7 +39,19 @@
                     @csrf
                   </a>
               </div> 
-      </div> 
+            
+
+        <p class="font-bold text-lg">ご家族に新規登録のご案内を送る</p>
+        <div class="share-buttons flex justify-center space-x-4 mt-4">
+            
+            <button type="button" 
+                    id="share-line"
+                    class="text-white bg-green-500 p-2 rounded flex items-center justify-center">
+                <i class="fab fa-line text-3xl"></i>
+            </button>
+        </div>
+    </div> 
+
     <!-- 修正フォーム -->
     <form action="{{ route('people.update', $person->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
@@ -85,11 +97,17 @@
             <div id="number-error" class="text-red-500 text-base font-bold hidden"></div>
         </div>
 
-            <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
-                <label class="block text-lg font-bold text-gray-700">医療的ケア</label>
-                <input name="medical_care" type="checkbox" value="1" class="mt-1" {{ $person->medical_care ? 'checked' : '' }}>
-                <span class="text-gray-500">医療的ケアを必要とする場合はチェックしてください</span>
-            </div>
+        @php
+    $medicalCareNeedId = $facility->medicalCareNeeds()->first()->id ?? null;
+@endphp
+
+@if($medicalCareNeedId && in_array($medicalCareNeedId, [1, 2]))
+    <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
+        <label class="block text-lg font-bold text-gray-700">医療的ケア</label>
+        <input name="medical_care" type="checkbox" value="1" class="mt-1" {{ $person->medical_care ? 'checked' : '' }}>
+        <span class="text-gray-500">医療的ケアを必要とする場合はチェックしてください</span>
+    </div>
+@endif
 
             <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
                 <label class="block text-lg font-bold text-gray-700">プロフィール画像</label>
@@ -187,10 +205,66 @@
         });
     });
 
- document.getElementById('filename').addEventListener('click', function() {
+    document.getElementById('filename').addEventListener('click', function() {
         // 選択されたファイルに対する処理を追加する（例: アップロード処理など）
         console.log('ファイルが選択されました:', this.files[0].name);
     });
-  </script>
+
+//     document.addEventListener('DOMContentLoaded', function() {
+//     const lineAccountForm = document.getElementById('lineAccountForm');
+//     const lineAccountSelect = document.getElementById('lineAccountSelect');
+
+//     lineAccountForm.addEventListener('submit', function(e) {
+//         e.preventDefault();
+        
+//         if (!lineAccountSelect.value) {
+//             alert('LINEアカウントを選択してください。');
+//             return;
+//         }
+
+//         fetch(this.action, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+//             },
+//             body: JSON.stringify({
+//                 line_account_id: lineAccountSelect.value
+//             })
+//         })
+//         .then(response => response.json())
+//         .then(data => {
+//             if (data.success) {
+//                 alert('LINEアカウントが正常に関連付けられました。');
+//             } else {
+//                 alert('エラーが発生しました: ' + data.message);
+//             }
+//         })
+//         .catch(error => {
+//             console.error('Error:', error);
+//             alert('エラーが発生しました。');
+//         });
+//     });
+// });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const shareUrl = "{!! $url !!}";
+        const defaultMessage = "新連絡帳システムのご案内です。以下のリンクから新規登録してください。有効期限は本メッセージ送信後24時間以内となります。有効期限切れの場合は施設管理者に再送をご依頼ください:";
+
+        
+
+        // LINEシェア
+        document.getElementById('share-line').addEventListener('click', function (e) {
+            e.preventDefault();
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            if (isMobile) {
+                window.location.href = `line://msg/text/${encodeURIComponent(defaultMessage + "\n" + shareUrl)}`;
+            } else {
+                const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(defaultMessage)}`;
+                window.open(lineShareUrl, '_blank');
+            }
+        });
+    });
+</script>
 </body>
 </x-app-layout>
