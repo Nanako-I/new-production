@@ -112,6 +112,12 @@
             表示
           </button>  
      </form> 
+    @if($stampExists && $isConfirmed)
+      <div class="bg-green-50 text-green-700 px-6 py-3 rounded-lg font-medium text-center text-xl">
+          {{ $selectedDate }}の記録はご家族確認済みです
+      </div>
+    @endif
+
      @if(!$isConfirmed)
             @if($hasData)
                 <form method="POST" action="{{ route('record.confirm', ['people_id' => $person->id]) }}" class="w-full mt-4">
@@ -128,14 +134,13 @@
                     <p class="font-bold text-2xl text-center my-4">{{ $selectedDate }}は記録が取られておりません</p>
                 @endif
             @endif
-        @else
-            <div class="bg-green-50 text-green-700 px-6 py-3 rounded-lg font-medium text-center text-xl">
-                この日の記録はご家族に送信済です。
-            </div>
         @endif
 
         
       @if(!$stampExists && $isConfirmed)
+      <div class="bg-green-50 text-green-700 px-6 py-3 rounded-lg font-medium text-center text-xl">
+                この日の記録はご家族に送信済です。
+      </div>
       <div class="bg-red-50 text-red-600 px-6 py-3 rounded-lg font-medium text-center text-xl">
         {{ $selectedDate }}の記録は、まだご家族の確認・押印がされていません。
       </div>
