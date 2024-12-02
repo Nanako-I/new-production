@@ -55,30 +55,25 @@ function updateChatUI(message) {
 document.addEventListener('DOMContentLoaded', function() {
     const chatbotContainer = document.getElementById('chatbot');
     
-    if (chatbotContainer) {
-        // Echo の設定
-        if (window.Echo) {
-            window.Echo.channel('chat-1')
-                .subscribed(() => {
-                    console.log('Subscribed to chat-1 channel');
-                })
-                .listen('.MessageSent', (e) => {
-                    console.log('新しいメッセージを受信:', e);
-                    updateChatUI(e);
-                })
-                .error((error) => {
-                    console.error('Channel error:', error);
-                });
-
-            // Pusher接続状態の変更をログに記録
-            window.Echo.connector.pusher.connection.bind('state_change', function(states) {
-                console.log('Pusher接続状態:', states.current);
+    if (chatbotContainer && window.Echo) {
+        window.Echo.channel('chat-1')
+            .subscribed(() => {
+                console.log('Subscribed to chat-1 channel');
+            })
+            .listen('.MessageSent', (e) => {
+                console.log('新しいメッセージを受信:', e);
+                updateChatUI(e);
+            })
+            .error((error) => {
+                console.error('Channel error:', error);
             });
-        } else {
-            console.warn('Echo が定義されていません');
-        }
+
+        // Pusher接続状態の変更をログに記録
+        window.Echo.connector.pusher.connection.bind('state_change', function(states) {
+            console.log('Pusher接続状態:', states.current);
+        });
     } else {
-        console.error('チャットボットコンテナが見つかりません');
+        console.warn('Echo が定義されていないか、チャットボットコンテナが見つかりません');
     }
 });
 

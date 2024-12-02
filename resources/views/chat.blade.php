@@ -367,47 +367,14 @@
     </div>
 
         <script>
-            function uploadFile1() {
-                var filename = document.getElementById('filename').value;
-                if (filename.trim() !== '') {
-                    document.getElementById('chatbot-text').value = '写真選択済。送信ボタンを押してください';
-                }
-            }
-
-            function chatToBottom() {
-                const chatField = document.getElementById('chatbot-body');
-                chatField.scrollTop = chatField.scrollHeight;
-            }
-
             document.addEventListener('DOMContentLoaded', (event) => {
-                console.log('DOMContentLoadedイベントが発生しました');
+                // チャットボックスを下までスクロールする関数
+                function chatToBottom() {
+                    const chatField = document.getElementById('chatbot-body');
+                    chatField.scrollTop = chatField.scrollHeight;
+                }
+
                 chatToBottom();
-                const userIdentifier = document.getElementById('chatbot-text').getAttribute('data-user-identifier');
-
-                window.displayMessage = function(data) {
-                    console.log('displayMessageが呼び出されました:', data);
-                    const chatUl = document.getElementById('chatbot-ul');
-                    if (!document.querySelector(`li[data-message-id="${data.id}"]`)) {
-                        const li = document.createElement('li');
-                        const className = data.user_identifier == window.sessionUserIdentifier ? 'self' : 'other';
-                        li.classList.add(className);
-                        li.setAttribute('data-message-id', data.id);
-
-                        li.innerHTML = `
-                            <div class="message-container ${className === 'self' ? 'self-message' : 'other-message'}">
-                                <div style="overflow-wrap: break-word;">
-                                    <p style="overflow-wrap: break-word;" class="text-gray-900">${data.message}</p>
-                                    ${data.filename ? `<img alt="team" class="w-80 h-64" src="/storage/sample/chat_photo/${data.filename}" onerror="this.onerror=null;">` : ''}
-                                </div>
-                                <p class="text-sm font-normal ${className === 'self' ? 'text-right' : 'text-left'}">
-                                    ${data.created_at} ＠${data.last_name}${data.first_name}
-                                </p>
-                            </div>
-                        `;
-                        chatUl.appendChild(li);
-                        chatToBottom();
-                    }
-                };
 
                 const chatForm = document.getElementById('chat-form');
                 if (chatForm) {
@@ -436,9 +403,6 @@
                             if (data.error) {
                                 throw new Error(data.error);
                             }
-                            // if (!document.querySelector(`li[data-message-id="${data.id}"]`)) {
-                            //     window.displayMessage(data);
-                            // }
                             document.getElementById('chatbot-text').value = '';
                             document.getElementById('filename').value = '';
                         })
