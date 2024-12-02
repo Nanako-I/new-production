@@ -366,100 +366,53 @@
         </form>
     </div>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', (event) => {
-                // チャットボックスを下までスクロールする関数
-                function chatToBottom() {
-                    const chatField = document.getElementById('chatbot-body');
-                    chatField.scrollTop = chatField.scrollHeight;
-                }
-
-                chatToBottom();
-
-                const chatForm = document.getElementById('chat-form');
-                if (chatForm) {
-                    chatForm.addEventListener('submit', function(e) {
-                        e.preventDefault();
-                        var formData = new FormData(chatForm);
-
-                        const isFileSelected = document.getElementById('filename').files.length > 0;
-
-                        if (isFileSelected) {
-                            formData.append('message', '写真が送信されました');
-                        }
-
-                        fetch(this.action, {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Data:', data);
-                            if (data.error) {
-                                throw new Error(data.error);
-                            }
-                            document.getElementById('chatbot-text').value = '';
-                            document.getElementById('filename').value = '';
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('メッセージの送信に失敗しました。');
-                        });
-                    }, { once: true });
-                }
-            });
-       
-
-
-
-     window.PUSHER_APP_KEY = "{{ env('PUSHER_APP_KEY') }}";
-    window.PUSHER_APP_CLUSTER = "{{ env('PUSHER_APP_CLUSTER') }}";
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        if (!window.pusherInitialized) {
-            window.pusherInitialized = true; // フラグを設定して、Pusherの初期化が1回だけ行われるようにする
-        Pusher.logToConsole = true;
-
-        var pusher = new Pusher(window.PUSHER_APP_KEY, {
-            cluster: window.PUSHER_APP_CLUSTER,
-            forceTLS: true,
-            authEndpoint: '/broadcasting/auth',
-            auth: {
-                headers: {
-                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
-            }
-        });
-
-        var channel = pusher.subscribe('chat-' + peopleId);
-
-        channel.bind('pusher:subscription_succeeded', function() {
-            console.log('Successfully subscribed to channel chat-' + peopleId);
-        });
-
-        channel.bind('MessageSent', function(data) {
-            console.log('Received message:', data);
-        //     // if (!document.querySelector(`li[data-message-id="${data.id}"]`)) {
-        //     //     displayMessage(data);
-        //     // }
-        });
-
-        channel.bind_global(function(eventName, data) {
-            console.log(`Received event "${eventName}":`, data);
-        });
-
-
+    <script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        // チャットボックスを下までスクロールする関数
         function chatToBottom() {
             const chatField = document.getElementById('chatbot-body');
-            console.log('チャットを下部までスクロールする');
             chatField.scrollTop = chatField.scrollHeight;
         }
-    }}); 
- </script>
+
+        chatToBottom();
+
+        const chatForm = document.getElementById('chat-form');
+        if (chatForm) {
+            chatForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var formData = new FormData(chatForm);
+
+                const isFileSelected = document.getElementById('filename').files.length > 0;
+
+                if (isFileSelected) {
+                    formData.append('message', '写真が送信されました');
+                }
+
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Data:', data);
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    document.getElementById('chatbot-text').value = '';
+                    document.getElementById('filename').value = '';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('メッセージの送信に失敗しました。');
+                });
+            }, { once: true });
+        }
+    });
+</script>
 </body>
 </x-app-layout>
