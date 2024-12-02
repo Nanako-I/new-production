@@ -458,7 +458,8 @@
     window.PUSHER_APP_CLUSTER = "{{ env('PUSHER_APP_CLUSTER') }}";
     
     document.addEventListener('DOMContentLoaded', function() {
-        
+        if (!window.pusherInitialized) {
+            window.pusherInitialized = true; // フラグを設定して、Pusherの初期化が1回だけ行われるようにする
         Pusher.logToConsole = true;
 
         var pusher = new Pusher(window.PUSHER_APP_KEY, {
@@ -495,7 +496,7 @@
             console.log('チャットを下部までスクロールする');
             chatField.scrollTop = chatField.scrollHeight;
         }
-    }); 
+    }}); 
  </script>
 </body>
 </x-app-layout>
