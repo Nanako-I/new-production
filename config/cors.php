@@ -19,9 +19,9 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://boocare.jp'],
+    'allowed_origins' => ['https://boocare.jp', 'https://*.pusher.com'],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => ['^https:\/\/.*\.pusher\.com$'],
 
     'allowed_headers' => ['*'],
 
