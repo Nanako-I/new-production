@@ -380,10 +380,12 @@
             }
 
             document.addEventListener('DOMContentLoaded', (event) => {
+                console.log('DOMContentLoadedイベントが発生しました');
                 chatToBottom();
                 const userIdentifier = document.getElementById('chatbot-text').getAttribute('data-user-identifier');
 
                 window.displayMessage = function(data) {
+                    console.log('displayMessageが呼び出されました:', data);
                     const chatUl = document.getElementById('chatbot-ul');
                     if (!document.querySelector(`li[data-message-id="${data.id}"]`)) {
                         const li = document.createElement('li');
@@ -456,6 +458,7 @@
     window.PUSHER_APP_CLUSTER = "{{ env('PUSHER_APP_CLUSTER') }}";
     
     document.addEventListener('DOMContentLoaded', function() {
+        
         Pusher.logToConsole = true;
 
         var pusher = new Pusher(window.PUSHER_APP_KEY, {
@@ -475,12 +478,12 @@
             console.log('Successfully subscribed to channel chat-' + peopleId);
         });
 
-        // channel.bind('MessageSent', function(data) {
-        //     console.log('Received message:', data);
+        channel.bind('MessageSent', function(data) {
+            console.log('Received message:', data);
         //     // if (!document.querySelector(`li[data-message-id="${data.id}"]`)) {
         //     //     displayMessage(data);
         //     // }
-        // });
+        });
 
         channel.bind_global(function(eventName, data) {
             console.log(`Received event "${eventName}":`, data);
@@ -489,6 +492,7 @@
 
         function chatToBottom() {
             const chatField = document.getElementById('chatbot-body');
+            console.log('チャットを下部までスクロールする');
             chatField.scrollTop = chatField.scrollHeight;
         }
     }); 
