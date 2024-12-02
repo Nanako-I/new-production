@@ -53,8 +53,8 @@ function updateChatUI(message) {
 
 // DOMContentLoaded イベントリスナー
 document.addEventListener('DOMContentLoaded', function() {
-    if (!window.echoInitialized) {
-        window.echoInitialized = true; // フラグを設定して、Echoの初期化が1回だけ行われるようにする
+    if (!window.pusherInitialized) {
+        window.pusherInitialized = true; // フラグを設定して、Pusherの初期化が1回だけ行われるようにする
 
         const chatbotContainer = document.getElementById('chatbot');
         
