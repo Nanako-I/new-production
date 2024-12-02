@@ -53,27 +53,38 @@ function updateChatUI(message) {
 
 // DOMContentLoaded イベントリスナー
 document.addEventListener('DOMContentLoaded', function() {
-    const chatbotContainer = document.getElementById('chatbot');
-    
-    if (chatbotContainer && window.Echo) {
-        window.Echo.channel('chat-1')
-            .subscribed(() => {
-                console.log('Subscribed to chat-1 channel');
-            })
-            .listen('.MessageSent', (e) => {
-                console.log('新しいメッセージを受信:', e);
-                updateChatUI(e);
-            })
-            .error((error) => {
-                console.error('Channel error:', error);
-            });
+    if (!window.pusherInitialized) {
+        window.pusherInitialized = true; // フラグを設定して、Pusherの初期化が1回だけ行われるようにする
 
-        // Pusher接続状態の変更をログに記録
-        window.Echo.connector.pusher.connection.bind('state_change', function(states) {
-            console.log('Pusher接続状態:', states.current);
+        Pusher.logToConsole = true;
+
+        var pusher = new Pusher(window.PUSHER_APP_KEY, {
+            cluster: window.PUSHER_APP_CLUSTER,
+            forceTLS: true,
+            authEndpoint: '/broadcasting/auth',
+            auth: {
+                headers: {
+                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            }
         });
-    } else {
-        console.warn('Echo が定義されていないか、チャットボットコンテナが見つかりません');
+
+        var channel = pusher.subscribe('chat-' + peopleId);
+
+        channel.bind('pusher:subscription_succeeded', function() {
+            console.log('Successfully subscribed to channel chat-' + peopleId);
+        });
+
+        channel.bind('MessageSent', function(data) {
+            console.log('Received message:', data);
+            if (!document.querySelector(`li[data-message-id="${data.id}"]`)) {
+                displayMessage(data);
+            }
+        });
+
+        channel.bind_global(function(eventName, data) {
+            console.log(`Received event "${eventName}":`, data);
+        });
     }
 });
 
