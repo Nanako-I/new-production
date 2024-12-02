@@ -413,11 +413,10 @@
                     }, { once: true });
                 }
             });
-        </script>
-    <!-- </div> -->
+       
 
-    <!-- <script src="https://js.pusher.com/7.0/pusher.min.js"></script> -->
-<script>
+
+
      window.PUSHER_APP_KEY = "{{ env('PUSHER_APP_KEY') }}";
     window.PUSHER_APP_CLUSTER = "{{ env('PUSHER_APP_CLUSTER') }}";
     
