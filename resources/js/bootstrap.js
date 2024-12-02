@@ -53,27 +53,30 @@ function updateChatUI(message) {
 
 // DOMContentLoaded イベントリスナー
 document.addEventListener('DOMContentLoaded', function() {
-    const chatbotContainer = document.getElementById('chatbot');
-    
-    if (chatbotContainer && window.Echo) {
-        window.Echo.channel('chat-1')
-            .subscribed(() => {
-                console.log('Subscribed to chat-1 channel');
-            })
-            .listen('.MessageSent', (e) => {
-                console.log('新しいメッセージを受信:', e);
-                updateChatUI(e);
-            })
-            .error((error) => {
-                console.error('Channel error:', error);
-            });
+    if (!window.echoInitialized) {
+        window.echoInitialized = true; // フラグを設定して、Echoの初期化が1回だけ行われるようにする
 
-        // Pusher接続状態の変更をログに記録
-        window.Echo.connector.pusher.connection.bind('state_change', function(states) {
-            console.log('Pusher接続状態:', states.current);
-        });
-    } else {
-        console.warn('Echo が定義されていないか、チャットボットコンテナが見つかりません');
+        const chatbotContainer = document.getElementById('chatbot');
+        
+        if (chatbotContainer && window.Echo) {
+            window.Echo.channel('chat-1')
+                .subscribed(() => {
+                    console.log('Subscribed to chat-1 channel');
+                })
+                .listen('.MessageSent', (e) => {
+                    console.log('新しいメッセージを受信:', e);
+                    updateChatUI(e);
+                })
+                .error((error) => {
+                    console.error('Channel error:', error);
+                });
+
+            window.Echo.connector.pusher.connection.bind('state_change', function(states) {
+                console.log('Pusher接続状態:', states.current);
+            });
+        } else {
+            console.warn('Echo が定義されていないか、チャットボットコンテナが見つかりません');
+        }
     }
 });
 
@@ -85,4 +88,4 @@ function scrollToBottom() {
 }
 
 // Call scrollToBottom when the page loads
-document.addEventListener('DOMContentLoaded', scrollToBottom);
+// document.addEventListener('DOMContentLoaded', scrollToBottom);
