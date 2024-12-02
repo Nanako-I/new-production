@@ -56,7 +56,7 @@ class FacilityController extends Controller
     $user->assignRole('facility staff administrator'); // ここで'facility staff administrator' を紐づける
     // 二重送信防止
     $request->session()->regenerateToken();
-    return redirect('/people'); 
+    return redirect('/medical_care_needs'); 
     }
 
     /**

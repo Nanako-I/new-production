@@ -220,7 +220,10 @@ class PersonController extends Controller
 }
     public function create()
     {
-        return view('peopleregister');
+        $user = Auth::user();
+        $facility = $user->facility_staffs()->first();
+   
+        return view('peopleregister', compact('facility'));
     }
 
     public function store(Request $request)

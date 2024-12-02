@@ -75,13 +75,17 @@
             <div id="number-error" class="text-red-500 text-base font-bold hidden"></div>
         </div>
 
+    @php
+        $medicalCareNeedId = $facility->medicalCareNeeds()->first()->id ?? null;
+    @endphp
+
+    @if($medicalCareNeedId && in_array($medicalCareNeedId, [1, 2]))
       <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
           <label class="block text-lg font-bold text-gray-700">医療的ケア</label>
           <input name="medical_care" type="checkbox" value="1" class="mt-1">
           <span class="text-gray-500">医療的ケアを必要とする場合はチェックしてください</span>
       </div>
-
-  
+    @endif
 
         <div class="form-group mb-4 m-2" style="display: flex; flex-direction: column; align-items: center;">
           <label class="block text-lg font-bold text-gray-700">プロフィール画像</label>

@@ -97,7 +97,7 @@
             <div id="number-error" class="text-red-500 text-base font-bold hidden"></div>
         </div>
 
-        @php
+@php
     $medicalCareNeedId = $facility->medicalCareNeeds()->first()->id ?? null;
 @endphp
 
