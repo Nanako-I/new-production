@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('facilities', function (Blueprint $table) {
             $table->id();
             $table->string('facility_name');
+            $table->string('facility_key', 10)->unique(); // 10文字までのユニークな施設キー
             $table->string('bikou')->nullable();
             $table->timestamps();
         });

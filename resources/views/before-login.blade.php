@@ -5,7 +5,7 @@
   <!-- Grid -->
   <div class="grid lg:grid-cols-2 gap-6">
     <!-- Card -->
-    	<a class="group relative block rounded-xl transform transition-transform duration-300 ease-in-out shadow-xl hover:-translate-y-2 hover:shadow-lg" href="{{ url('auth.login') }}">
+    	<a class="group relative block rounded-xl transform transition-transform duration-300 ease-in-out shadow-xl hover:-translate-y-2 hover:shadow-lg" href="{{ url('facility-key') }}">
     	  <!--<div class="flex-shrink-0 relative rounded-xl overflow-hidden w-full h-[350px] before:absolute before:inset-x-0 before:z-[1] before:size-full before:bg-gradient-to-t before:from-gray-900/70">-->
        <!-- <img class="size-full absolute top-0 start-0 object-cover" src="{{ asset('storage/sample/before-login_photo/staff-before-login.jpg')}}" alt="Image Description">-->
       <div class="relative rounded-xl overflow-hidden w-full h-[350px]">

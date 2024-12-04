@@ -36,14 +36,16 @@ class FacilityController extends Controller
      */
     public function store(Request $request)
     {
-       $storeData = $request->validate([
-           
-        ]);
-        // バリデーションした内容を保存する↓
-        
-        $facility = Facility::create([
+       // バリデーション
+    $storeData = $request->validate([
+        'facility_key' => 'required|string|max:10|unique:facilities,facility_key',
+        'facility_name' => 'required|string|max:255',
+    ]);
+
+    // 事業所を作成
+    $facility = Facility::create([
+        'facility_key' => $request->facility_key,
         'facility_name' => $request->facility_name,
-        'bikou' => $request->bikou,
     ]);
     
     // 中間テーブルへの登録

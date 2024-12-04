@@ -19,6 +19,7 @@ use App\Http\Controllers\Auth\NewPasswordController;//リセットメールか�
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\HogoshaLoginController;
 use App\Http\Controllers\RegistrationController;//ユーザー新規登録の二段階認証コントローラー
+use App\Http\Controllers\FacilityKeyController;//施設キーを認証するコントローラー
 
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\FacilityController;
@@ -88,6 +89,10 @@ Route::get('/', function () {
 
     // return view('auth.login');　//※ログイン画面にリダイレクトされないようここを削除
 })->middleware([Authenticate::class]); // Authenticate ミドルウェアを適用
+
+// 職員のログイン前に施設キーを認証させるビュー
+Route::get('/facility-key', [FacilityKeyController::class, 'show'])->name('facility.key.show');
+Route::post('/facility-key', [FacilityKeyController::class, 'submit'])->name('facility.key.submit');
 
 // 職員のログイン画面のビュー
 Route::get('auth.login', function () {

@@ -94,6 +94,7 @@ class RolesAndPermissionsSeeder extends Seeder
         // 施設を作成・ユーザーと紐づけ
         $facility = new Facility();
         $facility->facility_name = 'テスト施設';
+        $facility->facility_key = 'FAC1234567';
         $facility->bikou = 'テスト施設の備考';
         $facility->save();
         $facility->facility_staffs()->attach($facilityAdminUser->id);
