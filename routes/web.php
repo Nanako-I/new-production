@@ -20,6 +20,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\HogoshaLoginController;
 use App\Http\Controllers\RegistrationController;//ユーザー新規登録の二段階認証コントローラー
 use App\Http\Controllers\FacilityKeyController;//施設キーを認証するコントローラー
+use App\Http\Controllers\LineController;//職員側が保護者のLINEアカウントと利用者を直接紐づける
 
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\FacilityController;
@@ -53,7 +54,7 @@ use App\Http\Controllers\SpeechController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\NotebookController;
 use App\Http\Controllers\RecordController;
-use App\Http\Controllers\SpreadsheetController; // Qiitaの記事
+use App\Http\Controllers\SpreadsheetController; 
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\ChatController;
@@ -64,12 +65,14 @@ use App\Http\Controllers\ChildFoodController;
 use App\Http\Controllers\ChildToiletController;
 use App\Http\Controllers\BathController;
 use App\Http\Controllers\HogoshaRecordController;
+use App\Http\Controllers\HogoshaTextController; // 保護者からの文章を送信する
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\DompdfController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\AmiVoiceController;
 use App\Http\Controllers\CalenderController;
 use App\Http\Controllers\VideoController;
+use Illuminate\Support\Facades\Crypt;
 // use Google\Cloud\Speech\V1p1beta1\StreamingRecognitionConfig;
 // use Google\Cloud\Speech\V1p1beta1\StreamingRecognizeRequest;
 
@@ -178,6 +181,12 @@ Route::get('/registration-confirmation', function () {
 })->name('registration-confirmation');
 
 
+// LINEで保護者を利用者と直接紐づける↓
+Route::post('/generate-line-login-url', [LineController::class, 'generateLoginUrl']);
+Route::get('/line/callback', [LineController::class, 'callback'])->name('line.callback');
+Route::get('/line/friends', [LineController::class, 'showFriends'])->name('line.friends');
+Route::post('/line/friends', [LineController::class, 'storeFriends'])->name('line.store_friends');
+
 //管理者が職員のIDを入力するためにfacility_idを取得し画面遷移させる↓
 Route::get('custom_id_entryform/{facilityId}', [BeforeInvitationController::class, 'beforeInvitation'])->name('beforeInvitation');
 
@@ -269,15 +278,50 @@ Route::get('/passcodeform', function () {
 })->name('passcodeform');
 
 // 保護者の利用規約同意↓
+// Route::middleware(['web'])->group(function () {
+//     Route::get('/terms-agreement', function (Request $request) {
+//         if (!$request->session()->get('passcode_verified')) {
+//             return redirect()->route('preregistrationmail');
+//         }
+//         return view('terms-agreement');
+//     })->name('terms.show');
+// });
+// Route::middleware(['web'])->group(function () {
+//     Route::get('/terms-agreement', function (Request $request) {
+//         if (!$request->hasValidSignature()) {
+//             abort(401, '無効または期限切れのURLです。');
+//         }
+
+//         $people_id = $request->query('people_id');
+//         if (!$people_id) {
+//             abort(400, 'people_idパラメータがありません。');
+//         }
+
+//         return view('terms-agreement', compact('people_id'));
+//     })->name('terms.show');
+// });
 Route::middleware(['web'])->group(function () {
     Route::get('/terms-agreement', function (Request $request) {
-        if (!$request->session()->get('passcode_verified')) {
-            return redirect()->route('preregistrationmail');
+        if (!$request->hasValidSignature()) {
+            abort(401, '無効または期限切れのURLです。');
         }
-        return view('terms-agreement');
+
+        $encryptedId = $request->query('encrypted_id');
+        if (!$encryptedId) {
+            abort(400, 'encrypted_idパラメータがありません。');
+        }
+
+        try {
+            $people_id = Crypt::decryptString($encryptedId);
+        } catch (\Exception $e) {
+            abort(400, '無効なIDです。');
+        }
+
+        return view('terms-agreement', compact('people_id'));
     })->name('terms.show');
 });
-// Route::get('/terms-agreement', [TermsAgreementController::class, 'show'])->name('terms.show');
+
+
 Route::post('/terms-agreement', [TermsAgreementController::class, 'store'])->name('terms.agreement');
 
 // Route::get('/passcode-form', [PasscodeController::class, 'showPasscodeForm'])->name('passcode.form');
@@ -349,7 +393,13 @@ Route::middleware('auth')->group(function () {
 
 // 保護者のuser登録画面↓
 Route::get('/hogosharegister',[HogoshaUserController::class,'showRegister'])->name('hogosharegister');
-Route::post('/hogosharegister',[HogoshaUserController::class,'register']);
+// Route::post('/hogosharegister',[HogoshaUserController::class,'register']);
+// Route::post('/hogosharegister/{people_id}', [HogoshaUserController::class, 'register'])->name('hogosharegister.store');
+Route::post('/hogosharegister/{people_id}', [HogoshaUserController::class, 'register'])->name('hogosharegister.store');
+
+// Add a GET route for displaying the form
+// Route::get('/hogosharegister/{people_id}', [HogoshaUserController::class, 'showRegister'])->name('hogosharegister');
+
 Route::get('/hogosha', [HogoshaUserController::class, 'hogosha'])->name('hogosha');
 
 
@@ -519,6 +569,12 @@ Route::post('notebookchange/{people_id}/{id}',[NotebookController::class,'update
 Route::get('recordstamp/{people_id}', [RecordController::class, 'RecordStampshow'])->name('recordstamp.edit');
 Route::post('recordstamp/{people_id}', [RecordController::class, 'storeStamp'])->name('recordstamp.store');
 
+// 保護者が書く文章↓
+Route::get('hogoshatext/{people_id}', [HogoshaTextController::class, 'show'])->name('hogoshatext.show');
+Route::post('hogoshatext/{people_id}', [HogoshaTextController::class, 'store'])->name('hogoshatext.store');
+// 編集↓
+Route::get('hogoshatextchange/{people_id}/{id}', [HogoshaTextController::class, 'change'])->name('hogoshatext.change');
+Route::post('hogoshatextchange/{people_id}/{id}',[HogoshaTextController::class,'update'])->name('hogoshatext_update');
 
 Route::get('notification/{people_id}/edit', [NotificationController::class, 'show'])->name('notification.show');
 Route::post('notification/{people_id}/edit', [NotificationController::class,'store'])->name('notification.post');

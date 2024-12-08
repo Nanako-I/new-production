@@ -50,6 +50,13 @@
                 <i class="fab fa-line text-3xl"></i>
             </button>
         </div>
+
+        <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
+            <label class="block text-lg font-bold text-gray-700">LINE アカウント連携</label>
+            <button type="button" id="link-line-account" class="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                LINE アカウントを連携する
+            </button>
+        </div>
     </div> 
 
     <!-- 修正フォーム -->
@@ -58,7 +65,7 @@
         @method('PATCH')
 
     <div style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
-
+   
     
         <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
             <label class="block text-lg font-bold text-gray-700">名前</label>
@@ -109,10 +116,12 @@
     </div>
 @endif
 
+
             <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
                 <label class="block text-lg font-bold text-gray-700">プロフィール画像</label>
                 <input name="filename" id="filename" type="file" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm text-lg border-gray-300 rounded-md ml-20">
                 @if ($person->filename)
+                
                     <div class="mt-2">
                         <img src="{{ asset('storage/' . $person->filename) }}" alt="プロフィール画像" style="max-width: 150px;">
                     </div>
@@ -210,52 +219,21 @@
         console.log('ファイルが選択されました:', this.files[0].name);
     });
 
-//     document.addEventListener('DOMContentLoaded', function() {
-//     const lineAccountForm = document.getElementById('lineAccountForm');
-//     const lineAccountSelect = document.getElementById('lineAccountSelect');
-
-//     lineAccountForm.addEventListener('submit', function(e) {
-//         e.preventDefault();
-        
-//         if (!lineAccountSelect.value) {
-//             alert('LINEアカウントを選択してください。');
-//             return;
-//         }
-
-//         fetch(this.action, {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-//             },
-//             body: JSON.stringify({
-//                 line_account_id: lineAccountSelect.value
-//             })
-//         })
-//         .then(response => response.json())
-//         .then(data => {
-//             if (data.success) {
-//                 alert('LINEアカウントが正常に関連付けられました。');
-//             } else {
-//                 alert('エラーが発生しました: ' + data.message);
-//             }
-//         })
-//         .catch(error => {
-//             console.error('Error:', error);
-//             alert('エラーが発生しました。');
-//         });
-//     });
-// });
-
+    
     document.addEventListener('DOMContentLoaded', function () {
-        const shareUrl = "{!! $url !!}";
+        const shareUrl = "{{ $url }}";
+        console.log('Share URL:', shareUrl);
+
         const defaultMessage = "新連絡帳システムのご案内です。以下のリンクから新規登録してください。有効期限は本メッセージ送信後24時間以内となります。有効期限切れの場合は施設管理者に再送をご依頼ください:";
 
-        
-
-        // LINEシェア
         document.getElementById('share-line').addEventListener('click', function (e) {
             e.preventDefault();
+            if (!shareUrl) {
+                console.error('No URL available for sharing');
+                alert('共有するURLがありません。管理者に連絡してください。');
+                return;
+            }
+
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
             if (isMobile) {
                 window.location.href = `line://msg/text/${encodeURIComponent(defaultMessage + "\n" + shareUrl)}`;
@@ -263,8 +241,33 @@
                 const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(defaultMessage)}`;
                 window.open(lineShareUrl, '_blank');
             }
+            console.log('LINE share button clicked');
         });
     });
+    document.getElementById('link-line-account').addEventListener('click', function() {
+    fetch('/generate-line-login-url', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            person_id: '{{ $person->id }}'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.url) {
+            window.location.href = data.url;
+        } else {
+            alert('LINE連携URLの生成に失敗しました。');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('エラーが発生しました。');
+    });
+});
 </script>
 </body>
 </x-app-layout>

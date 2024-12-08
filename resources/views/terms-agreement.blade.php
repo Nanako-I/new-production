@@ -4,8 +4,17 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                 <h2 class="text-2xl font-bold mb-4">利用規約とプライバシーポリシー</h2>
                 
+                <!-- @if(isset($people_id))
+                    <p class="mb-4 text-green-600">People ID: {{ $people_id }}</p>
+                @else
+                    <p class="mb-4 text-red-600">People IDが見つかりません。</p>
+                @endif -->
+                
                 <form method="POST" action="{{ route('terms.agreement') }}">
                     @csrf
+                    @if(isset($people_id))
+                        <input type="hidden" name="people_id" value="{{ $people_id }}">
+                    @endif
                     
                     <div class="mb-6">
                         <div class="border p-4 mb-4 h-48 overflow-y-auto">
@@ -53,3 +62,4 @@
         </div>
     </div>
 </x-guest-layout>
+

@@ -27,10 +27,19 @@
 <body>
 
     <!--<form action="" method="post">-->
-    <form id="registerForm" action="{{ url('/hogosharegister') }}" method="post">
-        @csrf
+    <!-- Rest of the form content -->
+ 
+    <form id="registerForm" method="POST" action="{{ route('hogosharegister.store', ['people_id' => $people_id]) }}">
+    @csrf
+        <p class="text-xl">あなたの氏名・メールアドレス・パスワードを登録してください</p>
+        <!-- @if(isset($people_id))
+                    <p class="mb-4 text-green-600">People ID: {{ $people_id }}</p>
+                @else
+                    <p class="mb-4 text-red-600">People IDが見つかりません。</p>
+                @endif -->
+                
         <!-- Name -->
-        <div class="mt-4 flex space-x-4">
+        <div class="mt-4 flex space-x-4">      
         <div class="flex-1">
             <x-input-label for="last_name" :value="__('姓')" class="large-label" />
             <x-text-input id="last_name" class="block mt-1 w-full" type="text" name="last_name" :value="old('last_name')" required autofocus autocomplete="last_name" />
@@ -86,18 +95,33 @@
         
         
         <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('before-login') }}">
+            <a class="px-2 underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('before-login') }}">
                 {{ __('Already registered?') }}
             </a>
             
         <!--<button type="submit">送信</button>-->
 
-            <x-primary-button class="ml-4">
+            <!-- <x-primary-button class="ml-4">
                 {{ __('Register') }}
-            </x-primary-button>
+            </x-primary-button> -->
+            <!-- 登録ボタン -->
+            <button type="button" id="registerButton" class="bg-blue-500 text-white px-4 py-2 rounded">登録</button>
         </div>
         
     </form>
+
+    <!-- モーダルのHTML -->
+    <div id="confirmationModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded shadow-lg">
+            <p id="confirmationMessage" class="text-lg mb-4"></p>
+            <div class="flex justify-end">
+                <button id="confirmButton" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">はい</button>
+                <button id="cancelButton" class="bg-gray-500 text-white px-4 py-2 rounded">いいえ</button>
+            </div>
+        </div>
+    </div>
+
+    
 
     <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -195,6 +219,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return isValid;
     }
+});
+
+document.getElementById('registerButton').addEventListener('click', function() {
+    // モーダルメッセージを設定
+    const personName = "{{ $person->last_name }} {{ $person->first_name }}";
+    document.getElementById('confirmationMessage').textContent = `${personName}さんの親御さんですか？`;
+
+    // モーダルを表示
+    document.getElementById('confirmationModal').classList.remove('hidden');
+});
+
+document.getElementById('confirmButton').addEventListener('click', function() {
+    // モーダルを非表示にしてフォームを送信
+    document.getElementById('confirmationModal').classList.add('hidden');
+    document.getElementById('registerForm').submit();
+});
+
+document.getElementById('cancelButton').addEventListener('click', function() {
+    // モーダルを非表示
+    document.getElementById('confirmationModal').classList.add('hidden');
+    
+    // 新しい画面を表示
+    document.body.innerHTML = '<div class="flex items-center justify-center h-screen"><p class="text-xl">施設管理者にURLの再送を依頼してください</p></div>';
 });
 </script>
 </body>
