@@ -14,11 +14,13 @@ use App\Models\Option;
 use App\Models\OptionItem;
 use App\Models\ScheduledVisit;
 
+
 use Spatie\Permission\Models\Role as SpatieRole;
 use App\Enums\RoleType;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\URL;
@@ -386,24 +388,30 @@ class PersonController extends Controller
    // 利用者情報更新画面の表示↓
    public function edit($id)
    {
-       try {
-           $person = Person::findOrFail($id);
-           
-           // ユーザーに関連する施設を取得
-           $user = Auth::user();
-            $facility = $user->facility_staffs()->first();
-   
-           $url = URL::temporarySignedRoute(
-               'signed.invitation', 
-               now()->addHours(24), 
-               ['signedUrl' => 'preregistrationmail']
-           );
-   
-           return view('peopleedit', compact('person', 'facility', 'url'));
-       } catch (\Exception $e) {
-           return redirect()->route('dashboard')->with('error', '利用者が見つかりません。');
-       }
-   }
+       
+    $user = Auth::user();
+    $person = Person::findOrFail($id);
+    $facility = $user->facility_staffs()->first();
+    
+    $people = $user->people_family()->get();
+    
+    // Generate URL using the current person's ID if there are no family members
+    $encryptedId = Crypt::encryptString($person->id);
+    $url = URL::temporarySignedRoute(
+        'terms.show', 
+        now()->addHours(24), 
+        ['encrypted_id' => $encryptedId]
+    );
+    
+    \Log::info('Generated URL: ' . $url);
+    \Log::info('Person ID: ' . $person->id);
+    \Log::info('People family count: ' . $people->count());
+
+    return view('peopleedit', compact('url', 'person', 'facility', 'people'));
+}
+
+
+
 
 
     //  利用者情報更新

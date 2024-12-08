@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Log;
@@ -24,13 +25,35 @@ use App\Models\Chat;
 class HogoshaUserController extends Controller
 {
     public function showRegister()
-   {
-       return view('hogosharegister');
-   }
+    {
+        // セッションからpersonIdを取得
+        $people_id = session('temp_person_id');
+
+        if (!$people_id) {
+            $error = 'People IDが見つかりません。';
+            return view('hogosharegister', compact('error'));
+        }
+
+        $person = Person::findOrFail($people_id);
+
+        return view('hogosharegister', compact('person', 'people_id'));
+    }
+
+    
    
-   public function register(Request $request)
-   {
-       try {
+public function register(Request $request, $people_id)
+{
+    try {
+        // Validate the signed URL
+        // if (!$request->hasValidSignature()) {
+        //     abort(401, 'Invalid or expired URL.');
+        // }
+
+        // Extract people_id from the request
+        // $people_id = $request->query('people_id');
+        // if (!$people_id) {
+        //     abort(400, 'Missing people_id parameter.');
+        // }
            $validatedData = $request->validate([
                'last_name' => ['required', 'string', 'max:255'],
                'first_name' => ['required', 'string', 'max:255'],
@@ -65,31 +88,72 @@ class HogoshaUserController extends Controller
                'password.regex' => 'パスワードは大文字、小文字、数字を含む必要があります。'
            ]);
    
-           // バリデーションが成功した場合の処理
-           $userData = [
-               'last_name' => $validatedData['last_name'],
-               'first_name' => $validatedData['first_name'],
-               'last_name_kana' => $validatedData['last_name_kana'],
-               'first_name_kana' => $validatedData['first_name_kana'],
-               'email' => $validatedData['email'],
-               'password' => $validatedData['password'],
-               'terms_accepted' => session('terms_accepted', false),
-               'privacy_accepted' => session('privacy_accepted', false),
-               'terms_accepted_at' => session('terms_accepted_at'),
-               'privacy_accepted_at' => session('privacy_accepted_at')
-           ];
-   
-           $request->session()->put('user_data', $userData);
-   
-           return view('hogoshanumber', compact('userData'));
-   
-       } catch (ValidationException $e) {
-           // バリデーションが失敗した場合の処理
-           return view('hogosharegister')
-                            ->withErrors($e->errors())
-                            ->withInput();
-       }
-   }
+    //        $person = Person::where('id', $people_id)
+    //        ->where('jukyuusha_number', $validatedData['jukyuusha_number'])
+    //        ->where('date_of_birth', $validatedData['date_of_birth'])
+    //        ->first();
+
+    //    if (!$person) {
+    //        throw ValidationException::withMessages([
+    //            'jukyuusha_number' => '受給者証番号と生年月日が一致する利用者が存在しません。',
+    //        ]);
+    //    }
+
+    DB::beginTransaction();
+
+        try {
+            $user = User::create([
+                'last_name' => $validatedData['last_name'],
+                'first_name' => $validatedData['first_name'],
+                'last_name_kana' => $validatedData['last_name_kana'],
+                'first_name_kana' => $validatedData['first_name_kana'],
+                'email' => $validatedData['email'],
+                'password' => Hash::make($validatedData['password']),
+                'terms_accepted' => session('terms_accepted', false),
+                'privacy_accepted' => session('privacy_accepted', false),
+                'terms_accepted_at' => session('terms_accepted_at'),
+                'privacy_accepted_at' => session('privacy_accepted_at')
+            ]);
+
+    // $user->assignRole('client family user');
+
+    // Get the person_id from the session and create the relationship
+    $personId = session('temp_person_id');
+            
+            if ($personId) {
+                $user->people_family()->syncWithoutDetaching([$personId]);
+                $user->assignRole('client family user');
+            } else {
+                Log::warning('No temp_person_id found in session during registration');
+            }
+
+            Auth::login($user);
+
+            DB::commit();
+
+            // Fetch unread messages
+            $unreadMessages = Chat::where('people_id', $personId)
+                ->where('is_read', false)
+                ->where('user_identifier', '!=', $user->id)
+                ->exists();
+
+            $people = $user->people_family()->get();
+
+            return view('hogosha', compact('people', 'unreadMessages'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Registration error: ' . $e->getMessage());
+            throw $e;
+        }
+    } catch (ValidationException $e) {
+        return back()->withErrors($e->errors())->withInput();
+    } catch (\Exception $e) {
+        Log::error('Unexpected error during registration: ' . $e->getMessage());
+        return back()->withErrors(['email' => '登録処理中にエラーが発生しました。もう一度お試しください。'])->withInput();
+    }
+}
+
+
 
   public function edit(Request $request)
     {

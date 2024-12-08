@@ -142,6 +142,12 @@ public function foods()
         //  return $this->hasMany(Temperature::class);
     }
     
+    public function hogosha_texts()
+    {
+        return $this->hasMany(HogoshaText::class,'people_id');
+        //  return $this->hasMany(Temperature::class);
+    }
+
     public function child_conditions()
     {
         return $this->hasMany(ChildCondition::class,'people_id');
