@@ -101,11 +101,11 @@
             
         <!--<button type="submit">送信</button>-->
 
-            <!-- <x-primary-button class="ml-4">
+            <x-primary-button class="ml-4">
                 {{ __('Register') }}
-            </x-primary-button> -->
+            </x-primary-button>
             <!-- 登録ボタン -->
-            <button type="button" id="registerButton" class="bg-blue-500 text-white px-4 py-2 rounded">登録</button>
+            <!-- <button type="button" id="registerButton" class="bg-blue-500 text-white px-4 py-2 rounded">登録</button> -->
         </div>
         
     </form>
