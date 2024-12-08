@@ -230,11 +230,14 @@ document.getElementById('registerButton').addEventListener('click', function() {
     document.getElementById('confirmationModal').classList.remove('hidden');
 });
 
-document.getElementById('confirmButton').addEventListener('click', function() {
+function handleConfirm() {
     // モーダルを非表示にしてフォームを送信
     document.getElementById('confirmationModal').classList.add('hidden');
     document.getElementById('registerForm').submit();
-});
+}
+
+document.getElementById('confirmButton').addEventListener('click', handleConfirm);
+document.getElementById('confirmButton').addEventListener('touchend', handleConfirm);
 
 document.getElementById('cancelButton').addEventListener('click', function() {
     // モーダルを非表示
