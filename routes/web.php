@@ -88,6 +88,10 @@ use Illuminate\Support\Facades\Crypt;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/debug-sentry', function () {
+    throw new Exception('My first Sentry error!');
+});
+
 Route::get('/', function () {
 
     // return view('auth.login');　//※ログイン画面にリダイレクトされないようここを削除
