@@ -124,29 +124,29 @@
     
 
     <script>
-// document.addEventListener('DOMContentLoaded', function() {
-//     const form = document.getElementById('registerForm');
-//     const inputs = form.querySelectorAll('input');
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registerForm');
+    const inputs = form.querySelectorAll('input');
 
-//     inputs.forEach(input => {
-//         input.addEventListener('input', function() {
-//             validateField(this);
-//         });
-//     });
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            validateField(this);
+        });
+    });
 
     
-//     form.addEventListener('submit', function(e) {
-//         let isValid = true;
-//         inputs.forEach(input => {
-//             if (!validateField(input)) {
-//                 isValid = false;
-//             }
-//         });
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        inputs.forEach(input => {
+            if (!validateField(input)) {
+                isValid = false;
+            }
+        });
 
-//         if (!isValid) {
-//             e.preventDefault();
-//         }
-//     });
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
 
     
 
