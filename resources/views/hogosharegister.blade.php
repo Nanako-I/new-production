@@ -105,9 +105,9 @@
             <!-- 登録ボタン -->
             <!-- <button type="button" id="registerButton" class="bg-blue-500 text-white px-4 py-2 rounded">登録</button> -->
         </div>
-        <x-primary-button class="ml-4">
-                {{ __('Register') }}
-        </x-primary-button>
+        <button type="submit" class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                送信
+              </button>
         
     </form>
 
