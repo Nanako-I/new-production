@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
+use Sentry\Laravel\Integration;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,6 +31,10 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
+        if (app()->environment('production') && config('sentry.dsn')) {
+            $this->app->register(\Sentry\Laravel\ServiceProvider::class);
+            Integration::init();
+        }
     // URL::forceScheme('https');
     }
 }
