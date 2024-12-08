@@ -32,11 +32,11 @@
     <form id="registerForm" method="POST" action="{{ route('hogosharegister.store', ['people_id' => $people_id]) }}">
     @csrf
         <p class="text-xl">あなたの氏名・メールアドレス・パスワードを登録してください</p>
-        <!-- @if(isset($people_id))
+        @if(isset($people_id))
                     <p class="mb-4 text-green-600">People ID: {{ $people_id }}</p>
                 @else
                     <p class="mb-4 text-red-600">People IDが見つかりません。</p>
-                @endif -->
+                @endif
                 
         <!-- Name -->
         <div class="mt-4 flex space-x-4">      
@@ -111,7 +111,7 @@
     </form>
 
     <!-- モーダルのHTML -->
-    <div id="confirmationModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+    <!-- <div id="confirmationModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
         <div class="bg-white p-6 rounded shadow-lg">
             <p id="confirmationMessage" class="text-lg mb-4"></p>
             <div class="flex justify-end">
@@ -119,7 +119,7 @@
                 <button id="cancelButton" class="bg-gray-500 text-white px-4 py-2 rounded">いいえ</button>
             </div>
         </div>
-    </div>
+    </div> -->
 
     
 
@@ -221,31 +221,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-document.getElementById('registerButton').addEventListener('click', function() {
-    // モーダルメッセージを設定
-    const personName = "{{ $person->last_name }} {{ $person->first_name }}";
-    document.getElementById('confirmationMessage').textContent = `${personName}さんの親御さんですか？`;
+// document.getElementById('registerButton').addEventListener('click', function() {
+//     // モーダルメッセージを設定
+//     const personName = "{{ $person->last_name }} {{ $person->first_name }}";
+//     document.getElementById('confirmationMessage').textContent = `${personName}さんの親御さんですか？`;
 
-    // モーダルを表示
-    document.getElementById('confirmationModal').classList.remove('hidden');
-});
+//     // モーダルを表示
+//     document.getElementById('confirmationModal').classList.remove('hidden');
+// });
 
-function handleConfirm() {
-    // モーダルを非表示にしてフォームを送信
-    document.getElementById('confirmationModal').classList.add('hidden');
-    document.getElementById('registerForm').submit();
-}
+// function handleConfirm() {
+//     // モーダルを非表示にしてフォームを送信
+//     document.getElementById('confirmationModal').classList.add('hidden');
+//     document.getElementById('registerForm').submit();
+// }
 
-document.getElementById('confirmButton').addEventListener('click', handleConfirm);
-document.getElementById('confirmButton').addEventListener('touchend', handleConfirm);
+// document.getElementById('confirmButton').addEventListener('click', handleConfirm);
+// document.getElementById('confirmButton').addEventListener('touchend', handleConfirm);
 
-document.getElementById('cancelButton').addEventListener('click', function() {
-    // モーダルを非表示
-    document.getElementById('confirmationModal').classList.add('hidden');
+// document.getElementById('cancelButton').addEventListener('click', function() {
+//     // モーダルを非表示
+//     document.getElementById('confirmationModal').classList.add('hidden');
     
-    // 新しい画面を表示
-    document.body.innerHTML = '<div class="flex items-center justify-center h-screen"><p class="text-xl">施設管理者にURLの再送を依頼してください</p></div>';
-});
+//     // 新しい画面を表示
+//     document.body.innerHTML = '<div class="flex items-center justify-center h-screen"><p class="text-xl">施設管理者にURLの再送を依頼してください</p></div>';
+// });
 </script>
 </body>
 </html>
