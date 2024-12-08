@@ -125,105 +125,105 @@
     
 
     <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('registerForm');
-    const inputs = form.querySelectorAll('input');
+// document.addEventListener('DOMContentLoaded', function() {
+//     const form = document.getElementById('registerForm');
+//     const inputs = form.querySelectorAll('input');
 
-    inputs.forEach(input => {
-        input.addEventListener('input', function() {
-            validateField(this);
-        });
-    });
-
-    
-    form.addEventListener('submit', function(e) {
-        let isValid = true;
-        inputs.forEach(input => {
-            if (!validateField(input)) {
-                isValid = false;
-            }
-        });
-
-        if (!isValid) {
-            e.preventDefault();
-        }
-    });
+//     inputs.forEach(input => {
+//         input.addEventListener('input', function() {
+//             validateField(this);
+//         });
+//     });
 
     
+//     form.addEventListener('submit', function(e) {
+//         let isValid = true;
+//         inputs.forEach(input => {
+//             if (!validateField(input)) {
+//                 isValid = false;
+//             }
+//         });
 
-    function validateField(field) {
-        const errorSpan = document.getElementById(field.id + '_error');
-        let isValid = true;
+//         if (!isValid) {
+//             e.preventDefault();
+//         }
+//     });
 
-        switch(field.id) {
-            case 'last_name':
-            case 'first_name':
-                if (field.value.trim() === '') {
-                    errorSpan.textContent = field.id === 'last_name' ? '姓を入力してください。' : '名を入力してください。';
-                    isValid = false;
-                } else if (field.value.length > 255) {
-                    errorSpan.textContent = '255文字以内で入力してください。';
-                    isValid = false;
-                } else {
-                    errorSpan.textContent = '';
-                }
-                break;
-            case 'last_name_kana':
-            case 'first_name_kana':
-                if (field.value.trim() === '') {
-                    errorSpan.textContent = field.id === 'last_name_kana' ? 'セイを入力してください。' : 'メイを入力してください。';
-                    isValid = false;
-                } else if (field.value.length > 255) {
-                    errorSpan.textContent = '255文字以内で入力してください。';
-                    isValid = false;
-                } else if (!/^[ァ-ヶー]+$/.test(field.value)) {
-                    errorSpan.textContent = 'カタカナで入力してください。';
-                    isValid = false;
-                } else {
-                    errorSpan.textContent = '';
-                }
-                break;
-            case 'email':
-                if (field.value.trim() === '') {
-                    errorSpan.textContent = 'メールアドレスを入力してください。';
-                    isValid = false;
-                } else if (field.value.length > 255) {
-                    errorSpan.textContent = 'メールアドレスは255文字以内で入力してください。';
-                    isValid = false;
-                } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value)) {
-                    errorSpan.textContent = '有効なメールアドレスを入力してください。';
-                    isValid = false;
-                } else {
-                    errorSpan.textContent = '';
-                }
-                break;
-            case 'password':
-                if (field.value.trim() === '') {
-                    errorSpan.textContent = 'パスワードを入力してください。';
-                    isValid = false;
-                } else if (field.value.length < 8) {
-                    errorSpan.textContent = 'パスワードは8文字以上で入力してください。';
-                    isValid = false;
-                } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/.test(field.value)) {
-                    errorSpan.textContent = 'パスワードは大文字、小文字、数字を含む必要があります。';
-                    isValid = false;
-                } else {
-                    errorSpan.textContent = '';
-                }
-                break;
-            case 'password_confirmation':
-                if (field.value !== document.getElementById('password').value) {
-                    errorSpan.textContent = 'パスワードが一致しません。';
-                    isValid = false;
-                } else {
-                    errorSpan.textContent = '';
-                }
-                break;
-        }
+    
 
-        return isValid;
-    }
-});
+//     function validateField(field) {
+//         const errorSpan = document.getElementById(field.id + '_error');
+//         let isValid = true;
+
+//         switch(field.id) {
+//             case 'last_name':
+//             case 'first_name':
+//                 if (field.value.trim() === '') {
+//                     errorSpan.textContent = field.id === 'last_name' ? '姓を入力してください。' : '名を入力してください。';
+//                     isValid = false;
+//                 } else if (field.value.length > 255) {
+//                     errorSpan.textContent = '255文字以内で入力してください。';
+//                     isValid = false;
+//                 } else {
+//                     errorSpan.textContent = '';
+//                 }
+//                 break;
+//             case 'last_name_kana':
+//             case 'first_name_kana':
+//                 if (field.value.trim() === '') {
+//                     errorSpan.textContent = field.id === 'last_name_kana' ? 'セイを入力してください。' : 'メイを入力してください。';
+//                     isValid = false;
+//                 } else if (field.value.length > 255) {
+//                     errorSpan.textContent = '255文字以内で入力してください。';
+//                     isValid = false;
+//                 } else if (!/^[ァ-ヶー]+$/.test(field.value)) {
+//                     errorSpan.textContent = 'カタカナで入力してください。';
+//                     isValid = false;
+//                 } else {
+//                     errorSpan.textContent = '';
+//                 }
+//                 break;
+//             case 'email':
+//                 if (field.value.trim() === '') {
+//                     errorSpan.textContent = 'メールアドレスを入力してください。';
+//                     isValid = false;
+//                 } else if (field.value.length > 255) {
+//                     errorSpan.textContent = 'メールアドレスは255文字以内で入力してください。';
+//                     isValid = false;
+//                 } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value)) {
+//                     errorSpan.textContent = '有効なメールアドレスを入力してください。';
+//                     isValid = false;
+//                 } else {
+//                     errorSpan.textContent = '';
+//                 }
+//                 break;
+//             case 'password':
+//                 if (field.value.trim() === '') {
+//                     errorSpan.textContent = 'パスワードを入力してください。';
+//                     isValid = false;
+//                 } else if (field.value.length < 8) {
+//                     errorSpan.textContent = 'パスワードは8文字以上で入力してください。';
+//                     isValid = false;
+//                 } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/.test(field.value)) {
+//                     errorSpan.textContent = 'パスワードは大文字、小文字、数字を含む必要があります。';
+//                     isValid = false;
+//                 } else {
+//                     errorSpan.textContent = '';
+//                 }
+//                 break;
+//             case 'password_confirmation':
+//                 if (field.value !== document.getElementById('password').value) {
+//                     errorSpan.textContent = 'パスワードが一致しません。';
+//                     isValid = false;
+//                 } else {
+//                     errorSpan.textContent = '';
+//                 }
+//                 break;
+//         }
+
+//         return isValid;
+//     }
+// });
 
 // document.addEventListener('DOMContentLoaded', function() {
 //     const form = document.getElementById('registerForm');
