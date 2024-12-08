@@ -221,7 +221,7 @@
 
     
     document.addEventListener('DOMContentLoaded', function () {
-        const shareUrl = "{{ $url }}";
+        const shareUrl = "{!! $url !!}";
         console.log('Share URL:', shareUrl);
 
         const defaultMessage = "新連絡帳システムのご案内です。以下のリンクから新規登録してください。有効期限は本メッセージ送信後24時間以内となります。有効期限切れの場合は施設管理者に再送をご依頼ください:";
