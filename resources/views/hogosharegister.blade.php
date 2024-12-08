@@ -124,28 +124,31 @@
     
 
     <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('registerForm');
-    const inputs = form.querySelectorAll('input');
+// document.addEventListener('DOMContentLoaded', function() {
+//     const form = document.getElementById('registerForm');
+//     const inputs = form.querySelectorAll('input');
 
-    inputs.forEach(input => {
-        input.addEventListener('input', function() {
-            validateField(this);
-        });
-    });
+//     inputs.forEach(input => {
+//         input.addEventListener('input', function() {
+//             validateField(this);
+//         });
+//     });
 
-    form.addEventListener('submit', function(e) {
-        let isValid = true;
-        inputs.forEach(input => {
-            if (!validateField(input)) {
-                isValid = false;
-            }
-        });
+    
+//     form.addEventListener('submit', function(e) {
+//         let isValid = true;
+//         inputs.forEach(input => {
+//             if (!validateField(input)) {
+//                 isValid = false;
+//             }
+//         });
 
-        if (!isValid) {
-            e.preventDefault();
-        }
-    });
+//         if (!isValid) {
+//             e.preventDefault();
+//         }
+//     });
+
+    
 
     function validateField(field) {
         const errorSpan = document.getElementById(field.id + '_error');
@@ -220,6 +223,59 @@ document.addEventListener('DOMContentLoaded', function() {
         return isValid;
     }
 });
+
+// document.addEventListener('DOMContentLoaded', function() {
+//     const form = document.getElementById('registerForm');
+//     const submitButton = form.querySelector('button[type="submit"]');
+
+//     function validateForm() {
+//         let isValid = true;
+//         inputs.forEach(input => {
+//             if (!validateField(input)) {
+//                 isValid = false;
+//             }
+//         });
+//         return isValid;
+//     }
+
+//     form.addEventListener('submit', function(e) {
+//         e.preventDefault();
+//         if (validateForm()) {
+//             submitForm();
+//         }
+//     });
+
+//     function submitForm() {
+//         // 送信ボタンを無効化
+//         submitButton.disabled = true;
+
+//         // FormDataオブジェクトの作成
+//         const formData = new FormData(form);
+
+//         // AJAXリクエストの送信
+//         fetch(form.action, {
+//             method: 'POST',
+//             body: formData,
+//             headers: {
+//                 'X-Requested-With': 'XMLHttpRequest'
+//             }
+//         })
+//         .then(response => response.json())
+//         .then(data => {
+//             if (data.success) {
+//                 window.location.href = data.redirect;
+//             } else {
+//                 // エラー処理
+//                 displayErrors(data.errors);
+//                 submitButton.disabled = false;
+//             }
+//         })
+//         .catch(error => {
+//             console.error('エラー:', error);
+//             alert('登録処理中にエラーが発生しました。もう一度お試しください。');
+//             submitButton.disabled = false;
+//         });
+//     }});
 
 // document.getElementById('registerButton').addEventListener('click', function() {
 //     // モーダルメッセージを設定
