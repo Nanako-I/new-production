@@ -32,31 +32,32 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
     <div class="flex justify-end "> 
-              <div class="flex-col"> 
+              <!-- <div class="flex-col"> 
                 <p class="font-bold text-lg">連絡帳</p>
                 <a href="{{ url('record/'.$person->id.'/edit') }}" class="relative ml-2" style="display: flex; align-items: center;">
                     <i class="fa-regular fa-clipboard text-slate-600 hover:text-slate-900 icon-container mr-5 " style="font-size: 3em; padding: 0 5px; transition: transform 0.2s;"></i>
                     @csrf
                   </a>
-              </div> 
+              </div>  -->
             
 
-        <p class="font-bold text-lg">ご家族に新規登録のご案内を送る</p>
-        <div class="share-buttons flex justify-center space-x-4 mt-4">
+        <!-- <p class="font-bold text-lg">ご家族に新規登録のご案内を送る</p> -->
+        <!-- <div class="share-buttons flex justify-center space-x-4 mt-4">
             
             <button type="button" 
                     id="share-line"
                     class="text-white bg-green-500 p-2 rounded flex items-center justify-center">
                 <i class="fab fa-line text-3xl"></i>
             </button>
-        </div>
+        </div> -->
 
-        <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
+        <!-- <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
             <label class="block text-lg font-bold text-gray-700">LINE アカウント連携</label>
             <button type="button" id="link-line-account" class="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
                 LINE アカウントを連携する
             </button>
-        </div>
+        </div> -->
+       
     </div> 
 
     <!-- 修正フォーム -->
@@ -142,6 +143,94 @@
  <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
 
  <script>
+    function createIcon(iconClass, label) {
+    const icon = document.createElement('div');
+    icon.className = 'flex flex-col items-center cursor-pointer';
+    icon.innerHTML = `
+        <i class="${iconClass} text-4xl"></i>
+        <span class="mt-1 text-sm">${label}</span>
+    `;
+    return icon;
+}
+
+function showQRCode() {
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50';
+    modal.innerHTML = `
+        <div class="bg-white p-6 rounded-lg max-w-sm w-full mx-4">
+            <h2 class="text-lg font-bold mb-4">QRコード</h2>
+            <div class="qr-code-container overflow-hidden">
+                {!! $qrCode !!}
+            </div>
+            <p class="mt-4 text-sm text-gray-600">このQRコードをスキャンすると、ご家族の登録画面が表示されます。</p>
+            <button class="mt-4 px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">閉じる</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // QRコードのサイズを調整
+    const qrCodeContainer = modal.querySelector('.qr-code-container');
+    const qrCodeSvg = qrCodeContainer.querySelector('svg');
+    if (qrCodeSvg) {
+        qrCodeSvg.setAttribute('width', '100%');
+        qrCodeSvg.setAttribute('height', '100%');
+        qrCodeSvg.style.maxWidth = '200px';
+        qrCodeSvg.style.maxHeight = '200px';
+        qrCodeSvg.style.display = 'block';
+        qrCodeSvg.style.margin = '0 auto';
+    }
+    
+    modal.querySelector('button').addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+}
+
+// Create container for the invitation section
+const invitationContainer = document.createElement('div');
+invitationContainer.className = 'flex flex-col items-center my-4';
+
+// Add the "ご家族を招待する" text
+const invitationText = document.createElement('p');
+invitationText.className = 'text-lg font-bold mb-2';
+invitationText.textContent = 'ご家族を招待する';
+invitationContainer.appendChild(invitationText);
+
+// Create container for icons
+const iconContainer = document.createElement('div');
+iconContainer.className = 'flex justify-center items-center space-x-8';
+
+// LINEアイコン
+const lineIcon = createIcon('fab fa-line', 'LINE共有');
+lineIcon.id = 'share-line';
+
+// QRコードアイコン
+const qrCodeIcon = createIcon('fa-solid fa-qrcode', 'QRコード');
+qrCodeIcon.addEventListener('click', showQRCode);
+
+// Add icons to the icon container
+iconContainer.appendChild(lineIcon);
+iconContainer.appendChild(qrCodeIcon);
+
+// Add icon container to the invitation container
+invitationContainer.appendChild(iconContainer);
+
+// Add the invitation container to the document
+const targetElement = document.querySelector('.flex.justify-end');
+targetElement.parentNode.insertBefore(invitationContainer, targetElement);
+
+function removeExistingElements() {
+    const elementsToRemove = [
+        '.flex-col',
+        '.share-buttons',
+        '.form-group.mb-4.m-2.w-1/2.max-w-md.md\\:w-1\\/6'
+    ];
+    elementsToRemove.forEach(selector => {
+        const element = document.querySelector(selector);
+        if (element) element.remove();
+    });
+}
+
+
     document.addEventListener('DOMContentLoaded', function() {
     const lastNameKana = document.querySelector('input[name="last_name_kana"]');
     const firstNameKana = document.querySelector('input[name="first_name_kana"]');

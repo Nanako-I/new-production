@@ -399,7 +399,12 @@ Route::middleware('auth')->group(function () {
 Route::get('/hogosharegister',[HogoshaUserController::class,'showRegister'])->name('hogosharegister');
 // Route::post('/hogosharegister',[HogoshaUserController::class,'register']);
 // Route::post('/hogosharegister/{people_id}', [HogoshaUserController::class, 'register'])->name('hogosharegister.store');
-Route::post('/hogosharegister/{people_id}', [HogoshaUserController::class, 'register'])->name('hogosharegister.store');
+// Route::post('/hogosharegister/{people_id}', [HogoshaUserController::class, 'register'])->name('hogosharegister.store');
+// Route::post('/hogosharegister/{people_id}', [HogoshaUserController::class, 'register'])
+Route::post('/hogosharegister', [HogoshaUserController::class, 'register'])
+->name('hogosharegister.store');
+// ->middleware('guest');
+// ->middleware('signed');
 
 // Add a GET route for displaying the form
 // Route::get('/hogosharegister/{people_id}', [HogoshaUserController::class, 'showRegister'])->name('hogosharegister');

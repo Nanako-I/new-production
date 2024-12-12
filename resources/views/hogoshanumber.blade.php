@@ -54,7 +54,7 @@
                 </div>
             @endif
             
-            <div class="flex flex-col items-center justify-center">
+            <!-- <div class="flex flex-col items-center justify-center">
                 <p class="text-gray-900 font-bold text-xl mb-2">ご家族の受給者証番号（10桁）</p>
                 <div class="border-2 border-gray-300 rounded-md p-2 mb-4">
                     <input type="text" id="jukyuusha_number" name="jukyuusha_number" 
@@ -63,7 +63,7 @@
                         style="letter-spacing: 0.5em;">
                 </div>
                 <div id="number-error" class="text-red-500 text-sm hidden"></div>
-            </div>
+            </div> -->
             
             <div class="flex flex-col items-center justify-center pt-2">
                 <p class="text-gray-900 font-bold text-xl">ご家族の生年月日</p>
@@ -78,7 +78,7 @@
         </div>
      </form>
 
-    <script>
+    <!-- <script>
     document.addEventListener('DOMContentLoaded', function() {
     const input = document.getElementById('jukyuusha_number');
     const errorDiv = document.getElementById('number-error');
@@ -111,5 +111,5 @@
         });
     });
 
-    </script>
+    </script> -->
 </x-guest-layout>

@@ -17,8 +17,9 @@ class PersonPolicy
         }
 
         // 保護者の新規登録時はポリシーを適用しない
-        if (request()->routeIs('hogosha.register')) {
+        if (request()->routeIs('hogosharegister.store') || request()->routeIs('hogoshanumber.show') || request()->routeIs('hogoshanumber.store')) {
         return true;
+        
         }
 
         // ユーザーがsuper administratorの場合は全ての情報を閲覧可能

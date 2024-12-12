@@ -21,6 +21,7 @@ use App\Models\Facility;
 use App\Models\Person;
 use App\Models\Role;
 use App\Models\Chat;
+use Carbon\Carbon;
 
 class HogoshaUserController extends Controller
 {
@@ -41,13 +42,209 @@ class HogoshaUserController extends Controller
 
     
    
-    public function register(Request $request, $people_id)
-{
-    Log::info('Register method started');
+//     public function register(Request $request, $people_id)
+// {
+//     Log::info('Register method started', [
+//         'user_agent' => $request->header('User-Agent'),
+//         'ip_address' => $request->ip()
+//     ]);
 
-    try {
-        Log::info('Starting validation');
-        $validatedData = $request->validate([
+//     try {
+//         Log::info('Starting validation');
+//         $validatedData = $request->validate([
+//             'last_name' => ['required', 'string', 'max:255'],
+//             'first_name' => ['required', 'string', 'max:255'],
+//             'last_name_kana' => ['required', 'string', 'max:255', 'regex:/^[ァ-ヶー]+$/u'],
+//             'first_name_kana' => ['required', 'string', 'max:255', 'regex:/^[ァ-ヶー]+$/u'],
+//             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
+//             'password' => [
+//                 'required',
+//                 'string',
+//                 'min:8',
+//                 'confirmed',
+//                 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/' // 大文字小文字英数字含む
+//             ]
+//         ], [
+//             'last_name.required' => '姓を入力してください。',
+//             'last_name.max' => '姓は255文字以内で入力してください。',
+//             'first_name.required' => '名を入力してください。',
+//             'first_name.max' => '名は255文字以内で入力してください。',
+//             'last_name_kana.required' => 'セイを入力してください。',
+//             'last_name_kana.max' => 'セイは255文字以内で入力してください。',
+//             'last_name_kana.regex' => 'セイはカタカナで入力してください。',
+//             'first_name_kana.required' => 'メイを入力してください。',
+//             'first_name_kana.max' => 'メイは255文字以内で入力してください。',
+//             'first_name_kana.regex' => 'メイはカタカナで入力してください。',
+//             'email.required' => 'メールアドレスを入力してください。',
+//             'email.email' => '有効なメールアドレスを入力してください。',
+//             'email.max' => 'メールアドレスは255文字以内で入力してください。',
+//             'email.unique' => 'このメールアドレスは既に使用されています。',
+//             'password.required' => 'パスワードを入力してください。',
+//             'password.min' => 'パスワードは8文字以上で入力してください。',
+//             'password.confirmed' => 'パスワードが一致しません。',
+//             'password.regex' => 'パスワードは大文字、小文字、数字を含む必要があります。'
+//         ]);
+//         Log::info('Validation passed', $validatedData);
+
+//         DB::beginTransaction();
+//         Log::info('Starting database transaction');
+//         $userData = $request->session()->get('user_data');
+
+//         try {
+//             $user = User::create([
+//                 'last_name' => $validatedData['last_name'],
+//                 'first_name' => $validatedData['first_name'],
+//                 'last_name_kana' => $validatedData['last_name_kana'],
+//                 'first_name_kana' => $validatedData['first_name_kana'],
+//                 'email' => $validatedData['email'],
+//                 'password' => Hash::make($validatedData['password']),
+//                 'terms_accepted' => session('terms_accepted', false),
+//                 'privacy_accepted' => session('privacy_accepted', false),
+//                 'terms_accepted_at' => session('terms_accepted_at'),
+//                 'privacy_accepted_at' => session('privacy_accepted_at')
+//             ]);
+//             Log::info('User created', ['user_id' => $user->id]);
+
+//             // Get the person_id from the session and create the relationship
+//             $personId = session('temp_person_id');
+            
+//             if ($personId) {
+//                 $user->people_family()->syncWithoutDetaching([$personId]);
+//                 $user->assignRole('client family user');
+//             } else {
+//                 Log::warning('No temp_person_id found in session during registration');
+//             }
+
+//             Auth::login($user);
+
+//             DB::commit();
+//             Log::info('Database transaction committed');
+
+//             // Fetch unread messages
+//             $unreadMessages = Chat::where('people_id', $personId)
+//                 ->where('is_read', false)
+//                 ->where('user_identifier', '!=', $user->id)
+//                 ->exists();
+
+//             $people = $user->people_family()->get();
+
+//             return view('hogosha', compact('people', 'unreadMessages'));
+//         } catch (\Exception $e) {
+//             Log::error('Error during registration: ' . $e->getMessage());
+//             DB::rollBack();
+//             throw $e;
+//         }
+//     } catch (ValidationException $e) {
+//         Log::error('Validation error: ' . json_encode($e->errors()));
+//         return back()->withErrors($e->errors())->withInput();
+//     } catch (\Exception $e) {
+//         Log::error('Unexpected error during registration: ' . $e->getMessage());
+//         return back()->withErrors(['email' => '登録処理中にエラーが発生しました。もう一度お試しください。'])->withInput();
+//     }
+
+//     Log::info('Register method completed');
+// }
+// public function register(Request $request, $people_id)
+// {
+//     Log::info('Register method started');
+
+//     try {
+//         Log::info('Starting validation');
+//         $validatedData = $request->validate([
+//             'last_name' => ['required', 'string', 'max:255'],
+//             'first_name' => ['required', 'string', 'max:255'],
+//             'last_name_kana' => ['required', 'string', 'max:255', 'regex:/^[ァ-ヶー]+$/u'],
+//             'first_name_kana' => ['required', 'string', 'max:255', 'regex:/^[ァ-ヶー]+$/u'],
+//             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
+//             'password' => [
+//                 'required',
+//                 'string',
+//                 'min:8',
+//                 'confirmed',
+//                 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/' // 大文字小文字英数字含む
+//             ]
+//         ], [
+//             'last_name.required' => '姓を入力してください。',
+//             'last_name.max' => '姓は255文字以内で入力してください。',
+//             'first_name.required' => '名を入力してください。',
+//             'first_name.max' => '名は255文字以内で入力してください。',
+//             'last_name_kana.required' => 'セイを入力してください。',
+//             'last_name_kana.max' => 'セイは255文字以内で入力してください。',
+//             'last_name_kana.regex' => 'セイはカタカナで入力してください。',
+//             'first_name_kana.required' => 'メイを入力してください。',
+//             'first_name_kana.max' => 'メイは255文字以内で入力してください。',
+//             'first_name_kana.regex' => 'メイはカタカナで入力してください。',
+//             'email.required' => 'メールアドレスを入力してください。',
+//             'email.email' => '有効なメールアドレスを入力してください。',
+//             'email.max' => 'メールアドレスは255文字以内で入力してください。',
+//             'email.unique' => 'このメールアドレスは既に使用されています。',
+//             'password.required' => 'パスワードを入力してください。',
+//             'password.min' => 'パスワードは8文字以上で入力してください。',
+//             'password.confirmed' => 'パスワードが一致しません。',
+//             'password.regex' => 'パスワードは大文字、小文字、数字を含む必要があります。'
+//         ]);
+//         Log::info('Validation passed', $validatedData);
+
+//         DB::beginTransaction();
+//         Log::info('Starting database transaction');
+
+//         try {
+//             $user = User::create([
+//                 'last_name' => $validatedData['last_name'],
+//                 'first_name' => $validatedData['first_name'],
+//                 'last_name_kana' => $validatedData['last_name_kana'],
+//                 'first_name_kana' => $validatedData['first_name_kana'],
+//                 'email' => $validatedData['email'],
+//                 'password' => Hash::make($validatedData['password']),
+//                 'terms_accepted' => session('terms_accepted', false),
+//                 'privacy_accepted' => session('privacy_accepted', false),
+//                 'terms_accepted_at' => session('terms_accepted_at'),
+//                 'privacy_accepted_at' => session('privacy_accepted_at')
+//             ]);
+//             Log::info('User created', ['user_id' => $user->id]);
+
+//             // Get the person_id from the session and create the relationship
+//             $personId = session('temp_person_id');
+            
+//             if ($personId) {
+//                 $user->people_family()->syncWithoutDetaching([$personId]);
+//                 $user->assignRole('client family user');
+//             } else {
+//                 Log::warning('No temp_person_id found in session during registration');
+//             }
+
+//             Auth::login($user);
+
+//             DB::commit();
+//             Log::info('Database transaction committed');
+
+//             // Fetch unread messages
+//             $unreadMessages = Chat::where('people_id', $personId)
+//                 ->where('is_read', false)
+//                 ->where('user_identifier', '!=', $user->id)
+//                 ->exists();
+
+//             $people = $user->people_family()->get();
+
+//             return view('hogosha', compact('people', 'unreadMessages'));
+//         } catch (\Exception $e) {
+//             Log::error('Error during registration: ' . $e->getMessage());
+//             DB::rollBack();
+//             throw $e;
+//         }
+//     } catch (ValidationException $e) {
+//         Log::error('Validation error: ' . json_encode($e->errors()));
+//         return back()->withErrors($e->errors())->withInput();
+//     } catch (\Exception $e) {
+//         Log::error('Unexpected error during registration: ' . $e->getMessage());
+//         return back()->withErrors(['email' => '登録処理中にエラーが発生しました。もう一度お試しください。'])->withInput();
+//     }
+
+//     Log::info('Register method completed');
+// }
+public function register(Request $request)
+    {
+        $form = $request->validate([
             'last_name' => ['required', 'string', 'max:255'],
             'first_name' => ['required', 'string', 'max:255'],
             'last_name_kana' => ['required', 'string', 'max:255', 'regex:/^[ァ-ヶー]+$/u'],
@@ -58,7 +255,7 @@ class HogoshaUserController extends Controller
                 'string',
                 'min:8',
                 'confirmed',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/' // 大文字小文字英数字含む
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/'
             ]
         ], [
             'last_name.required' => '姓を入力してください。',
@@ -80,65 +277,131 @@ class HogoshaUserController extends Controller
             'password.confirmed' => 'パスワードが一致しません。',
             'password.regex' => 'パスワードは大文字、小文字、数字を含む必要があります。'
         ]);
-        Log::info('Validation passed', $validatedData);
 
-        DB::beginTransaction();
-        Log::info('Starting database transaction');
+        // 入力データと同意情報を配列に保存
+        $now = Carbon::now();
+        $userData = [
+            'last_name' => $request->input('last_name'),
+            'first_name' => $request->input('first_name'),
+            'last_name_kana' => $request->input('last_name_kana'),
+            'first_name_kana' => $request->input('first_name_kana'),
+            'email' => $request->input('email'),
+            'password' => $request->input('password'),
+            'terms_accepted' => true,
+            'privacy_accepted' => true,
+            'terms_accepted_at' => $now,
+            'privacy_accepted_at' => $now
+        ];
 
-        try {
-            $user = User::create([
-                'last_name' => $validatedData['last_name'],
-                'first_name' => $validatedData['first_name'],
-                'last_name_kana' => $validatedData['last_name_kana'],
-                'first_name_kana' => $validatedData['first_name_kana'],
-                'email' => $validatedData['email'],
-                'password' => Hash::make($validatedData['password']),
-                'terms_accepted' => session('terms_accepted', false),
-                'privacy_accepted' => session('privacy_accepted', false),
-                'terms_accepted_at' => session('terms_accepted_at'),
-                'privacy_accepted_at' => session('privacy_accepted_at')
-            ]);
-            Log::info('User created', ['user_id' => $user->id]);
+        $request->session()->put('user_data', $userData);
 
-            // Get the person_id from the session and create the relationship
-            $personId = session('temp_person_id');
-            
-            if ($personId) {
-                $user->people_family()->syncWithoutDetaching([$personId]);
-                $user->assignRole('client family user');
-            } else {
-                Log::warning('No temp_person_id found in session during registration');
-            }
+        $personId = session('temp_person_id');
 
-            Auth::login($user);
-
-            DB::commit();
-            Log::info('Database transaction committed');
-
-            // Fetch unread messages
-            $unreadMessages = Chat::where('people_id', $personId)
-                ->where('is_read', false)
-                ->where('user_identifier', '!=', $user->id)
-                ->exists();
-
-            $people = $user->people_family()->get();
-
-            return view('hogosha', compact('people', 'unreadMessages'));
-        } catch (\Exception $e) {
-            Log::error('Error during registration: ' . $e->getMessage());
-            DB::rollBack();
-            throw $e;
-        }
-    } catch (ValidationException $e) {
-        Log::error('Validation error: ' . json_encode($e->errors()));
-        return back()->withErrors($e->errors())->withInput();
-    } catch (\Exception $e) {
-        Log::error('Unexpected error during registration: ' . $e->getMessage());
-        return back()->withErrors(['email' => '登録処理中にエラーが発生しました。もう一度お試しください。'])->withInput();
+        return view('hogoshanumber', compact('userData','personId'));
     }
+// public function register(Request $request, $people_id)
+// {
+//     // try {
+//         $validated = $request->validate([
+//             'last_name' => ['required', 'string', 'max:255'],
+//             'first_name' => ['required', 'string', 'max:255'],
+//             'last_name_kana' => ['required', 'string', 'max:255', 'regex:/^[ァ-ヶー]+$/u'],
+//             'first_name_kana' => ['required', 'string', 'max:255', 'regex:/^[ァ-ヶー]+$/u'],
+//             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
+//             'password' => [
+//                 'required',
+//                 'string',
+//                 'min:8',
+//                 'confirmed',
+//                 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/'
+//             ],
+//         ], [
+//             'last_name.required' => '姓を入力してください。',
+//             'last_name.max' => '姓は255文字以内で入力してください。',
+//             'first_name.required' => '名を入力してください。',
+//             'first_name.max' => '名は255文字以内で入力してください。',
+//             'last_name_kana.required' => 'セイを入力してください。',
+//             'last_name_kana.max' => 'セイは255文字以内で入力してください。',
+//             'last_name_kana.regex' => 'セイはカタカナで入力してください。',
+//             'first_name_kana.required' => 'メイを入力してください。',
+//             'first_name_kana.max' => 'メイは255文字以内で入力してください。',
+//             'first_name_kana.regex' => 'メイはカタカナで入力してください。',
+//             'email.required' => 'メールアドレスを入力してください。',
+//             'email.email' => '有効なメールアドレスを入力してください。',
+//             'email.max' => 'メールアドレスは255文字以内で入力してください。',
+//             'email.unique' => 'このメールアドレスは既に使用されています。',
+//             'password.required' => 'パスワードを入力してください。',
+//             'password.min' => 'パスワードは8文字以上で入力してください。',
+//             'password.confirmed' => 'パスワードが一致しません。',
+//             'password.regex' => 'パスワードは大文字、小文字、数字を含む必要があります。'
+//         ]);
 
-    Log::info('Register method completed');
-}
+//         $userData = [
+//                  'last_name' => $request->input('last_name'),
+//      'first_name' => $request->input('first_name'),
+//      'last_name_kana' => $request->input('last_name_kana'),
+//      'first_name_kana' => $request->input('first_name_kana'),
+//      'email' => $request->input('email'),
+//     //  'password' => Hash::make($request->input('password')),
+//     'password' => $request->input('password'),
+//         ];
+
+//         $request->session()->put('user_data', $userData);
+//         $userData = session('user_data');
+//         if ($request->ajax()) {
+//             return response()->json([
+//                 'success' => true,
+//                 'message' => '登録情報が保存されました。',
+//                 'redirect' => route('hogoshanumber.show')
+//             ]);
+//         }
+
+//         return redirect()->route('hogoshanumber.show');
+
+    // } catch (ValidationException $e) {
+    //     if ($request->ajax()) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'errors' => $e->errors()
+    //         ], 422);
+    //     }
+    //     return back()->withErrors($e->errors())->withInput();
+    // } catch (\Exception $e) {
+    //     \Log::error('Registration error: ' . $e->getMessage());
+    //     if ($request->ajax()) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => '登録処理中にエラーが発生しました。'
+    //         ], 500);
+    //     }
+    //     return back()->with('error', '登録処理中にエラーが発生しました。')->withInput();
+    // }
+// }
+    // public function store(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'last_name' => 'required|string|max:255',
+    //         'first_name' => 'required|string|max:255',
+    //         'last_name_kana' => 'required|string|max:255|regex:/^[ァ-ヶー]+$/u',
+    //         'first_name_kana' => 'required|string|max:255|regex:/^[ァ-ヶー]+$/u',
+    //         'email' => 'required|string|email|max:255|unique:users',
+    //         'password' => 'required|string|min:8|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+    //     }
+
+    //     $userData = $validator->validated();
+    //     $request->session()->put('user_data', $userData);
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'ユーザー情報が正常に保存されました。',
+    //         'userData' => $userData
+    //     ]);
+    // }
+
 
 
 
@@ -188,16 +451,30 @@ class HogoshaUserController extends Controller
     Log::info('リクエストデータ: ' . json_encode($request->all()));
       // バリデーションルールとメッセージを定義
     $rules = [
-        'jukyuusha_number' => 'required|digits:10',
+        // 'jukyuusha_number' => 'required|digits:10',
         'date_of_birth' => 'required|date_format:Y-m-d', // 必要に応じてフォーマットを調整
     ];
 
     $messages = [
-        'jukyuusha_number.required' => '受給者証番号は必須です。',
-        'jukyuusha_number.digits' => '受給者証番号は10桁で入力してください。',
+        // 'jukyuusha_number.required' => '受給者証番号は必須です。',
+        // 'jukyuusha_number.digits' => '受給者証番号は10桁で入力してください。',
         'date_of_birth.required' => '生年月日は必須です。',
         'date_of_birth.date_format' => '生年月日は正しい形式で入力してください。',
     ];
+
+    // 試行回数を取得（セッションになければ0を設定）
+    $attempts = session('birth_date_attempts', 0);
+
+    // 試行回数が3回以上の場合
+    if ($attempts >= 3) {
+        // セッションをクリア
+        session()->forget(['birth_date_attempts', 'user_data', 'temp_person_id']);
+        
+        // シンプルなエラーメッセージを白い画面に表示
+        return response()->view('errorsbirthday', [
+            'message' => '生年月日の入力を3回間違えました。最初から試してください。'
+        ]);
+    }
 
     // バリデーションを実行
     $validator = Validator::make($request->all(), $rules, $messages);
@@ -211,10 +488,32 @@ class HogoshaUserController extends Controller
     // 受給者証番号と生年月日で人を検索
     Log::info('クエリ実行前');
     $person = Person::withoutGlobalScopes()
-    ->where('jukyuusha_number', $request->jukyuusha_number)
+    // ->where('jukyuusha_number', $request->jukyuusha_number)
     ->where('date_of_birth', $request->date_of_birth)
     ->first();
 Log::info('クエリ結果: ' . ($person ? 'データあり' : 'データなし'));
+
+// 人が見つからなかった場合
+if (!$person) {
+    // 試行回数を増やす
+    $attempts++;
+    session(['birth_date_attempts' => $attempts]);
+
+    // 試行回数が3回以上の場合
+    if ($attempts >= 3) {
+        // セッションをクリア
+        session()->forget(['birth_date_attempts', 'user_data', 'temp_person_id']);
+        
+        // 生年月日を3回間違えたらエラー画面に遷移
+        return response()->view('eroorsbirthday', [
+            'message' => '生年月日が一致する利用者が存在しません。施設側でご家族の生年月日がこのアプリに正しく登録されているかお問い合わせください。'
+        ]);
+    }
+
+    $error = '生年月日が一致する利用者が存在しません。<br>施設側でご家族の生年月日がこのアプリに正しく登録されているかお問い合わせください';
+    return view('hogoshanumber', compact('error'));
+}
+
     // Log::info('検索された人物: ' . ($person ? json_encode($person) : 'なし'));
     // 人が見つかった場合
         if ($person) {
@@ -267,7 +566,7 @@ Log::info('クエリ結果: ' . ($person ? 'データあり' : 'データなし'
             return view('hogoshanumber', compact('error'));
         }
     } else {
-        $error = '受給者証番号と生年月日が一致する利用者が存在しません。<br>施設側でこのアプリにご家族の登録がされているか施設にお問い合わせください';
+        $error = '生年月日が一致する利用者が存在しません。<br>施設側でご家族の生年月日がこのアプリに正しく登録されているかお問い合わせください';
         return view('hogoshanumber', compact('error'));
     }
 

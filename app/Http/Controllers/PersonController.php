@@ -28,6 +28,7 @@ use Carbon\Carbon;
 use App\Enums\PermissionType;
 use App\Enums\RoleType as RoleEnums;
 use App\Enums\Role as RoleEnum;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PersonController extends Controller
 {
@@ -407,7 +408,10 @@ class PersonController extends Controller
     \Log::info('Person ID: ' . $person->id);
     \Log::info('People family count: ' . $people->count());
 
-    return view('peopleedit', compact('url', 'person', 'facility', 'people'));
+    $qrCode = QrCode::size(200)->generate($url);
+
+
+    return view('peopleedit', compact('url', 'qrCode', 'person', 'facility', 'people'));
 }
 
 
