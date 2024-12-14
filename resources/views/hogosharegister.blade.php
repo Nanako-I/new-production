@@ -77,15 +77,19 @@
     <!--<form action="" method="post">-->
     <!-- Rest of the form content -->
     <form id="registerForm" method="POST" action="{{ route('hogosharegister.store') }}">
-    <!-- <form id="registerForm" method="POST" action="{{ route('hogosharegister.store', ['people_id' => $people_id]) }}"> -->
     @csrf
         <p class="text-xl">あなたの氏名・メールアドレス・パスワードを登録してください</p>
       
-        @if(isset($people_id))
-                    <p class="mb-4 text-green-600">People ID: {{ $people_id }}</p>
-                @else
-                    <p class="mb-4 text-red-600">People IDが見つかりません。</p>
-                @endif
+        @if(isset($people_ids))
+    <div class="mb-4">
+        <h3 class="text-lg font-semibold mb-2">People ID(s):</h3>
+        <ul class="list-disc list-inside">
+            @foreach($people_ids as $id)
+                <li class="text-green-600">{{ $id }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
                 @if(session('terms_accepted') && session('privacy_accepted'))
     <p>利用規約に同意しました: {{ session('terms_accepted_at') }}</p>
     <p>プライバシーポリシーに同意しました: {{ session('privacy_accepted_at') }}</p>

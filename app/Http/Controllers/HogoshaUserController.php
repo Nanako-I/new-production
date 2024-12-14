@@ -25,6 +25,31 @@ use Carbon\Carbon;
 
 class HogoshaUserController extends Controller
 {
+
+    // public function showRegister()
+    // {
+    //     // セッションからpeople_idsを取得（複数のIDを想定）
+    //     $people_ids = session('temp_people_ids', []);
+    
+    //     if (empty($people_ids)) {
+    //         $error = 'People IDが見つかりません。';
+    //         return view('hogosharegister', compact('error'));
+    //     }
+    
+    //     // 複数のPersonを取得
+    //     $people = Person::whereIn('id', $people_ids)->get();
+    
+    //     if ($people->isEmpty()) {
+    //         $error = '指定されたIDに該当する人物が見つかりません。';
+    //         return view('hogosharegister', compact('error'));
+    //     }
+    
+    //     // 単一のPersonの場合の処理
+    //     $people_id = session('temp_person_id');
+    //     $person = Person::findOrFail($people_id);
+    
+    //     return view('hogosharegister', compact('people', 'person', 'people_ids'));
+    // }
     public function showRegister()
     {
         // セッションからpersonIdを取得
@@ -36,6 +61,8 @@ class HogoshaUserController extends Controller
         }
 
         $person = Person::findOrFail($people_id);
+
+        
 
         return view('hogosharegister', compact('person', 'people_id'));
     }

@@ -60,22 +60,33 @@
        
     </div> 
 
+    <div style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
+    <span class="mt-1 text-sm text-blue-500 underline cursor-pointer invite-siblings">兄弟も招待する</span>
+    
+    <div class="sibling-list" id="siblingList">
+        <h4>招待する兄弟を選択してください:</h4>
+        <!-- ここに施設の人物リストを表示 -->
+        @foreach($facilitypeople as $facilityperson)
+            <div>
+                <input type="checkbox" id="person_{{ $facilityperson->id }}" name="siblings[]" value="{{ $facilityperson->id }}">
+                <label for="person_{{ $facilityperson->id }}">{{ $facilityperson->last_name }} {{ $facilityperson->first_name }}</label>
+            </div>
+        @endforeach
+        <button id="generateUrlsButton">URLを生成</button>
+    </div>
+
     <!-- 修正フォーム -->
     <form action="{{ route('people.update', $person->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PATCH')
-
-    <div style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
-   
-    
-        <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
+        <div class="form-group mb-4 m-2 w-full max-w-lg" style="display: flex; flex-direction: column; align-items: center;">
             <label class="block text-lg font-bold text-gray-700">名前</label>
             <input name="last_name" type="text" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm text-xl font-bold border-gray-300 rounded-md" value="{{ old('last_name', $person->last_name) }}"placeholder="姓">
             <input name="first_name" type="text" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm text-xl font-bold border-gray-300 rounded-md" value="{{ old('first_name', $person->first_name) }}" placeholder="名">
 
         </div>
 
-        <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
+        <div class="form-group mb-4 m-2 w-full max-w-lg" style="display: flex; flex-direction: column; align-items: center;">
             <input name="last_name_kana" type="text" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm text-xl font-bold border-gray-300 rounded-md" value="{{ old('last_name_kana', $person->last_name_kana) }}" placeholder="セイ">
             @error('last_name_kana')
                 <div class="kana-error text-red-500 text-base font-bold mt-1">{{ $message }}</div>
@@ -87,7 +98,7 @@
             @enderror
         </div>
         
-        <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
+        <div class="form-group mb-4 m-2 w-full max-w-lg" style="display: flex; flex-direction: column; align-items: center;">
             <label class="block text-lg font-bold text-gray-700">生年月日</label>
             <input name="date_of_birth" type="date" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm text-xl font-bold border-gray-300 rounded-md" value="{{ old('date_of_birth', $person->date_of_birth) }}" placeholder="生年月日">
         </div>
@@ -105,20 +116,20 @@
             <div id="number-error" class="text-red-500 text-base font-bold hidden"></div>
         </div>
 
-@php
-    $medicalCareNeedId = $facility->medicalCareNeeds()->first()->id ?? null;
-@endphp
+        @php
+            $medicalCareNeedId = $facility->medicalCareNeeds()->first()->id ?? null;
+        @endphp
 
-@if($medicalCareNeedId && in_array($medicalCareNeedId, [1, 2]))
-    <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
-        <label class="block text-lg font-bold text-gray-700">医療的ケア</label>
-        <input name="medical_care" type="checkbox" value="1" class="mt-1" {{ $person->medical_care ? 'checked' : '' }}>
-        <span class="text-gray-500">医療的ケアを必要とする場合はチェックしてください</span>
-    </div>
-@endif
+        @if($medicalCareNeedId && in_array($medicalCareNeedId, [1, 2]))
+            <div class="form-group mb-4 m-2 w-full max-w-lg" style="display: flex; flex-direction: column; align-items: center;">
+                <label class="block text-lg font-bold text-gray-700">医療的ケア</label>
+                <input name="medical_care" type="checkbox" value="1" class="mt-1" {{ $person->medical_care ? 'checked' : '' }}>
+                <span class="text-gray-500">医療的ケアを必要とする場合はチェックしてください</span>
+            </div>
+        @endif
 
 
-            <div class="form-group mb-4 m-2 w-1/2 max-w-md md:w-1/6" style="display: flex; flex-direction: column; align-items: center;">
+            <div class="form-group mb-4 m-2 w-full max-w-lg" style="display: flex; flex-direction: column; align-items: center;">
                 <label class="block text-lg font-bold text-gray-700">プロフィール画像</label>
                 <input name="filename" id="filename" type="file" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm text-lg border-gray-300 rounded-md ml-20">
                 @if ($person->filename)
@@ -143,15 +154,17 @@
  <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
 
  <script>
-    function createIcon(iconClass, label) {
+   function createIcon(iconClass, label) {
     const icon = document.createElement('div');
     icon.className = 'flex flex-col items-center cursor-pointer';
     icon.innerHTML = `
         <i class="${iconClass} text-4xl"></i>
         <span class="mt-1 text-sm">${label}</span>
+        
     `;
     return icon;
 }
+
 
 function showQRCode() {
     const modal = document.createElement('div');
@@ -356,6 +369,106 @@ function removeExistingElements() {
         console.error('Error:', error);
         alert('エラーが発生しました。');
     });
+});
+</script>
+
+<style>
+.icon-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 20px 0;
+}
+
+.icon-item {
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.icon-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.invite-siblings {
+    text-align: center;
+    margin-top: 10px;
+    cursor: pointer;
+    color: blue;
+    text-decoration: underline;
+}
+
+.sibling-list {
+    display: none;
+    margin-top: 20px;
+    text-align: left;
+}
+
+.sibling-list input[type="checkbox"] {
+    margin-right: 10px;
+}
+</style>
+
+
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all elements with the class 'invite-siblings'
+    const inviteSiblingsLinks = document.querySelectorAll('.invite-siblings');
+    
+    // Get the sibling list element
+    const siblingList = document.getElementById('siblingList');
+    
+    // Initially hide the sibling list
+    siblingList.style.display = 'none';
+    
+    // Add click event listener to all 'invite-siblings' elements
+    inviteSiblingsLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent default link behavior
+            toggleSiblingList();
+        });
+    });
+    
+    // Function to toggle the sibling list visibility
+    function toggleSiblingList() {
+        if (siblingList.style.display === 'none') {
+            siblingList.style.display = 'block';
+        } else {
+            siblingList.style.display = 'none';
+        }
+    }
+});
+
+// 暗号化関数（例としてBase64を使用）
+function encryptId(id) {
+    return btoa(id); // Base64エンコード
+}
+
+// チェックボックスの選択されたIDを取得し、暗号化してURLを作成
+function createEncryptedUrls() {
+    const selectedIds = [];
+    document.querySelectorAll('input[name="siblings[]"]:checked').forEach(function(checkbox) {
+        selectedIds.push(checkbox.value);
+    });
+
+    const encryptedUrls = selectedIds.map(id => {
+        const encryptedId = encryptId(id);
+        return `https://example.com/invite?person_id=${encryptedId}`;
+    });
+
+    console.log(encryptedUrls); // 生成されたURLをコンソールに出力
+    return encryptedUrls;
+}
+// URL生成ボタンのクリックイベント
+document.getElementById('generateUrlsButton').addEventListener('click', function() {
+    const urls = createEncryptedUrls();
+    // ここでURLを使用する処理を追加（例：表示、送信など）
 });
 </script>
 </body>

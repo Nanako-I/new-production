@@ -409,9 +409,19 @@ class PersonController extends Controller
     \Log::info('People family count: ' . $people->count());
 
     $qrCode = QrCode::size(200)->generate($url);
+    $firstFacility = $facility->first();
 
+    // Retrieve people associated with the first facility
+    if ($firstFacility) {
+        $facilitypeople = $firstFacility->people_facilities()->get();
+    } else {
+        $facilitypeople = []; // Handle case when no people are registered
+    }
 
-    return view('peopleedit', compact('url', 'qrCode', 'person', 'facility', 'people'));
+    // Add this line to check if $facilitypeople has data
+    \Log::info('Facility people count: ' . $facilitypeople->count());
+
+    return view('peopleedit', compact('url', 'qrCode', 'person', 'facility', 'facilitypeople'));
 }
 
 
