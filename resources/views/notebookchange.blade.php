@@ -1,4 +1,16 @@
 <x-app-layout>
+@if ($errors->any())
+    <div style="color: red; font-weight: bold; background-color: #ffe6e6; border: 2px solid red; padding: 10px; border-radius: 5px;">
+      <ul style="list-style-type: none; padding-left: 0;">
+          @foreach ($errors->all() as $error)
+              <li style="margin-bottom: 5px; color: red; font-weight: bold; font-size: 1.1em;">
+                  <i class="fas fa-exclamation-triangle" style="margin-right: 5px;"></i>
+                  {{ $error }}
+              </li>
+          @endforeach
+      </ul>
+    </div>
+@endif
 
     <!--ヘッダー[START]-->
     

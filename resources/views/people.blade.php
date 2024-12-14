@@ -585,15 +585,18 @@
                                                         <input type="hidden" name="people_id" value="{{ $person->id }}">
                                                         <input type="hidden" name="option_id" value="{{ $option->id }}">
                                                         <input type="hidden" name="has_input" value="0" id="has_input_{{ $option->id }}">
+                                                        <p class="text-gray-900 font-bold text-xl">本日行った内容</p>
 
-                                                        <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
+                                                        <div class="flex flex-col items-start mt-2 mb-4">
                                                             @for($i = 1; $i <= 5; $i++)
                                                                 @php
                                                                     $itemKey = "item{$i}";
                                                                 @endphp
                                                                 @if(!is_null($option->$itemKey) && $option->$itemKey !== '')
-                                                                    <input type="checkbox" name="item{{ $i }}" value="1" class="w-6 h-6 option-checkbox" data-option-id="{{ $option->id }}">
-                                                                    <p class="text-gray-900 font-bold text-xl px-1.5">{{ $option->$itemKey }}</p>
+                                                                    <div class="flex items-center mb-2">
+                                                                        <input type="checkbox" name="item{{ $i }}" value="1" class="w-6 h-6 option-checkbox" data-option-id="{{ $option->id }}">
+                                                                        <p class="text-gray-900 font-bold text-xl ml-2">{{ $option->$itemKey }}</p>
+                                                                    </div>
                                                                 @endif
                                                             @endfor
                                                         </div>
@@ -602,11 +605,11 @@
                                                             <p class="text-gray-900 font-bold text-xl">備考</p>
                                                             <textarea id="bikou_{{ $option->id }}" name="bikou" class="w-3/4 max-w-lg font-bold option-bikou" style="height: 200px;" data-option-id="{{ $option->id }}"></textarea>
                                                         </div>
-                                                        <div class="my-2" style="display: flex; justify-content: center; align-items: center; max-width: 300px;">
+                                                        <div class="mt-4 flex justify-center">
                                                             <button type="submit" class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
                                                                 送信
-                                                                </button>
-                                                            </div>
+                                                            </button>
+                                                        </div>
                                                             @if($errors->has('error_'.$option->id))
                                                                 <div class="text-red-500 font-bold mt-2">
                                                                     {{ $errors->first('error_'.$option->id) }}

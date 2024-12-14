@@ -794,6 +794,15 @@ public function addItemToAll($people_id)
 
 public function updateFacilityItems(Request $request, $facility_id)
 {
+    // バリデーションルールとカスタムメッセージを設定
+    $request->validate([
+        'title' => 'required|string|max:32',
+        'item.0' => 'required|string|max:32',
+    ], [
+        'title.required' => 'タイトルを入れてください。',
+        'item.0.required' => '記録項目を入れてください。',
+    ]);
+
     $selectedItems = $request->input('selected_items', []);
     
     // 施設に関連する全てのオプションを取得し、グループ化する

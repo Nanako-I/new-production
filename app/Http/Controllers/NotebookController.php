@@ -78,9 +78,11 @@ class NotebookController extends Controller
      */
     public function store(Request $request)
     {
-        $storeData = $request->validate([
-            // 'temperature' => 'required|max:255',
-            // 'people_id' => 'required|exists:people,id',
+        // バリデーションルールとカスタムメッセージを設定
+        $request->validate([
+            'notebook' => 'required|string',
+        ], [
+            'notebook.required' => 'フォームに入力してください。',
         ]);
         // バリデーションした内容を保存する↓
         
@@ -334,6 +336,11 @@ $headers = [
      */
     public function update(Request $request, $people_id, $id)
     {
+        $request->validate([
+            'notebook' => 'required|string',
+        ], [
+            'notebook.required' => 'フォームに入力してください。',
+        ]);
       //データ更新
       $person = Person::find($request->people_id);
       $notebook = Notebook::findOrFail($id);

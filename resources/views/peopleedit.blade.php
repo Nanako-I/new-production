@@ -128,17 +128,17 @@
             </div>
         @endif
 
-<!--S3の設定がまだなので写真登録は一旦コメントアウト-->
-            <!-- <div class="form-group mb-4 m-2 w-full max-w-lg" style="display: flex; flex-direction: column; align-items: center;">
-                <label class="block text-lg font-bold text-gray-700">プロフィール画像</label>
-                <input name="filename" id="filename" type="file" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm text-lg border-gray-300 rounded-md ml-20">
+
+            <div class="hidden form-group mb-4 m-2 w-full max-w-lg" style="display: flex; flex-direction: column; align-items: center;">
+                <label class="hidden block text-lg font-bold text-gray-700">プロフィール画像</label>
+                <input name="filename" id="filename" type="file" class="hidden mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm text-lg border-gray-300 rounded-md ml-20">
                 @if ($person->filename)
                 
                     <div class="mt-2">
                         <img src="{{ asset('storage/' . $person->filename) }}" alt="プロフィール画像" style="max-width: 150px;">
                     </div>
                 @endif
-            </div> -->
+            </div>
 
             <div class="flex flex-col col-span-1">
                 <div class="text-gray-700 text-center px-4 py-2 m-2">

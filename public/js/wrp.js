@@ -225,7 +225,7 @@ var apiKeyContainerPromise = new Promise(function(resolve, reject) {
 	document.getElementById('amivoiceApiKeyContainer');
 		if (apiKeyContainer && apiKeyContainer.getAttribute) {
 		Wrp.authorization = apiKeyContainer.getAttribute('data-api-key');
-		console.log(Wrp.authorization);
+		// console.log(Wrp.authorization);
 		resolve(Wrp.authorization);
 		
 	} else {
@@ -234,7 +234,7 @@ var apiKeyContainerPromise = new Promise(function(resolve, reject) {
 	});
 });
 setTimeout(() => {
-	console.log(Wrp.authorization);//←ここではundefinedになる
+	// console.log(Wrp.authorization);//←ここではundefinedになる
 }, "1000");
 
 	// public オブジェクト
@@ -262,7 +262,7 @@ var Wrp = function() {
 	  message = "さようなら、世界！";
 	}
 
-	console.log(message);
+	// console.log(message);
 
 // 	var apiKey; // グローバルスコープにapiKeyを定義
 // 	// public オブジェクト
