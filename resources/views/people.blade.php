@@ -103,13 +103,13 @@
                      <a href="{{ url('people/'.$person->id.'/edit') }}" class="relative  ml-2">
 
                       <div class="h-30 flex flex-row items-center rounded-lg bg-white width:100vw relative z-0">
-                          <!--ハンバーガーメニューが表示された時は、下に表示されるようz-0をつける-->
+                          <!--S3の設定がまだなので写真表示は一旦コメントアウト-->
                           
-                            @if ($person->filename)
+                            <!-- @if ($person->filename)
                               <img alt="team" class="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 rounded-full mr-4" src="{{ asset('storage/sample/person_photo/' . $person->filename) }}">
                             @else
                               <img alt="team" class="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 rounded-full mr-4" src="https://dummyimage.com/80x80">
-                            @endif
+                            @endif -->
                             
                                 <style>
                                   /* フォントを指定 */

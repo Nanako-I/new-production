@@ -7,6 +7,12 @@
 
         <!-- バリデーションエラーの表示に使用-->
        <!-- resources/views/components/errors.blade.php -->
+        @if (session('success'))
+        <div class="bg-green-500 text-white p-4 rounded-lg mb-4">
+                {{ session('success') }}
+            </div>
+        @endif
+
         @if (count($errors) > 0)
             <!-- Form Error List -->
             <div class="flex justify-between p-4 items-center bg-red-500 text-white rounded-lg border-2 p-2 border-white">
