@@ -136,11 +136,10 @@
                                             </a>
                                     </div>
                                 </div> -->
-
                                 <div class="border-2 p-2 rounded-lg bg-white mx-2 mb-2 mt-8">
                                           <div class="flex justify-start items-center">
                                             <i class="fa-solid fa-pencil text-orange-600" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
-                                            <p class="font-bold text-xl ml-2">事業所に様子を伝える</p>
+                                            <p class="font-bold text-xl ml-2">施設に連絡する</p>
                                           </div>
                                           <div class="flex items-center justify-center p-4">
                                             @php
@@ -153,15 +152,19 @@
                                             
                                             @if ($todayHogoshaText)
                                                 <!-- 登録済みの場合 -->
-                                                <a href="{{ route('hogoshatext.change', ['people_id' => $person->id, 'id' => $todayHogoshaText->id]) }}" class="relative ml-2 flex items-center">
+                                                <a href="{{ url('hogoshatext/'.$person->id) }}" class="relative ml-2 flex items-center">
                                                   @csrf
-                                                    <p class="font-bold text-xl p-2">{{ Str::limit($todayHogoshaText->notebook, 10, '...') }}</p>
-                                                    <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s; vertical-align: middle;"></i>
+                                                    <!-- 未読メッセージがある場合に new マークを表示 -->
+                                                @if($person->unreadMessages)
+                                                    <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">New</span>
+                                                @else
+                                                <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">連絡する</span>
+                                                @endif
                                                 </a>
                                             @else
                                                 <!-- 未登録の場合 -->
                                                 <a href="{{ url('hogoshatext/'.$person->id) }}" class="relative">
-                                                    <summary class="text-red-500 font-bold text-xl">登録する</summary>
+                                                    <summary class="text-red-500 font-bold text-xl">連絡する</summary>
                                                     @csrf
                                                     <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
                                                 </a>

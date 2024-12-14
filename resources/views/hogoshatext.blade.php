@@ -1,12 +1,21 @@
 <x-app-layout>
+    @if (session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline font-bold">{{ session('success') }}</span>
+        </div>
+    @endif
     <div class="center-container">
         <div class="flex items-center justify-center my-2 font-bold text-2xl">
-            <h2>事業所に伝えたいこと</h2>
+            <h2>{{$person->last_name}}{{$person->first_name}}さんについての連絡</h2>
         </div>
+        
 
         <form action="{{ route('hogoshatext.show', $person->id) }}" method="GET" class="w-full max-w-lg mx-auto mt-4">
             @csrf
             <div class="flex flex-col items-center my-4">
+                @error('notebook')
+                    <p class="text-red-500 text-lg font-bold mt-2">{{ $message }}</p>
+                @enderror
                 <label for="selected_date" class="text-gray-900 font-bold text-xl">日付選択：</label>
                 <input type="date" name="selected_date" id="selected_date" value="{{ $selectedDate }}">
             </div>
@@ -17,9 +26,13 @@
                 @if($hogoshatexts->isNotEmpty())
                     <h3 class="text-xl font-bold mb-2">{{ $selectedDate }}の記録:</h3>
                     @foreach($hogoshatexts as $hogosha_text)
-                        <div class="bg-white p-4 rounded-lg shadow mb-4 w-full">
-                            <p class="text-gray-700">{{ $hogosha_text->notebook }}</p>
-                            <p class="text-sm text-gray-500 mt-2">記録時間: {{ $hogosha_text->created_at->format('H:i') }}</p>
+                        <div class="p-4 rounded-lg shadow mb-4 w-full {{ $hogosha_text->user_identifier != session('user_identifier') ? 'bg-blue-50 border-2 border-blue-500' : 'bg-white' }}">
+                            @if($hogosha_text->user_identifier != session('user_identifier'))
+                                <p class="text-sm text-gray-700 font-bold mt-2"> {{ $hogosha_text->last_name . $hogosha_text->first_name }}</p>
+                            @endif
+                            <p class="text-gray-900 font-bold">{{ $hogosha_text->notebook }}</p>
+                            <p class="text-sm text-gray-700 mt-2 font-bold">記録時間: {{ $hogosha_text->created_at->format('H:i') }}</p>
+                            
                         </div>
                     @endforeach
                 @else
@@ -38,7 +51,7 @@
             </div>
             <div class="flex justify-center my-2">
                 <button type="submit" class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
-                    事業所に送信
+                    送信
                 </button>
             </div>
         </form>
@@ -89,3 +102,4 @@
     });
     </script>
 </x-app-layout>
+

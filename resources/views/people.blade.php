@@ -131,40 +131,70 @@
                       </div>
                       
                       
-                      <!--連絡事項↓ -->
-                      　    　<div class="border-2 p-2 rounded-lg bg-white m-2">
+                      <!--連絡事項（緊急の連絡はLINEで行ってもらうためチャットは一旦コメントアウト）↓ -->
+                      <!-- 　    　<div class="border-2 p-2 rounded-lg bg-white m-2">
                                     <div class="flex justify-start items-center">
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                         <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
                                         <i class="fa-solid fa-comments text-sky-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
                                         <p class="font-bold text-xl ml-2">連絡</p>
                                     </div>
-                                        <div class="flex items-center justify-center p-4">
+                                        <div class="flex items-center justify-center p-4"> -->
 
                                            
                                             <!-- リアルタイムで新着メッセージが届いた場合にNewと表示 -->
-                                            <a href="{{ url('chat/'.$person->id) }}" id="person-{{ $person->id }}" class="relative ml-2" style="display: flex; align-items: center;">
+                                            <!-- <a href="{{ url('chat/'.$person->id) }}" id="person-{{ $person->id }}" class="relative ml-2" style="display: flex; align-items: center;">
                                                 <summary class="text-red-500 font-bold text-xl">連絡する</summary>
                                                 @csrf
-                                                <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
+                                                <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i> -->
 
                                                <!-- 未読メッセージがある場合に new マークを表示 -->
-                                                @if($person->unreadMessages)
+                                                <!-- @if($person->unreadMessages)
                                                     <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-sm font-bold">New</span>
                                                 @else
                                                     <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-sm font-bold" style="display: none;">New</span>
                                                 @endif
                                             </a>
                                         </div>
+                                    </div> -->
+
+                                    <div class="border-2 p-2 rounded-lg bg-white mx-2 mb-2 mt-8">
+                                          <div class="flex justify-start items-center">
+                                            <i class="fa-solid fa-pencil text-orange-600" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
+                                            <p class="font-bold text-xl ml-2">保護者からの連絡</p>
+                                          </div>
+                                          <div class="flex items-center justify-center p-4">
+                                            @php
+                                                $today = \Carbon\Carbon::now()->toDateString();
+                                                $todayHogoshaText = $person->hogosha_texts()
+                                                    ->whereDate('created_at', $today)
+                                                    ->latest()  // 最新のレコードを取得
+                                                    ->first();
+                                            @endphp
+                                            
+                                            @if ($todayHogoshaText)
+                                                <!-- 登録済みの場合 -->
+                                                <a href="{{ url('hogoshatext/'.$person->id) }}" class="relative ml-2 flex items-center">
+                                                  @csrf
+                                                    <!-- 未読メッセージがある場合に new マークを表示 -->
+                                                @if($person->unreadMessages)
+                                                    <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">New</span>
+                                                @else
+                                                <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">登録する</span>
+                                                @endif
+                                                </a>
+                                            @else
+                                                <!-- 未登録の場合 -->
+                                                <a href="{{ url('hogoshatext/'.$person->id) }}" class="relative">
+                                                    <summary class="text-red-500 font-bold text-xl">登録する</summary>
+                                                    @csrf
+                                                    <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
+                                                </a>
+                                            @endif
+                                        </div>
                                     </div>
-
-
                  
-
-                                    
-
-
-                                    <!-- 利用時間など↓ -->
+                                 <!-- 利用時間など↓ -->
                                     <div class="border-2 p-2 rounded-lg bg-white m-2">
                                                 <div class="flex justify-start items-center">
                                                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />

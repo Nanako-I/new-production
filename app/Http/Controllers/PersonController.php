@@ -13,7 +13,7 @@ use App\Models\Chat;
 use App\Models\Option;
 use App\Models\OptionItem;
 use App\Models\ScheduledVisit;
-
+use App\Models\HogoshaText;
 
 use Spatie\Permission\Models\Role as SpatieRole;
 use App\Enums\RoleType;
@@ -90,6 +90,16 @@ class PersonController extends Controller
                 $person->unreadMessages = $unreadMessages;
                 \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
         }
+
+        foreach ($people as $person) {
+            $unreadMessages = HogoshaText::where('people_id', $person->id)
+                                ->where('is_read', false)
+                                ->where('user_identifier', '!=', $user->id)
+                                ->exists();
+        
+            $person->unreadMessages = $unreadMessages;
+            \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
+    }
 
         $selectedItems = [];
         

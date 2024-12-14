@@ -6,6 +6,7 @@ use App\Models\Person;
 use App\Models\Hogosha;
 use Illuminate\Http\Request;
 use App\Models\Chat;
+use App\Models\HogoshaText;
 
 class HogoshaController extends Controller
 {
@@ -37,8 +38,16 @@ class HogoshaController extends Controller
             $person->unreadMessages = $unreadMessages;
             \Log::info('Person ID: ' . $person->id . ' Unread Messages: ' . $unreadMessages);
         }
-
-        // 'people'はpeople.blade.phpの省略↓　// compact('people')で合っている↓
+        // 施設から連絡があった場合(hogoshatextビュー)の未読メッセージの情報を各 Person に追加↓
+        foreach ($people as $person) {
+            $unreadMessages = HogoshaText::where('people_id', $person->id)
+                                ->where('is_read', false)
+                                ->where('user_identifier', '!=', $user->id)
+                                ->exists();
+        
+            $person->unreadMessages = $unreadMessages;
+            \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
+    }
         return view('hogosha', compact('hogosha', 'people'));
     }
     /**
@@ -96,12 +105,22 @@ class HogoshaController extends Controller
     $person = Person::findOrFail($id);
     $hogoshas = $person->hogoshas;
 
+    // 施設から連絡があった場合(hogoshatextビュー)の未読メッセージの情報を各 Person に追加↓
+    foreach ($people as $person) {
+        $unreadMessages = HogoshaText::where('people_id', $person->id)
+                            ->where('is_read', false)
+                            ->where('user_identifier', '!=', $user->id)
+                            ->exists();
+    
+        $person->unreadMessages = $unreadMessages;
+        \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
+    }
     return view('people', compact('hogoshas'));
-
+}
     // $temperature = Temperature::findOrFail($id);
 
     // return view('temperaturelist', compact('temperature'));
-}
+
 
     /**
      * Show the form for editing the specified resource.
