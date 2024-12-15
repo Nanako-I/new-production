@@ -21,6 +21,7 @@ use App\Http\Controllers\Auth\HogoshaLoginController;
 use App\Http\Controllers\RegistrationController;//ユーザー新規登録の二段階認証コントローラー
 use App\Http\Controllers\FacilityKeyController;//施設キーを認証するコントローラー
 use App\Http\Controllers\LineController;//職員側が保護者のLINEアカウントと利用者を直接紐づける
+use App\Http\Controllers\BrotherInvitationController;//職員側が兄弟のいる利用者を招待するためのコントローラー
 
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\FacilityController;
@@ -212,6 +213,11 @@ Route::get('/invitation_staff', function () {
 // 招待URL生成
 Route::get('/invitation_staff', [URLController::class, 'staffsendInvitation'])->name('staff.invitation');
 
+// 兄弟の招待URL生成↓
+Route::get('/brother-invitation', [BrotherInvitationController::class, 'show'])->name('brother.invitation');
+Route::post('/brother-invitation', [BrotherInvitationController::class, 'generateUrls'])->name('generate.urls');
+
+// Route::post('/generate-urls', [YourController::class, 'generateUrls'])->name('generate.urls');
 // 職員に届いた招待URLの認証
 // Route::get('invitation_staff/{signedUrl}', function (Request $request) {
 //     if (! $request->hasValidSignature()) {
@@ -409,8 +415,8 @@ Route::post('/hogosharegister', [HogoshaUserController::class, 'register'])
 // Add a GET route for displaying the form
 // Route::get('/hogosharegister/{people_id}', [HogoshaUserController::class, 'showRegister'])->name('hogosharegister');
 
-Route::get('/hogosha', [HogoshaUserController::class, 'hogosha'])->name('hogosha');
-
+// Route::get('/hogosha', [HogoshaUserController::class, 'hogosha'])->name('hogosha');
+Route::get('/hogosha', [HogoshaController::class, 'index'])->name('hogosha');
 
 Route::get('hogoshanumber', [HogoshaUserController::class, 'create'])->name('hogoshanumber.show');
 Route::post('hogoshanumber', [HogoshaUserController::class, 'numberregister'])->name('hogoshanumber.store');

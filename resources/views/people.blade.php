@@ -62,14 +62,29 @@
   <!-- <div class="flex flex-row justify-start w-screen overflow-x-auto"> -->
     <div class="slider">
     @csrf
-                @if (isset($people) && !empty($people) && count($people) > 0)
-             <div class="flex flex-row justify-center tw-flex-row h-150 -m-2">
 
+<!-- 左半分: 利用者情報 -->
+<div class="p-4 overflow-x-auto md:overflow-y-auto">
+    @foreach ($people as $person)
+        <div class="inline-block md:block bg-white rounded-lg shadow-md p-4 mb-4 cursor-pointer person-info" 
+             data-person-id="{{ $person->id }}"
+             data-last-name="{{ $person->last_name }}"
+             data-first-name="{{ $person->first_name }}"
+             data-date-of-birth="{{ $person->date_of_birth }}">
+            <h2 class="text-gray-900 font-bold text-2xl mb-2">{{ $person->last_name }} {{ $person->first_name }}</h2>
+            <p class="text-gray-700 mb-2">{{ $person->date_of_birth }} 生まれ</p>
+        </div>
+    @endforeach
+</div>
+            <!-- 右半分 -->
+                @if (isset($people) && !empty($people) && count($people) > 0)
+             <!-- <div class="flex flex-col justify-center tw-flex-row h-150 -m-2"> -->
+             <div class="p-4 flex flex-col overflow-y-auto">
                 @foreach ($people as $person)
                 <!-- <a href="{{ route('update.selected.items', ['people_id' => $person->id]) }}" class="relative ml-2"> -->
                     @csrf
-                  <div class="p-2 h-full lg:w-1/3 md:w-full flex">
-                   <div class="slide height:auto  border-2 p-2 p-4 w-full md:w-64 lg:w-100 rounded-lg bg-white">
+                    <div id="record-list-{{ $person->id }}" class="w-full flex hidden">
+                   <div class="slide height:auto  border-2 p-4 w-full rounded-lg bg-white">
                      <style>
                         .slider {
                             display: flex;
@@ -78,31 +93,34 @@
                             gap: 10px; /* スライド間の余白 */
                             overflow-x: scroll; /* 水平方向にスクロール可能 */
                             white-space: nowrap; /* 子要素を横並びにする */
-                            display: flex; /* 子要素を横並びにする */
+                            width: 100%;
+                        }
+
+                        .slider > div{
+                            width: 100%;
+                        }
+
+                        @media screen and (min-width: 768px){
+                            .slider > div{
+                                width: 49%;
+                                max-height: 80vh;
+                            }
                         }
 
                         
                         .slide {
-                        width:100vw;
-                        background: rgb(244,244,244);
-                        
+                        background: rgb(244,244,244);                       
                       }
-                      @media screen and (min-width: 768px){
-                        .slide {
-                            width:600px;
-                        }
-                      }
-                      @media screen and (min-width: 1024px){
-                        .slide {
-                            width:700px;
-                        }
-                      }
+
+                     
+                    
+                      
                      
                      </style>
+                <div class="w-full flex flex-col">
                      
-                     <a href="{{ url('people/'.$person->id.'/edit') }}" class="relative  ml-2">
 
-                      <div class="h-30 flex flex-row items-center rounded-lg bg-white width:100vw relative z-0">
+                      <div class="h-30 flex flex-row items-center rounded-lg bg-white p-2 relative z-0">
                           <!--S3の設定がまだなので写真表示は一旦コメントアウト-->
                           
                             <!-- @if ($person->filename)
@@ -120,45 +138,48 @@
                                     font-family: Arial, sans-serif; /* フォントをArialに設定 */
                                   }
                                  </style>
+                                 
+                                 
                                         <div class="flex-grow">
-                                          <h2 class="h2 text-gray-900 title-font font-bold text-2.5xl" _msttexthash="277030">{{$person->last_name}}{{$person->first_name}}</h2>
-                                          <p class="text-gray-900 font-bold text-xs inline-flex items-center" _msttexthash="150072">{{$person->date_of_birth}}生まれ</p>
-                        </a>
-                                          <a href="{{ route('show.selected.items',['people_id' => $person->id, 'id' => $person->id]) }}" class="ml-2 px-2 py-1 bg-gray-600 text-white rounded hover:bg-gray-500">
-                                            記録アイテムの変更
-                                          </a>
+                                            <a href="{{ url('people/'.$person->id.'/edit') }}" class="relative  ml-2">
+                                            <h2 class="h2 text-gray-900 title-font font-bold text-2.5xl" _msttexthash="277030">{{$person->last_name}}{{$person->first_name}}</h2>
+                                            <p class="text-gray-900 font-bold text-xs inline-flex items-center" _msttexthash="150072">{{$person->date_of_birth}}生まれ</p>
+                                            </a>
+                                            <a href="{{ route('show.selected.items',['people_id' => $person->id, 'id' => $person->id]) }}" class="ml-2 px-2 py-1 bg-gray-600 text-white rounded hover:bg-gray-500">
+                                                記録アイテムの変更
+                                            </a>
                                         </div>
                       </div>
                       
                       
                       <!--連絡事項（緊急の連絡はLINEで行ってもらうためチャットは一旦コメントアウト）↓ -->
-                      <!-- 　    　<div class="border-2 p-2 rounded-lg bg-white m-2">
+                      <!-- <div class="border-2 p-2 rounded-lg bg-white my-2">
                                     <div class="flex justify-start items-center">
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                         <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
                                         <i class="fa-solid fa-comments text-sky-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
                                         <p class="font-bold text-xl ml-2">連絡</p>
                                     </div>
-                                        <div class="flex items-center justify-center p-4"> -->
+                                    <div class="flex items-center justify-center p-4"> -->
 
-                                           
-                                            <!-- リアルタイムで新着メッセージが届いた場合にNewと表示 -->
-                                            <!-- <a href="{{ url('chat/'.$person->id) }}" id="person-{{ $person->id }}" class="relative ml-2" style="display: flex; align-items: center;">
-                                                <summary class="text-red-500 font-bold text-xl">連絡する</summary>
-                                                @csrf
-                                                <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i> -->
+                                        
+                                        <!-- リアルタイムで新着メッセージが届いた場合にNewと表示 -->
+                                        <!-- <a href="{{ url('chat/'.$person->id) }}" id="person-{{ $person->id }}" class="relative ml-2" style="display: flex; align-items: center;">
+                                            <summary class="text-red-500 font-bold text-xl">連絡する</summary>
+                                            @csrf
+                                            <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i> -->
 
-                                               <!-- 未読メッセージがある場合に new マークを表示 -->
-                                                <!-- @if($person->unreadMessages)
-                                                    <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-sm font-bold">New</span>
-                                                @else
-                                                    <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-sm font-bold" style="display: none;">New</span>
-                                                @endif
-                                            </a>
-                                        </div>
-                                    </div> -->
+                                            <!-- 未読メッセージがある場合に new マークを表示 -->
+                                            <!-- @if($person->unreadMessages)
+                                                <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-sm font-bold">New</span>
+                                            @else
+                                                <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-sm font-bold" style="display: none;">New</span>
+                                            @endif
+                                        </a>
+                                    </div>
+                            </div> -->
 
-                                    <div class="border-2 p-2 rounded-lg bg-white mx-2 mb-2 mt-8">
+                                    <div class="border-2 p-2 rounded-lg bg-white mb-2 mt-8">
                                           <div class="flex justify-start items-center">
                                             <i class="fa-solid fa-pencil text-orange-600" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
                                             <p class="font-bold text-xl ml-2">保護者からの連絡</p>
@@ -195,7 +216,7 @@
                                     </div>
                  
                                  <!-- 利用時間など↓ -->
-                                    <div class="border-2 p-2 rounded-lg bg-white m-2">
+                                    <div class="border-2 p-2 rounded-lg bg-white">
                                                 <div class="flex justify-start items-center">
                                                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                                     <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -263,8 +284,8 @@
                                                                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                                                     <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
                                                                     <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
-                                                                </a>
-                                                            </div>
+                                                                </div>
+                                                            </a>
                                                         </div>
                                                     @else
                                                         <!-- 本日分の実際の利用時間データがまだない場合 -->
@@ -352,7 +373,7 @@
 
                                 <!-- 体温登録↓ -->
                                 @if($hasFixedTemperature)
-                        　    　　  <div class="border-2 p-2 rounded-lg bg-white m-2">
+                        　    　　  <div class="border-2 p-2 rounded-lg bg-white">
                                     <div class="flex justify-start items-center">
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                         <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -487,7 +508,7 @@
                                                                     </div>
                                                                 </div>
                                                             </details>
-                                                    </form>
+                                                        </form>
                                                     </div>  
                                                 @endif
                                             @else
@@ -524,20 +545,20 @@
                                                         </details>
                                                 </form>
                                             @endif
-                                        </div>
-                                  </div>
-                                  @endif
+                                    </div>
+                                </div>
+                            @endif
 
                                  
 
 
-                                  @php 
+                                @php 
                                     $lastOptionItem = $person->option_items()->latest()->first();
                                 @endphp
 
                                 @if(isset($personOptions[$person->id]))
                                     @foreach($personOptions[$person->id] as $option)
-                                        <div class="border-2 p-2 rounded-lg bg-white m-2">
+                                        <div class="border-2 p-2 rounded-lg bg-white my-2">
                                             <div class="flex justify-start items-center">
                                                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                                 <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -574,76 +595,76 @@
                                                     $todayItems = $person->todayOptionItems->where('option_id', $option->id);
                                                 @endphp
 
-                                            @if($todayItems->isEmpty())
-                                                <form action="{{ route('options.item.store', ['people_id' => $person->id, 'id' => $option->id]) }}" method="POST">
-                                                    @csrf
-                                                    <details class="justify-center">
-                                                        <summary class="text-red-500 font-bold text-xl">登録する</summary>
+                                                @if($todayItems->isEmpty())
+                                                    <form action="{{ route('options.item.store', ['people_id' => $person->id, 'id' => $option->id]) }}" method="POST">
+                                                        @csrf
+                                                        <details class="justify-center">
+                                                            <summary class="text-red-500 font-bold text-xl">登録する</summary>
 
-                                                        <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
-                                                        
-                                                        <input type="hidden" name="people_id" value="{{ $person->id }}">
-                                                        <input type="hidden" name="option_id" value="{{ $option->id }}">
-                                                        <input type="hidden" name="has_input" value="0" id="has_input_{{ $option->id }}">
-                                                        <p class="text-gray-900 font-bold text-xl">本日行った内容</p>
+                                                            <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
+                                                            
+                                                            <input type="hidden" name="people_id" value="{{ $person->id }}">
+                                                            <input type="hidden" name="option_id" value="{{ $option->id }}">
+                                                            <input type="hidden" name="has_input" value="0" id="has_input_{{ $option->id }}">
+                                                            <p class="text-gray-900 font-bold text-xl">本日行った内容</p>
 
-                                                        <div class="flex flex-col items-start mt-2 mb-4">
-                                                            @for($i = 1; $i <= 5; $i++)
-                                                                @php
-                                                                    $itemKey = "item{$i}";
-                                                                @endphp
-                                                                @if(!is_null($option->$itemKey) && $option->$itemKey !== '')
-                                                                    <div class="flex items-center mb-2">
-                                                                        <input type="checkbox" name="item{{ $i }}" value="1" class="w-6 h-6 option-checkbox" data-option-id="{{ $option->id }}">
-                                                                        <p class="text-gray-900 font-bold text-xl ml-2">{{ $option->$itemKey }}</p>
+                                                            <div class="flex flex-col items-start mt-2 mb-4">
+                                                                @for($i = 1; $i <= 5; $i++)
+                                                                    @php
+                                                                        $itemKey = "item{$i}";
+                                                                    @endphp
+                                                                    @if(!is_null($option->$itemKey) && $option->$itemKey !== '')
+                                                                        <div class="flex items-center mb-2">
+                                                                            <input type="checkbox" name="item{{ $i }}" value="1" class="w-6 h-6 option-checkbox" data-option-id="{{ $option->id }}">
+                                                                            <p class="text-gray-900 font-bold text-xl ml-2">{{ $option->$itemKey }}</p>
+                                                                        </div>
+                                                                    @endif
+                                                                @endfor
+                                                            </div>
+
+                                                            <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
+                                                                <p class="text-gray-900 font-bold text-xl">備考</p>
+                                                                <textarea id="bikou_{{ $option->id }}" name="bikou" class="w-3/4 max-w-lg font-bold option-bikou" style="height: 200px;" data-option-id="{{ $option->id }}"></textarea>
+                                                            </div>
+                                                            <div class="mt-4 flex justify-center">
+                                                                <button type="submit" class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                                                                    送信
+                                                                </button>
+                                                            </div>
+                                                                @if($errors->has('error_'.$option->id))
+                                                                    <div class="text-red-500 font-bold mt-2">
+                                                                        {{ $errors->first('error_'.$option->id) }}
                                                                     </div>
                                                                 @endif
-                                                            @endfor
-                                                        </div>
-
-                                                        <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
-                                                            <p class="text-gray-900 font-bold text-xl">備考</p>
-                                                            <textarea id="bikou_{{ $option->id }}" name="bikou" class="w-3/4 max-w-lg font-bold option-bikou" style="height: 200px;" data-option-id="{{ $option->id }}"></textarea>
-                                                        </div>
-                                                        <div class="mt-4 flex justify-center">
-                                                            <button type="submit" class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
-                                                                送信
-                                                            </button>
-                                                        </div>
-                                                            @if($errors->has('error_'.$option->id))
-                                                                <div class="text-red-500 font-bold mt-2">
-                                                                    {{ $errors->first('error_'.$option->id) }}
-                                                                </div>
-                                                            @endif
-                                                        </details>
-                                                    </form>
-                                            @else
-                                                <div class="flex flex-col items-center">
-                                                    @foreach($todayItems as $optionItem)
-                                                        <div class="flex items-center justify-around mb-2">
-                                                            @for($i = 1; $i <= 5; $i++)
-                                                                @php
-                                                                    $itemKey = "item{$i}";
-                                                                    $itemData = json_decode($optionItem->$itemKey);
-                                                                @endphp
-                                                                @if(!is_null($option->$itemKey) && $option->$itemKey !== '' && !empty($itemData) && is_array($itemData) && count($itemData) > 0)
-                                                                    <p class="text-gray-900 font-bold text-xl px-1">{{ $option->$itemKey }}</p>
-                                                                @endif
-                                                            @endfor
-                                                            <p class="text-gray-600 text-sm">{{ $optionItem->created_at->format('H:i') }}</p>
-                                                        </div>
-                                                    @endforeach
-                                                    
-                                                    <a href="{{ url('optionchange/' . $person->id . '/' . $optionItem->id) }}" class="text-stone-500">
-                                                        <i class="fa-solid fa-pencil text-stone-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
-                                                        編集
-                                                    </a>
-                                                </div>
-                                            @endif
+                                                            </details>
+                                                        </form>
+                                                @else
+                                                    <div class="flex flex-col items-center">
+                                                        @foreach($todayItems as $optionItem)
+                                                            <div class="flex items-center justify-around mb-2">
+                                                                @for($i = 1; $i <= 5; $i++)
+                                                                    @php
+                                                                        $itemKey = "item{$i}";
+                                                                        $itemData = json_decode($optionItem->$itemKey);
+                                                                    @endphp
+                                                                    @if(!is_null($option->$itemKey) && $option->$itemKey !== '' && !empty($itemData) && is_array($itemData) && count($itemData) > 0)
+                                                                        <p class="text-gray-900 font-bold text-xl px-1">{{ $option->$itemKey }}</p>
+                                                                    @endif
+                                                                @endfor
+                                                                <p class="text-gray-600 text-sm">{{ $optionItem->created_at->format('H:i') }}</p>
+                                                            </div>
+                                                        @endforeach
+                                                        
+                                                        <a href="{{ url('optionchange/' . $person->id . '/' . $optionItem->id) }}" class="text-stone-500">
+                                                            <i class="fa-solid fa-pencil text-stone-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
+                                                            編集
+                                                        </a>
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
-                                    </div>
-                                @endforeach
-                            @endif
+                                    @endforeach
+                                @endif
                             <script>
                                 document.addEventListener('DOMContentLoaded', function() {
                                     const forms = document.querySelectorAll('form[action^="{{ route('options.item.store', ['people_id' => $person->id, 'id' => ':id']) }}"]'.replace(':id', ''));
@@ -677,7 +698,7 @@
                                 </script>
                                 <!-- トレーニング登録↓ -->
                                 @if(isset($selectedItems[$person->id]) && in_array('トレーニング', $selectedItems[$person->id]))
-                        　    　　  <div class="border-2 p-2 rounded-lg bg-white m-2">
+                        　    　　  <div class="border-2 p-2 rounded-lg bg-white my-2">
                                     <div class="flex justify-start items-center">
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                         <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -838,7 +859,7 @@
 
                                 <!-- 生活習慣登録↓ -->
                                 @if(isset($selectedItems[$person->id]) && in_array('生活習慣', $selectedItems[$person->id]))
-                        　    　　  <div class="border-2 p-2 rounded-lg bg-white m-2">
+                        　    　　  <div class="border-2 p-2 rounded-lg bg-white my-2">
                                     <div class="flex justify-start items-center">
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                         <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -929,7 +950,7 @@
 
                                 <!-- 創作活動登録↓ -->
                                 @if(isset($selectedItems[$person->id]) && in_array('創作活動', $selectedItems[$person->id]))
-                        　    　　  <div class="border-2 p-2 rounded-lg bg-white m-2">
+                        　    　　  <div class="border-2 p-2 rounded-lg bg-white my-2">
                                     <div class="flex justify-start items-center">
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                         <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -1019,7 +1040,7 @@
                                         @endif
                                 <!-- 集団・個人活動登録↓ -->
                             @if(isset($selectedItems[$person->id]) && in_array('集団・個人活動', $selectedItems[$person->id]))
-                        　    　　  <div class="border-2 p-2 rounded-lg bg-white m-2">
+                        　    　　  <div class="border-2 p-2 rounded-lg bg-white my-2">
                                     <div class="flex justify-start items-center">
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                         <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -1150,7 +1171,7 @@
                                     
                        <!-- 食事登録↓ -->
                        @if($hasFixedMeal)
-                        　    　 <div class="border-2 p-2 rounded-lg bg-white m-2">
+                        　    　 <div class="border-2 p-2 rounded-lg bg-white my-2">
                                     <div class="flex justify-start items-center">
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                         <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -1197,7 +1218,6 @@
                                         <summary class="text-red-500 font-bold text-xl">登録する</summary>
                                                 @csrf
                                         <div class="flex items-center justify-center">
-                                      <!--<div style="display: flex; flex-direction: column;">-->
                                          <div class="flex flex-col items-center">        
                                         <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
                                         <input type="hidden" name="people_id" value="{{ $person->id }}">
@@ -1224,14 +1244,14 @@
                                         
                                         <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
                                             <p class="text-gray-900 font-bold text-xl">間食</p>
-                                                <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
-                                                    <select name="oyatsu" class="mx-1 my-1.5" style="width: 6rem;">
-                                                        <option value="登録なし">選択</option>
-                                                        <option value="あり">あり</option>
-                                                        <option value="なし">なし</option>
-                                                    </select>
-                                                </div>
-                                          </div>
+                                            <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
+                                                <select name="oyatsu" class="mx-1 my-1.5" style="width: 6rem;">
+                                                    <option value="登録なし">選択</option>
+                                                    <option value="あり">あり</option>
+                                                    <option value="なし">なし</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                         <!--</div>-->
                                         <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
                                           <p class="text-gray-900 font-bold text-xl">備考（メニューなど）<p>
@@ -1262,15 +1282,15 @@
                         </div>
                       
                                                     
-                                                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-                                                    <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
-                                                    <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
-                                                </a>
-                                               </div>
-                                            @endif
-                                        
-                                    </div>
-                                </div>
+                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+                        <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
+                        <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
+                    </a>
+            </div>
+            @endif
+                                    
+            </div>
+        </div>
                   
                                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                         <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -1280,7 +1300,7 @@
                                     
                         <!--水分登録↓-->
                         @if(isset($selectedItems[$person->id]) && in_array('水分摂取', $selectedItems[$person->id]))
-                            　<div class="border-2 p-2 rounded-lg bg-white m-2">
+                            　<div class="border-2 p-2 rounded-lg bg-white my-2">
                                 <div class="flex justify-start items-center">
                                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                     <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -1399,7 +1419,7 @@
 
                          <!--内服登録↓-->
                          @if(isset($selectedItems[$person->id]) && in_array('内服', $selectedItems[$person->id]))
-                            　<div class="border-2 p-2 rounded-lg bg-white m-2">
+                            　<div class="border-2 p-2 rounded-lg bg-white my-2">
                                 <div class="flex justify-start items-center">
                                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                     <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -1521,7 +1541,7 @@
 
                         <!--注入登録↓-->
                         @if(isset($selectedItems[$person->id]) && in_array('注入', $selectedItems[$person->id]))
-                            　<div class="border-2 p-2 rounded-lg bg-white m-2">
+                            　<div class="border-2 p-2 rounded-lg bg-white my-2">
                                 <div class="flex justify-start items-center">
                                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                     <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -1654,7 +1674,7 @@
                         
                                 <!-- 血圧登録↓ -->
                                 @if(isset($selectedItems[$person->id]) && in_array('血圧・脈・SpO2', $selectedItems[$person->id]))
-                        　    　 <div class="border-2 p-2 rounded-lg bg-white m-2">
+                        　    　 <div class="border-2 p-2 rounded-lg bg-white my-2">
                                     <div class="flex justify-start items-center">
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                         <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -1732,7 +1752,7 @@
 
                                     <!-- トイレ登録↓ -->
                             @if(isset($selectedItems[$person->id]) && in_array('トイレ', $selectedItems[$person->id]))
-                        　    　<div class="border-2 p-2 rounded-lg bg-white m-2">
+                        　    　<div class="border-2 p-2 rounded-lg bg-white my-2">
                                 <div class="flex justify-start items-center">
                                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                     <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -1810,7 +1830,7 @@
 
                             <!--吸引登録↓-->
                             @if(isset($selectedItems[$person->id]) && in_array('吸引', $selectedItems[$person->id]))
-                            <div class="border-2 p-2 rounded-lg bg-white m-2">
+                            <div class="border-2 p-2 rounded-lg bg-white my-2">
                                 <div class="flex justify-start items-center">
                                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                     <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -1944,7 +1964,7 @@
                                 @endif
                                      <!--発作↓-->
                              @if(isset($selectedItems[$person->id]) && in_array('発作', $selectedItems[$person->id]))
-                                <div class="border-2 p-2 rounded-lg bg-white m-2">
+                                <div class="border-2 p-2 rounded-lg bg-white my-2">
                                 <div class="flex justify-start items-center">
                                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                     <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -2078,7 +2098,7 @@
                                       
                                     
 
-                                    <div class="border-2 p-2 rounded-lg bg-white mx-2 mb-2 mt-8">
+                                    <div class="border-2 p-2 rounded-lg bg-white my-2">
                                           <div class="flex justify-start items-center">
                                             <i class="fa-solid fa-pencil text-orange-600" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
                                             <p class="font-bold text-xl ml-2">連絡帳の文章作成</p>
@@ -2095,7 +2115,6 @@
                                             @if ($todayNotebook)
                                                 <!-- 登録済みの場合 -->
                                                 <a href="{{ route('notebook.change', ['people_id' => $person->id, 'id' => $todayNotebook->id]) }}" class="relative ml-2 flex items-center">
-                                                <!-- <a href="{{ url('notebookchange/'.$person->id) }}" class="relative ml-2 flex items-center"> -->
                                                     @csrf
                                                     <p class="font-bold text-xl p-2">{{ Str::limit($todayNotebook->notebook, 10, '...') }}</p>
                                                     <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s; vertical-align: middle;"></i>
@@ -2113,7 +2132,7 @@
                                    
                                     
                                     
-                                        <div class="border-2 p-2 rounded-lg bg-white mx-2 mb-2 mt-8">
+                                        <div class="border-2 p-2 rounded-lg bg-white my-2">
                                           <div class="flex justify-start items-center">
                                             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                             <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -2127,8 +2146,8 @@
                                             </a>
                                           </div>
                                     　　</div>
-                                  　　
-                               </div>
+                            </div>  
+                        </div>
                   </div>
                   @endforeach
               </div>
@@ -2143,9 +2162,8 @@
            
        
         @endhasanyrole
-        
-    </div>
-  </div>
+        </div>   
+    
   <!-- 右矢印ボタン -->
   <button id="scrollRight" class="absolute right-0 z-10 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r">
     &gt;
@@ -2314,5 +2332,31 @@ function nextSlide() {
     showSlide(currentSlide + 1);
   }
 }
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const personElements = document.querySelectorAll('.person-info');
+    const recordLists = document.querySelectorAll('[id^="record-list-"]');
+
+    personElements.forEach(element => {
+        element.addEventListener('click', function() {
+            const personId = this.getAttribute('data-person-id');
+            
+            // Hide all record lists
+            recordLists.forEach(list => {
+                list.classList.add('hidden');
+            });
+
+            // Show the selected person's record list
+            const selectedRecordList = document.getElementById(`record-list-${personId}`);
+            if (selectedRecordList) {
+                selectedRecordList.classList.remove('hidden');
+            }
+
+            // Optionally, you can add AJAX call here to fetch and update records
+            // fetchRecords(personId);
+        });
+    });
+});
 </script>
 </x-app-layout>

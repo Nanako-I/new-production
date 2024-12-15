@@ -13,11 +13,11 @@
         @csrf
         @method('put')
 
-        <div>
+        <!-- <div>
             <x-input-label for="current_password" :value="__('現在のパスワード')" />
-            <x-text-input id="current_password" name="current_password" type="password" class="mt-1 block w-full" autocomplete="current-password" />
-            <x-input-error :messages="$errors->get('current_password')" class="mt-2" />
-        </div>
+            <x-text-input id="current_password" name="current_password" type="password" class="mt-1 block w-full" autocomplete="current-password" :value="old('password', $user->password)" />
+            <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
+        </div> -->
 
         <div>
             <x-input-label for="password" :value="__('新しいパスワード')" />
