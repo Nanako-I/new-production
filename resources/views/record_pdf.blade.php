@@ -1,13 +1,10 @@
-<!--<x-guest-layout>-->
 <x-app-layout>
 
-    <!--ヘッダー[START]-->
 <html>
   <div class="flex items-center justify-center" style="padding: 20px 0;">
     <div class="flex flex-col items-center">
      <form method="get" action="{{ route('pdf', ['people_id' => $person->id, 'selected_date' => $selectedDate]) }}">
        @csrf
-        <!--<form action="{{ url('people' ) }}" method="POST" class="w-full max-w-lg">-->
                         @method('PATCH')
                         
     <style> 
@@ -693,6 +690,70 @@
 </table>
 @endif
 
+@if($optionItemsOnSelectedDate->isNotEmpty())
+<table style="width: 100%; border-collapse: collapse; border: 1px solid #000;">
+
+        <thead>
+            <tr>
+                <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm leading-4 font-medium text-gray-600 uppercase tracking-wider" colspan="7">本日行った内容</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($optionItemsOnSelectedDate as $optionItem)
+                @php
+                    $correspondingOption = $correspondingOptions[$optionItem->id] ?? null;
+                @endphp
+                @if($correspondingOption)
+                    <tr>
+                        <td class="py-2 px-4 border-b border-gray-200">{{ $correspondingOption->title }}</td>
+                        @for($i = 1; $i <= 5; $i++)
+                            @php
+                                $optionItemKey = "item{$i}";
+                                $optionItemValue = json_decode($optionItem->$optionItemKey);
+                                $correspondingItemValue = $correspondingOption->$optionItemKey;
+                            @endphp
+                            <td class="py-2 px-4 border-b border-gray-200">
+                                @if(!empty($optionItemValue) && is_array($optionItemValue) && count($optionItemValue) > 0 && $correspondingItemValue)
+                                    {{ $correspondingItemValue }}
+                                @endif
+                            </td>
+                        @endfor
+                        <td class="py-2 px-4 border-b border-gray-200">
+                            @if($optionItem->bikou !== null)
+                                {{ $optionItem->bikou }}
+                            @endif
+                        </td>
+                    </tr>
+                @endif
+            @endforeach
+        </tbody>
+  </table>
+@endif
+
+
+@if($lastNotebook)
+<table style="width: 100%; border-collapse: collapse; border: 1px solid #000;">
+  <thead>
+    <tr>
+      <th style="padding-bottom: 10px;">本日の活動・様子</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+          @php
+              $notebookData = json_decode($lastNotebook->notebook);
+          @endphp
+          
+          @if(!empty($notebookData) && is_array($notebookData) && count($notebookData) > 0)
+              <p>{{ optional($lastNotebook)->notebook}}</p>
+          @endif
+      </td>
+     </tr>
+  </tbody>
+</table>
+@endif
+
 <table style="width: 100%; border-collapse: collapse; border: 1px solid #000;">
   <thead>
     <tr>
@@ -717,5 +778,4 @@
 </table>
 </body>
 
-<!--</x-app-layout>-->
 <!--</x-guest-layout>-->

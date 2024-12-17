@@ -215,8 +215,8 @@ Route::get('/invitation_staff', [URLController::class, 'staffsendInvitation'])->
 
 // 兄弟の招待URL生成↓
 Route::get('/brother-invitation', [BrotherInvitationController::class, 'show'])->name('brother.invitation');
-Route::post('/brother-invitation', [BrotherInvitationController::class, 'generateUrls'])->name('generate.urls');
-
+// Route::post('/brother-invitation', [BrotherInvitationController::class, 'generateUrls'])->name('generate.urls');
+Route::post('/brother-invitation', [BrotherInvitationController::class, 'register'])->name('brother.invitation.store');
 // Route::post('/generate-urls', [YourController::class, 'generateUrls'])->name('generate.urls');
 // 職員に届いた招待URLの認証
 // Route::get('invitation_staff/{signedUrl}', function (Request $request) {

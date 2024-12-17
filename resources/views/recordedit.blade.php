@@ -101,7 +101,11 @@
       
       <div class="flex items-center justify-center" style="padding: 20px 0;">
         <div class="flex flex-col items-center">
-
+        @if(session('error'))
+            <div class="alert alert-error text-xl "  style="color: red; font-weight: bold;" >
+                {{ session('error') }}
+            </div>
+        @endif
         <h2>{{$person->last_name}}{{$person->first_name}}さん</h2>
         <h3 class="text-gray-900 font-bold text-xl">{{ $selectedDate }}の記録</h3>
         </div>
@@ -158,16 +162,16 @@
    
       <div class="flex justify-end "> 
         <div class="flex-col"> 
-        <!-- <a href="{{ route('pdf', ['people_id' => $person->id, 'selected_date' => $selectedDate]) }}">
+        <a href="{{ route('pdf', ['people_id' => $person->id, 'selected_date' => $selectedDate]) }}">
               @csrf
           <button class="inline-flex items-center px-4 py-2 mr-5 mb-1 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
               ダウンロード
           </button>
-        </a> -->
-        <a href="{{ url('chat/'.$person->id) }}" class="relative ml-2" style="display: flex; align-items: center;">
+        </a>
+        <!-- <a href="{{ url('chat/'.$person->id) }}" class="relative ml-2" style="display: flex; align-items: center;">
           <i class="fa-solid fa-comments text-sky-500 icon-container mr-5 " style="font-size: 3em; padding: 0 5px; transition: transform 0.2s;"></i>
           @csrf
-        </a>
+        </a> -->
       </div> 
     </div> 
     <style>
@@ -875,6 +879,45 @@ document.addEventListener("DOMContentLoaded", function() {
             errorElement.textContent = "押印中にエラーが発生しました。もう一度お試しください。";
             form.parentNode.insertBefore(errorElement, form.nextSibling);
         });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('pdf-form');
+    const errorMessage = document.getElementById('error-message');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        errorMessage.style.display = 'none';
+
+        fetch(this.action + '?' + new URLSearchParams(new FormData(this)))
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                } else {
+                    return response.json().then(data => {
+                        throw new Error(data.error);
+                    });
+                }
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = '記録表.pdf';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+
+            .catch(error => {
+            alert(error.message);
+        });
+            // .catch(error => {
+            //     errorMessage.textContent = error.message;
+            //     errorMessage.style.display = 'block';
+            // });
     });
 });
 </script>

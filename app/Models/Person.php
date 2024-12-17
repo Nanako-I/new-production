@@ -10,6 +10,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Models\Role as SpatieRole;
 use App\Enums\Role as RoleEnum;
 use App\Scopes\FacilityScope;
+// use Barryvdh\DomPDF\Facade\Pdf as DomPDF;
 
 class Person extends Model
 {

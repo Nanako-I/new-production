@@ -20,6 +20,9 @@ use App\Models\Training;
 use App\Models\Lifestyle;
 use App\Models\Creative;
 use App\Models\Activity;
+use App\Models\Option;
+use App\Models\OptionItem;
+use App\Models\Notebook;
 use App\Models\Dompdf;
 use App\Models\Person;
 use Illuminate\Http\Request;
@@ -202,18 +205,100 @@ class DompdfController extends Controller
         ->latest()
         ->first();
         // $lastActivityValue = $lastActivity ? json_decode($lastActivity->value) : null;
+
+        // ここからした追加↓
+        $lastSpeech = Speech::where('people_id', $people_id)
+        ->whereDate('created_at', $selectedDate)
+        ->latest()
+        ->first();
+
+        $optionItemsOnSelectedDate = OptionItem::where('people_id', $people_id)
+        ->whereDate('created_at', $selectedDate)
+        ->orderBy('created_at')
+        ->get();
+
+    $correspondingOptions = [];
+    foreach ($optionItemsOnSelectedDate as $optionItem) {
+        $correspondingOptions[$optionItem->id] = Option::find($optionItem->option_id);
+    }
+
+    // $correspondingOption = $optionItemsOnSelectedDate->isNotEmpty() ? $correspondingOptions[$optionItemsOnSelectedDate->first()->id] ?? null : null;
+
+    $lastNotebook = Notebook::where('people_id', $people_id)
+    ->whereDate('created_at', $selectedDate)
+    ->latest()
+    ->first();
+
         $today = 'today';
         $hankoName = $person->pdfs->last();
 
+        // すべてのデータが存在しないかチェック
+        $hasData = $timesOnSelectedDate->isNotEmpty() ||
+    $temperaturesOnSelectedDate->isNotEmpty() ||
+    $bloodPressuresOnSelectedDate->isNotEmpty() ||
+    $watersOnSelectedDate->isNotEmpty() ||
+    $medicinesOnSelectedDate->isNotEmpty() ||
+    $tubesOnSelectedDate->isNotEmpty() ||
+    $kyuuinsOnSelectedDate->isNotEmpty() ||
+    $hossasOnSelectedDate->isNotEmpty() ||
+    $toiletsOnSelectedDate->isNotEmpty() ||
+    $foodsOnSelectedDate->isNotEmpty() ||
+    $lastTraining !== null ||
+    $lastLifestyle !== null ||
+    $lastCreative !== null ||
+    $lastActivity !== null ||
+    $lastSpeech !== null ||
+    $lastNotebook !== null ||
+    $$optionItemsOnSelectedDate->isNotEmpty() ||
+    !empty($correspondingOptions);
+    // !empty($correspondingOptions) ||
+    // $correspondingOption !== null;
+
+        if (!$hasData) {
+            return redirect()->route('record.edit', [
+                'people_id' => $people_id,
+                'selected_date' => $selectedDate
+            ])->with('error', 'この日は記録が取られていないためダウンロードするファイルがありません');
+        }
+        \Log::info('PDF Data:', [
+            'person' => $person,
+            'timesOnSelectedDate' => $timesOnSelectedDate,
+            'temperaturesOnSelectedDate' => $temperaturesOnSelectedDate,
+            'bloodPressuresOnSelectedDate' => $bloodPressuresOnSelectedDate,
+            'watersOnSelectedDate' => $watersOnSelectedDate,
+            'medicinesOnSelectedDate' => $medicinesOnSelectedDate,
+            'tubesOnSelectedDate' => $tubesOnSelectedDate,
+            'kyuuinsOnSelectedDate' => $kyuuinsOnSelectedDate,
+            'hossasOnSelectedDate' => $hossasOnSelectedDate,
+            'toiletsOnSelectedDate' => $toiletsOnSelectedDate,
+            'foodsOnSelectedDate' => $foodsOnSelectedDate,
+            'lastTraining' => $lastTraining,
+            'lastLifestyle' => $lastLifestyle,
+            'lastCreative' => $lastCreative,
+            'lastActivity' => $lastActivity,
+            'lastSpeech' => $lastSpeech,
+            'lastNotebook' => $lastNotebook,
+            'optionItemsOnSelectedDate' => $optionItemsOnSelectedDate,
+            'correspondingOptions' => $correspondingOptions,
+            // 'correspondingOption' => $correspondingOption,
+            'selectedDate' => $selectedDate,
+            'today' => $today,
+            'hankoName' => $hankoName,
+        ]);
+
         // レコードデータを使用してビューを読み込む
-    $pdf = PDF::loadView('record_pdf', compact('person', 'timesOnSelectedDate','temperaturesOnSelectedDate','bloodPressuresOnSelectedDate','watersOnSelectedDate','medicinesOnSelectedDate','tubesOnSelectedDate','kyuuinsOnSelectedDate','hossasOnSelectedDate','toiletsOnSelectedDate', 'foodsOnSelectedDate', 'lastTraining', 'lastLifestyle', 'lastCreative', 'lastActivity', 'selectedDate', 'today', 'hankoName'));
+        $htmlContent = view('record_pdf', compact('person', 'timesOnSelectedDate', 'temperaturesOnSelectedDate', 'bloodPressuresOnSelectedDate', 'watersOnSelectedDate', 'medicinesOnSelectedDate', 'tubesOnSelectedDate', 'kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'toiletsOnSelectedDate', 'foodsOnSelectedDate', 'lastTraining', 'lastLifestyle', 'lastCreative', 'lastActivity', 'lastSpeech', 'lastNotebook', 'optionItemsOnSelectedDate', 'correspondingOptions', 'selectedDate', 'today', 'hankoName'))->render();
+
+    \Log::info('PDF HTML Content:', ['html' => $htmlContent]);
+
+    $pdf = PDF::loadHTML($htmlContent);
 
 
         // PDFファイルをプレビュー
-        // return $pdf->stream('recordfile.pdf');
+        return $pdf->stream('recordfile.pdf');
 
         // PDFファイルをダウンロード
-        return $pdf->download('記録表.pdf');
+        // return $pdf->download('記録表.pdf');
 }
     
 
@@ -279,7 +364,30 @@ class DompdfController extends Controller
         ->latest()
         ->first();
 
-        return view('recordedit', compact('person', 'lastTemperature', 'lastBloodPressure', 'lastToilet', 'lastFood', 'lastMorningActivity', 'lastAfternoonActivity',  'lastTraining', 'lastLifestyle', 'lastCreative', 'lastActivity', 'selectedDate'));
+         // ここからした追加↓
+         $lastSpeech = Speech::where('people_id', $people_id)
+         ->whereDate('created_at', $selectedDate)
+         ->latest()
+         ->first();
+         
+         $optionItemsOnSelectedDate = OptionItem::where('people_id', $people_id)
+         ->whereDate('created_at', $selectedDate)
+         ->orderBy('created_at')
+         ->get();
+ 
+        $correspondingOptions = [];
+        foreach ($optionItemsOnSelectedDate as $optionItem) {
+            $correspondingOptions[$optionItem->id] = Option::find($optionItem->option_id);
+        }
+    
+        $correspondingOption = $optionItemsOnSelectedDate->isNotEmpty() ? $correspondingOptions[$optionItemsOnSelectedDate->first()->id] ?? null : null;
+    
+        $lastNotebook = Notebook::where('people_id', $people_id)
+        ->whereDate('created_at', $selectedDate)
+        ->latest()
+        ->first();
+
+        return view('recordedit', compact('person', 'lastTemperature', 'lastBloodPressure', 'lastToilet', 'lastFood', 'lastMorningActivity', 'lastAfternoonActivity',  'lastTraining', 'lastLifestyle', 'lastCreative', 'lastActivity', 'lastSpeech','lastNotebook','optionItemsOnSelectedDate','correspondingOptions','correspondingOption', 'selectedDate'));
     }
 
 };

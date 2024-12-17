@@ -373,7 +373,7 @@
 
                                 <!-- 体温登録↓ -->
                                 @if($hasFixedTemperature)
-                        　    　　  <div class="border-2 p-2 rounded-lg bg-white">
+                                 <div class="border-2 p-2 rounded-lg bg-white">
                                     <div class="flex justify-start items-center">
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                         <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -1171,7 +1171,7 @@
                                     
                        <!-- 食事登録↓ -->
                        @if($hasFixedMeal)
-                        　    　 <div class="border-2 p-2 rounded-lg bg-white my-2">
+                                 <div class="border-2 p-2 rounded-lg bg-white my-2">
                                     <div class="flex justify-start items-center">
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                         <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -2164,10 +2164,6 @@
         @endhasanyrole
         </div>   
     
-  <!-- 右矢印ボタン -->
-  <button id="scrollRight" class="absolute right-0 z-10 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r">
-    &gt;
-</button>
 <!--</section>-->
 </div>
  
@@ -2175,164 +2171,6 @@
 
 </body>
 </html>
-<script>
-    const slider = document.querySelector('.slider');
-const scrollRightButton = document.getElementById('scrollRight');
-
-scrollRightButton.addEventListener('click', function() {
-    // alert('クリック');
-    slider.scrollBy({
-        left: 300,
-        behavior: 'smooth'
-    });
-});
-// document.addEventListener('DOMContentLoaded', function() {
-//     const slider = document.querySelector('.slider');
-//     const scrollLeftButton = document.getElementById('scrollLeft');
-//     const scrollRightButton = document.getElementById('scrollRight');
-
-//     scrollLeftButton.addEventListener('click', function() {
-//         slider.scrollBy({
-//             left: -300, // スクロール量を調整
-//             behavior: 'smooth'
-//         });
-//     });
-
-//     scrollRightButton.addEventListener('click', function() {
-//         alert('クリック'); // ここを修正：クォーテーションで囲む
-//         slider.scrollBy({
-//             left: 300, // スクロール量を調整
-//             behavior: 'smooth'
-//         });
-//     });
-// });
-
- const startBtn = document.querySelector('#start-btn');
-const stopBtn = document.querySelector('#stop-btn');
-const resultSpeech = document.querySelector('#result-speech');
-
-let morningRecognition = initMorningRecognition();
-
-function initMorningRecognition() {
-    let recognition = new (webkitSpeechRecognition || SpeechRecognition)();
-    recognition.lang = 'ja-JP';
-    recognition.interimResults = true;
-    recognition.continuous = true;
-
-    let finalTranscript = ''; // 確定した(黒の)認識結果
-
-    recognition.onresult = (event) => {
-        let interimTranscript = ''; // 暫定(灰色)の認識結果
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            let transcript = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
-                finalTranscript += transcript;
-                console.log('aaa');
-            } else {
-                interimTranscript = transcript;
-                console.log('bbb');
-            }
-        }
-        console.log('ccc');
-        resultSpeech.value = finalTranscript + interimTranscript;
-    }
-
-    return recognition;
-}
-
-if (startBtn) {
-    console.log('Start button found:', startBtn);
-    startBtn.onclick = () => {
-        console.log('Start button clicked.');
-        morningRecognition.start();
-    };
-} else {
-    console.error('Start button not found.');
-}
-
-if (stopBtn) {
-    stopBtn.onclick = () => {
-        morningRecognition.stop();
-    }
-} else {
-    console.error('Stop button not found.');
-}
-
-// 午後の活動の認識処理も同様に別のオブジェクトを作成
-const startBtn2 = document.querySelector('#start-btn2');
-const stopBtn2 = document.querySelector('#stop-btn2');
-const afternoonSpeech = document.querySelector('#afternoon-speech');
-
-let afternoonRecognition = initAfternoonRecognition();
-
-function initAfternoonRecognition() {
-    let recognition2 = new (webkitSpeechRecognition || SpeechRecognition)();
-    recognition2.lang = 'ja-JP';
-    recognition2.interimResults = true;
-    recognition2.continuous = true;
-
-    let finalTranscript2 = ''; // 確定した(黒の)認識結果
-
-    recognition2.onresult = (event) => {
-        let interimTranscript2 = ''; // 暫定(灰色)の認識結果
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            let transcript2 = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
-                finalTranscript2 += transcript;
-                console.log('aaa');
-            } else {
-                interimTranscript2 = transcript;
-                console.log('bbb');
-            }
-        }
-        console.log('ccc');
-        afternoonSpeech.value = finalTranscript2 + interimTranscript2;
-    }
-
-    return recognition2;
-}
-
-if (startBtn2) {
-    console.log('Start button 2 found:', startBtn2);
-    startBtn2.onclick = () => {
-        console.log('Start button 2 clicked.');
-        afternoonRecognition.start();
-    };
-} else {
-    console.error('Start button 2 not found.');
-}
-
-if (stopBtn2) {
-    stopBtn2.onclick = () => {
-        afternoonRecognition.stop();
-    }
-} else {
-    console.error('Stop button 2 not found.');
-}
-
-  
-// showToiletModal関数を定期的に実行する (例: 1分ごとに実行)
-setInterval(showToiletModal, 60000);
-const slides = document.querySelectorAll('.slide');
-let currentSlide = 0;
-function showSlide(n) {
-  // すべてのスライドを非表示にする
-  for (let i = 0; i < slides.length; i++) {
-    slides[i].classList.remove('active');
-  }
-  // 指定されたスライドを表示する
-  slides[n].classList.add('active');
-  currentSlide = n;
-}
-function nextSlide() {
-  // 次のスライドを表示する
-  if (currentSlide === slides.length - 1) {
-    showSlide(0);
-  } else {
-    showSlide(currentSlide + 1);
-  }
-}
-</script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const personElements = document.querySelectorAll('.person-info');
