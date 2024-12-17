@@ -744,9 +744,8 @@
           @php
               $notebookData = json_decode($lastNotebook->notebook);
           @endphp
-          
-          @if(!empty($notebookData) && is_array($notebookData) && count($notebookData) > 0)
-              <p>{{ optional($lastNotebook)->notebook}}</p>
+          @if($lastNotebook->notebook !== null)
+              {{ $lastNotebook->notebook }}
           @endif
       </td>
      </tr>
