@@ -79,7 +79,7 @@
                         
                         <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
                             <i class="fa-solid fa-school text-gray-700" style="font-size: 1.5em; transition: transform 0.2s;"></i>
-                            <p class="text-gray-900 font-bold text-xl px-1.5">学校</p>
+                            <p class="text-gray-900 font-bold text-xl px-1.5">利用形態</p>
                         </div>
                         
                             <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
@@ -88,9 +88,25 @@
                                     <option value="登録なし"{{ $lastTime->school === '登録なし' ? ' selected' : '' }}>登録なし</option>
                                     <option value="授業終了後"{{ $lastTime->school === '授業終了後' ? ' selected' : '' }}>授業終了後</option>
                                     <option value="休校"{{ $lastTime->school === '休校' ? ' selected' : '' }}>休校</option>
-                                    <option value="欠席"{{ $lastTime->school === '欠席' ? ' selected' : '' }}>欠席</option>
                                 </select>
                             </div>
+
+                                <div style="display: flex; align-items: center; margin: 10px 0;">
+        <input type="checkbox" name="is_absent" value="1" class="w-6 h-6">
+        <p class="text-gray-900 font-bold text-xl px-1.5">欠席</p>
+    </div>
+     <!-- 送迎状況 -->
+    <div style="display: flex; flex-direction: column; align-items: flex-start; margin: 10px 0;">
+        <p class="text-gray-900 font-bold text-xl mb-2">送迎状況</p>
+        <div class="flex items-center">
+            <input type="checkbox" name="pick_up" value="1" class="w-6 h-6">
+            <p class="text-gray-900 font-bold text-xl px-1.5">迎え完了</p>
+        </div>
+        <div class="flex items-center mt-2">
+            <input type="checkbox" name="send" value="1" class="w-6 h-6">
+            <p class="text-gray-900 font-bold text-xl px-1.5">送り完了</p>
+        </div>
+    </div>
                             
       
                             <!-- <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">

@@ -9,7 +9,7 @@ class Time extends Model
 {
     use HasFactory;
     protected $table = 'times';
-    protected $fillable = ['people_id','date','start_time','end_time','school', 'pick_up', 'send'];
+    protected $fillable = ['people_id','date','start_time','end_time','school', 'pick_up', 'send', 'is_absent'];
     
     protected $casts = [
     'start_time' => 'datetime:H:i',

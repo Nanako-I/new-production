@@ -41,26 +41,30 @@ class TimeController extends Controller
     public function store(Request $request)
 {
     $storeData = $request->validate([
-        // バリデーションルールを追加
+            // バリデーションルールを追加
+            'date' => 'required|date',
+            'start_time' => 'required_unless:is_absent,1',
+            'end_time' => 'required_unless:is_absent,1',
+        
     ]);
-
-    // チェックボックスのデータをJSON形式に変換
-    $pick_up = json_encode($request->input('pick_up', []));
-    $send = json_encode($request->input('send', []));
-    
-
-    $time = Time::create([
-        'people_id' => $request->people_id,
-        'date' => $request->date,
-        'start_time' => $request->start_time,
-        'end_time' => $request->end_time,
-        'school' => $request->school,
-        'pick_up' => $pick_up,
-        'send' => $send,
-       
-    ]);
+       //JSON形式からboolean型に更新するため、コメントアウト
+        // チェックボックスのデータをJSON形式に変換
+        // $pick_up = json_encode($request->input('pick_up', []));
+        // $send = json_encode($request->input('send', []));
 
 
+        // 送迎のチェックボックスの値を直接booleanとして扱う
+        $time = Time::create([
+            'people_id' => $request->people_id,
+            'date' => $request->date,
+            //$is_absentがtrueの場合はnullを代入
+            'start_time' =>$request->start_time,
+            'end_time' =>$request->end_time,
+            'school' => $request->school,
+            'is_absent' => $request->boolean('is_absent'),
+            'pick_up' => $request->boolean('pick_up'),
+            'send' => $request->boolean('send'),
+        ]);
     $people = Person::all();
      // 二重送信防止
     $request->session()->regenerateToken();
@@ -129,8 +133,8 @@ class TimeController extends Controller
     public function update(Request $request, Time $time, $id)
     {
         // チェックボックスのデータをJSON形式に変換
-        $pick_up = json_encode($request->input('pick_up', []));
-        $send = json_encode($request->input('send', []));
+        // $pick_up = json_encode($request->input('pick_up', []));
+        // $send = json_encode($request->input('send', []));
         
         // IDをリクエストから取得
         $id = $request->id;
@@ -141,8 +145,14 @@ class TimeController extends Controller
         if (!$time) {
             return redirect()->back()->with('error', '指定されたデータが見つかりません。');
         }
-
-        $form = $request->all();
+        // フォームの値を更新
+        $form = array_merge($request->all(), [
+            'is_absent' => $request->boolean('is_absent'),
+            'pick_up' => $request->boolean('pick_up'),
+            'send' => $request->boolean('send'),
+            'start_time' =>$request->start_time,
+            'end_time' =>$request->end_time,
+        ]);
         $time->fill($form)->save();
     
         $people = Person::all();

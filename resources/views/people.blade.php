@@ -179,64 +179,68 @@
                                                         $todayTime = $person->times ? $person->times->where('date', $today)->first() : null;
                                                     @endphp
 
-                                                    @if ($todayTime)
-                                                        <!-- 本日分のデータがある場合 -->
-                                                        <div class="flex justify-evenly">
-                                                            <a href="{{ url('timechange/'.$person->id . '/'.$todayTime->id) }}" class="relative ml-2 flex items-center">
-                                                                @csrf
-                                                                <div class="flex items-center justify-around">
-                                                                    @php
-                                                                        $pick_upData = json_decode($todayTime->pick_up);
-                                                                        $sendData = json_decode($todayTime->send);
-                                                                        $startTime = \Carbon\Carbon::parse($todayTime->start_time);
-                                                                        $endTime = \Carbon\Carbon::parse($todayTime->end_time);
-                                                                        $diffInHours = $startTime->diffInHours($endTime);
-                                                                        $diffInMinutes = $startTime->diffInMinutes($endTime) % 60;
-                                                                        $totalUsageTime = $endTime ? $diffInHours . '時間' . $diffInMinutes . '分' : null;
-                                                                    @endphp
-                                                                    <div class="flex justify-evenly">
-                                                                        <div class="px-1.5">
-                                                                            <p class="text-gray-900 font-bold text-base">利用日:</p>
-                                                                            <p class="text-gray-900 font-bold text-xl">{{ \Carbon\Carbon::parse($todayTime->date)->format('n月j日') }}</p>
+                                @if ($todayTime)
+    <div class="flex justify-evenly">
+        <a href="{{ url('timechange/'.$person->id . '/'.$todayTime->id) }}" class="relative ml-2 flex items-center">
+            @csrf
+            <div class="flex items-center justify-around">
+                @php
+                $startTime = \Carbon\Carbon::parse($todayTime->start_time);
+                $endTime = \Carbon\Carbon::parse($todayTime->end_time);
+                $diffInHours = $startTime->diffInHours($endTime);
+                $diffInMinutes = $startTime->diffInMinutes($endTime) % 60;
+                $totalUsageTime = $endTime ? $diffInHours . '時間' . $diffInMinutes . '分' : null;
+                @endphp
+                
+                <div class="flex justify-evenly">
+                    <div class="px-1.5">
+                        <p class="text-gray-900 font-bold text-base">利用日:</p>
+                        <p class="text-gray-900 font-bold text-xl">{{ \Carbon\Carbon::parse($todayTime->date)->format('n月j日') }}</p>
 
-                                                                            @if ($todayTime->start_time)
-                                                                                {{ $startTime->format('H:i') }}
-                                                                            @else
-                                                                                <span class="text-red-500 font-bold">未設定</span>
-                                                                            @endif
-                                                                            ～
-                                                                            @if ($todayTime->end_time)
-                                                                                {{ $endTime->format('H:i') }}
-                                                                            @else
-                                                                                <span class="text-red-500 font-bold">未設定</span>
-                                                                            @endif
+                        @if ($todayTime->is_absent)
+                            <p class="text-red-500 font-bold text-xl">欠席</p>
+                        @else
+                            @if ($todayTime->start_time)
+                                {{ $startTime->format('H:i') }}
+                            @else
+                                <span class="text-red-500 font-bold">未設定</span>
+                            @endif
+                            ～
+                            @if ($todayTime->end_time)
+                                {{ $endTime->format('H:i') }}
+                            @else
+                                <span class="text-red-500 font-bold">未設定</span>
+                            @endif
 
-                                                                            @if ($todayTime->start_time && $todayTime->end_time)
-                                                                                <p class="text-gray-900 font-bold text-xl">({{ $totalUsageTime }})</p>
-                                                                            @endif
-                                                                        </div>
+                            @if ($todayTime->start_time && $todayTime->end_time)
+                                <p class="text-gray-900 font-bold text-xl">({{ $totalUsageTime }})</p>
+                            @endif
+                        @endif
+                    </div>
 
-                                                                        @if(!empty($pick_upData) && is_array($pick_upData) && count($pick_upData) > 0)
-                                                                            <div class="px-1.5">
-                                                                                <p class="text-gray-900 font-bold text-base">迎え:</p>
-                                                                                <p class="text-gray-900 font-bold text-xl px-1">済</p>
-                                                                            </div>
-                                                                        @endif
+                    @if(!$todayTime->is_absent)
+                        @if($todayTime->pick_up)
+                            <div class="px-1.5">
+                                <p class="text-gray-900 font-bold text-base">迎え:</p>
+                                <p class="text-gray-900 font-bold text-xl px-1">済</p>
+                            </div>
+                        @endif
 
-                                                                        @if(!empty($sendData) && is_array($sendData) && count($sendData) > 0)
-                                                                            <div class="px-1.5">
-                                                                                <p class="text-gray-900 font-bold text-base">送り:</p>
-                                                                                <p class="text-gray-900 font-bold text-xl px-1">済</p>
-                                                                            </div>
-                                                                        @endif
-                                                                    </div>
-                                                                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-                                                                    <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
-                                                                    <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    @else
+                        @if($todayTime->send)
+                            <div class="px-1.5">
+                                <p class="text-gray-900 font-bold text-base">送り:</p>
+                                <p class="text-gray-900 font-bold text-xl px-1">済</p>
+                            </div>
+                        @endif
+                    @endif
+                </div>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+                <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
+                <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
+            </div>
+        </a>
+    </div>
+    @else
                                                         <!-- 本日分の実際の利用時間データがまだない場合 -->
                                                             @php
                                                                 $today = \Carbon\Carbon::now()->toDateString();
@@ -278,17 +282,35 @@
 
                                                                 <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
                                                                     <i class="fa-solid fa-school text-gray-700" style="font-size: 1.5em; transition: transform 0.2s;"></i>
-                                                                    <p class="text-gray-900 font-bold text-xl px-1.5">学校</p>
+                                                                    <p class="text-gray-900 font-bold text-xl px-1.5">提供形態</p>
                                                                 </div>
 
                                                                 <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
-                                                                    <select name="school" class="mx-1 my-1.5" style="width: 6rem;">
+                                                                    <select name="school" class="mx-1 my-1.5" style="width: 8rem;">
                                                                         <option value="登録なし">選択</option>
                                                                         <option value="授業終了後">授業終了後</option>
                                                                         <option value="休校">休校</option>
-                                                                        <option value="欠席">欠席</option>
                                                                     </select>
                                                                 </div>
+
+                                                                 <!-- サービス提供の状況 -->
+    <div style="display: flex; align-items: center; margin: 10px 0;">
+        <input type="checkbox" name="is_absent" value="1" class="w-6 h-6">
+        <p class="text-gray-900 font-bold text-xl px-1.5">欠席</p>
+    </div>
+     <!-- 送迎状況 -->
+    <div style="display: flex; flex-direction: column; align-items: flex-start; margin: 10px 0;">
+        <p class="text-gray-900 font-bold text-xl mb-2">送迎状況</p>
+        <div class="flex items-center">
+            <input type="checkbox" name="pick_up" value="1" class="w-6 h-6">
+            <p class="text-gray-900 font-bold text-xl px-1.5">迎え完了</p>
+        </div>
+        <div class="flex items-center mt-2">
+            <input type="checkbox" name="send" value="1" class="w-6 h-6">
+            <p class="text-gray-900 font-bold text-xl px-1.5">送り完了</p>
+        </div>
+    </div>
+
 
                                                                 <div class="my-2" style="display: flex; justify-content: center; align-items: center; max-width: 300px;">
                                                                     <button type="submit" class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
