@@ -249,7 +249,7 @@ class DompdfController extends Controller
     $lastActivity !== null ||
     $lastSpeech !== null ||
     $lastNotebook !== null ||
-    $$optionItemsOnSelectedDate->isNotEmpty() ||
+    $optionItemsOnSelectedDate->isNotEmpty() ||
     !empty($correspondingOptions);
     // !empty($correspondingOptions) ||
     // $correspondingOption !== null;
@@ -289,7 +289,6 @@ class DompdfController extends Controller
         // レコードデータを使用してビューを読み込む
         $htmlContent = view('record_pdf', compact('person', 'timesOnSelectedDate', 'temperaturesOnSelectedDate', 'bloodPressuresOnSelectedDate', 'watersOnSelectedDate', 'medicinesOnSelectedDate', 'tubesOnSelectedDate', 'kyuuinsOnSelectedDate', 'hossasOnSelectedDate', 'toiletsOnSelectedDate', 'foodsOnSelectedDate', 'lastTraining', 'lastLifestyle', 'lastCreative', 'lastActivity', 'lastSpeech', 'lastNotebook', 'optionItemsOnSelectedDate', 'correspondingOptions', 'selectedDate', 'today', 'hankoName'))->render();
 
-    \Log::info('PDF HTML Content:', ['html' => $htmlContent]);
 
     $pdf = PDF::loadHTML($htmlContent);
 
