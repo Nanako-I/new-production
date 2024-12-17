@@ -92,6 +92,7 @@
                             </div>
 
                                 <div style="display: flex; align-items: center; margin: 10px 0;">
+                                <p class="text-gray-900 font-bold text-xl mb-2">サービス提供の状況</p>
         <input type="checkbox" name="is_absent" value="1" class="w-6 h-6">
         <p class="text-gray-900 font-bold text-xl px-1.5">欠席</p>
     </div>
