@@ -1195,42 +1195,53 @@
                                         <input type="hidden" name="people_id" value="{{ $person->id }}">
                                         
                               
-                                    <div style="display: flex; flex-direction: column; align-items: center;">
+    
                                         
                                           <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
+                                          <p class="text-gray-900 font-bold text-xl">食事登録の種類</p>
+    <div style="display: flex; flex-direction: row; align-items: center; margin: 10px 0;">
+        <label class="mr-4">
+            <input type="radio" name="meal_type" value="lunch_only" class="mr-2">
+            昼食のみ
+        </label>
+        <label>
+            <input type="radio" name="meal_type" value="lunch_and_oyatsu" class="mr-2">
+            昼食と間食
+        </label>
+    </div>
+</div>
                                             <!--<input name="staple_food" type="text" id="staple_food" class="w-1/4 h-8px flex-shrink-0 break-words mx-1">-->
-                                            <p class="text-gray-900 font-bold text-xl">昼食</p>
-                                                <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
-                                                    <select name="lunch" class="mx-1 my-1.5" style="width: 6rem;">
-                                                        <option value="登録なし">選択</option>
-                                                        <option value="あり">あり</option>
-                                                        <option value="なし">なし</option>
-                                                    </select>
-                                                </div>
-                                          </div>
-                                        <!--</div>-->
-                                        <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
-                                          <p class="text-gray-900 font-bold text-xl">備考（メニューなど）<p>
-                                          <textarea id="result-speech" name="lunch_bikou" class="w-full max-w-lg font-bold" style="height: 150px;"></textarea>
-                                        </div>
-                                        
-                                        <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
-                                            <p class="text-gray-900 font-bold text-xl">間食</p>
-                                                <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
-                                                    <select name="oyatsu" class="mx-1 my-1.5" style="width: 6rem;">
-                                                        <option value="登録なし">選択</option>
-                                                        <option value="あり">あり</option>
-                                                        <option value="なし">なし</option>
-                                                    </select>
-                                                </div>
-                                          </div>
-                                        <!--</div>-->
-                                        <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
-                                          <p class="text-gray-900 font-bold text-xl">備考（メニューなど）<p>
-                                          <textarea id="result-speech" name="oyatsu_bikou" class="w-full max-w-lg font-bold" style="height: 150px;"></textarea>
-                                        </div>
-                                    </div>
-                               
+                                            <div id="lunch-section" style="display: none;">
+    <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
+        <p class="text-gray-900 font-bold text-xl">昼食</p>
+        <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
+           <select name="lunch" class="mx-1 my-1.5" style="width: 6rem;">
+                <option value="あり">あり</option>
+            </select>
+        </div>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
+        <p class="text-gray-900 font-bold text-xl">備考（メニューなど）</p>
+        <textarea name="lunch_bikou" class="w-full max-w-lg font-bold" style="height: 150px;"></textarea>
+    </div>
+</div>
+
+<div id="oyatsu-section" style="display: none;">
+    <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
+        <p class="text-gray-900 font-bold text-xl">間食</p>
+        <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
+           <select name="oyatsu" class="mx-1 my-1.5" style="width: 6rem;">
+                <option value="登録なし">選択</option>
+                <option value="あり">あり</option>
+                <option value="なし">なし</option>
+            </select>
+        </div>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
+        <p class="text-gray-900 font-bold text-xl">備考（メニューなど）</p>
+        <textarea name="oyatsu_bikou" class="w-full max-w-lg font-bold" style="height: 150px;"></textarea>
+    </div>
+</div>
                                     <button type="submit" class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
                                     送信
                                     </button>
@@ -1238,6 +1249,36 @@
                             </div>
                         </details>
                         </form>
+                        <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const mealTypeRadios = document.querySelectorAll('input[name="meal_type"]');
+    const lunchSection = document.getElementById('lunch-section');
+    const oyatsuSection = document.getElementById('oyatsu-section');
+    const lunchSelect = document.querySelector('select[name="lunch"]');
+    const oyatsuSelect = document.querySelector('select[name="oyatsu"]');
+
+    mealTypeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'lunch_only') {
+                lunchSection.style.display = 'block';
+                oyatsuSection.style.display = 'none';
+
+                 // lunch のデフォルト値を 'あり' に、oyatsu のデフォルト値を 'なし' に
+                lunchSelect.value = 'あり';
+                oyatsuSelect.value = 'なし';
+
+            } else if (this.value === 'lunch_and_oyatsu') {
+                lunchSection.style.display = 'block';
+                oyatsuSection.style.display = 'block';
+
+                   // 両方のデフォルト値を 'あり' に
+                lunchSelect.value = 'あり';
+                oyatsuSelect.value = 'あり';
+            }
+        });
+    });
+});
+</script>
             @else
             <!-- 直近の食事結果表示 -->
             <div class="flex justify-evenly">
