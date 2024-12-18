@@ -19,6 +19,13 @@
             </div>
         @endif
 
+        @if ($errors->has('fields'))
+    <li style="margin-bottom: 5px; color: red; font-weight: bold; font-size: 1.1em;">
+        <i class="fas fa-exclamation-triangle" style="margin-right: 5px;"></i>
+        {{ $errors->first('fields') }}
+    </li>
+@endif
+
     @php
         $user = Auth::user();
         $permissions = $user->getPermissionsViaRoles();
@@ -293,6 +300,12 @@
     </div>
     @else
                                                         <!-- 本日分の実際の利用時間データがまだない場合 -->
+
+                                                        @if (session('alert'))
+                                                            <script>
+                                                                alert('{{ session('alert') }}');
+                                                            </script>
+                                                        @endif
                                                             @php
                                                                 $today = \Carbon\Carbon::now()->toDateString();
                                                                 $todaySchedule = $person->scheduled_visits->where('arrival_datetime', 'like', $today.'%')->first();
@@ -392,7 +405,6 @@
                                     @php
                                     $items = $selectedItems[$person->id] ?? [];
                                     $hasFixedTemperature = hasFixedItem($items, '体温');
-                                    $hasFixedMeal = hasFixedItem($items, '食事');
                                     @endphp
 
 
@@ -626,7 +638,7 @@
                                                         <details class="justify-center">
                                                             <summary class="text-red-500 font-bold text-xl">登録する</summary>
 
-                                                            <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
+                                                            
                                                             
                                                             <input type="hidden" name="people_id" value="{{ $person->id }}">
                                                             <input type="hidden" name="option_id" value="{{ $option->id }}">
@@ -1195,8 +1207,7 @@
                                          @endif
                                     
                        <!-- 食事登録↓ -->
-                       @if($hasFixedMeal)
-                        　    　 <div class="border-2 p-2 rounded-lg bg-white m-2">
+                                 <div class="border-2 p-2 rounded-lg bg-white m-2">
                                     <div class="flex justify-start items-center">
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                         <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
@@ -1243,7 +1254,6 @@
                                         <summary class="text-red-500 font-bold text-xl">登録する</summary>
                                                 @csrf
                                         <div class="flex items-center justify-center">
-                                      <!--<div style="display: flex; flex-direction: column;">-->
                                          <div class="flex flex-col items-center">        
                                         <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
                                         <input type="hidden" name="people_id" value="{{ $person->id }}">
@@ -1300,7 +1310,7 @@
         <textarea name="oyatsu_bikou" class="w-full max-w-lg font-bold" style="height: 150px;"></textarea>
     </div>
 </div>
-                                    <button type="submit" class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                                    <button type="submit" id="submit-button" class="hidden inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
                                     送信
                                     </button>
                                 </div>
@@ -1314,9 +1324,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const oyatsuSection = document.getElementById('oyatsu-section');
     const lunchSelect = document.querySelector('select[name="lunch"]');
     const oyatsuSelect = document.querySelector('select[name="oyatsu"]');
+    const submitButton = document.getElementById('submit-button');
 
     mealTypeRadios.forEach(radio => {
         radio.addEventListener('change', function() {
+            // ラジオボタンが選択されたら送信ボタンを表示
+            submitButton.classList.remove('hidden');
             if (this.value === 'lunch_only') {
                 lunchSection.style.display = 'block';
                 oyatsuSection.style.display = 'none';
@@ -1374,7 +1387,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
                                         <a href="{{ url('food/'.$person->id.'/edit') }}" class="relative">
                                         </a>
-                                @endif
                                     
                         <!--水分登録↓-->
                         @if(isset($selectedItems[$person->id]) && in_array('水分摂取', $selectedItems[$person->id]))

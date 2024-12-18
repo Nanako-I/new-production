@@ -40,13 +40,22 @@ class TimeController extends Controller
      */
     public function store(Request $request)
 {
-    $storeData = $request->validate([
-            // バリデーションルールを追加
-            'date' => 'required|date',
-            'start_time' => 'required_unless:is_absent,1',
-            'end_time' => 'required_unless:is_absent,1',
-        
+    // バリデーションルールを設定
+    $request->validate([
+        'start_time' => 'nullable',
+        'end_time' => 'nullable',
+        'school' => 'nullable',
+        'is_absent' => 'nullable',
+        'pick_up' => 'nullable',
+        'send' => 'nullable',
     ]);
+
+    // すべてのフィールドが空であるかをチェック
+    if (empty($request->start_time) && empty($request->end_time) && empty($request->school) &&
+        empty($request->is_absent) && empty($request->pick_up) && empty($request->send)) {
+        return redirect()->back()->withErrors(['fields' => 'いずれか登録してください。'])->withInput();
+    }
+
        //JSON形式からboolean型に更新するため、コメントアウト
         // チェックボックスのデータをJSON形式に変換
         // $pick_up = json_encode($request->input('pick_up', []));
@@ -69,7 +78,7 @@ class TimeController extends Controller
      // 二重送信防止
     $request->session()->regenerateToken();
     // return view('people', compact('time', 'people'));
-    return redirect()->route('people.index');
+    return redirect()->route('people.index')->with('success', '登録が成功しました。');
 }
 
     /**

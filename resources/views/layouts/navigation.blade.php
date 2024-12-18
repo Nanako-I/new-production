@@ -82,18 +82,17 @@
                         </x-nav-link>
                     </div>
                     
-                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('calendar') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
+                     <!-- <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('calendar') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
                          <x-nav-link :href="url('calendar')" :active="request()->is('calendar')">
                             {{ __('カレンダー') }}
                         </x-nav-link>
-                    </div>
+                    </div> -->
                     
-                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('before-invitation') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
-                         <!--<i class="material-icons md-48" id="face">face</i>-->
+                    <!-- <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('before-invitation') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
                          <x-nav-link :href="url('before-invitation')" :active="request()->is('before-invitation')">
                             {{ __('保護者を招待する') }}
                         </x-nav-link>
-                    </div>
+                    </div> -->
                 @endhasanyrole
                 
                 @hasanyrole('super administrator|client family user|client family reader')
@@ -132,18 +131,7 @@
              style="display: none;"
              @click="open = false">
             <div class="rounded-md ring-1 ring-black ring-opacity-5 py-1 bg-white dark:bg-gray-700">
-                <x-dropdown-link :href="route('profile.edit')" class="text-lg">
-                    {{ __('プロフィール') }}
-                </x-dropdown-link>
-
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-dropdown-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();" class="text-lg">
-                        {{ __('ログアウト') }}
-                    </x-dropdown-link>
-                </form>
+                
 
                 @hasanyrole('super administrator|facility staff administrator|facility staff user|facility staff reader')
                 <!-- 送迎が完成したら「今日の利用者」にして訪問予定の利用者だけ表示させる -->
@@ -164,9 +152,9 @@
                     {{ __('新規の利用者登録') }}
                 </x-dropdown-link>
 
-                <x-dropdown-link :href="url('before-invitation')" class="text-lg">
+                <!-- <x-dropdown-link :href="url('before-invitation')" class="text-lg">
                     {{ __('保護者を招待する') }}
-                </x-dropdown-link>
+                </x-dropdown-link> -->
 
                 <!-- <x-dropdown-link :href="url('calendar')" class="text-lg">
                     {{ __('カレンダー') }}
@@ -178,6 +166,19 @@
                     {{ __('一覧へ') }}
                 </x-dropdown-link>
                 @endhasanyrole
+
+                <x-dropdown-link :href="route('profile.edit')" class="text-lg">
+                    {{ __('プロフィール') }}
+                </x-dropdown-link>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <x-dropdown-link :href="route('logout')"
+                            onclick="event.preventDefault();
+                                        this.closest('form').submit();" class="text-lg">
+                        {{ __('ログアウト') }}
+                    </x-dropdown-link>
+                </form>
             </div>
         </div>
     </div>
@@ -198,18 +199,7 @@
              class="absolute z-50 mt-2 w-48 rounded-md shadow-lg origin-top-right right-0"
              style="display: none;">
             <div class="rounded-md ring-1 ring-black ring-opacity-5 py-1 bg-white">
-                <x-dropdown-link :href="route('profile.edit')" class="text-lg">
-                    {{ __('プロフィール') }}
-                </x-dropdown-link>
-
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-dropdown-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();" class="text-lg">
-                        {{ __('ログアウト') }}
-                    </x-dropdown-link>
-                </form>
+                
 
                 @hasanyrole('super administrator|facility staff administrator|facility staff user|facility staff reader')
 
@@ -230,9 +220,9 @@
                     {{ __('事業所の共通記録追加') }}
                 </x-dropdown-link>
 
-                <x-dropdown-link :href="url('before-invitation')" class="text-lg">
+                <!-- <x-dropdown-link :href="url('before-invitation')" class="text-lg">
                     {{ __('保護者を招待する') }}
-                </x-dropdown-link>
+                </x-dropdown-link> -->
 
                 <!-- <x-dropdown-link :href="url('calendar')" class="text-lg">
                     {{ __('カレンダー') }}
@@ -245,6 +235,19 @@
                     {{ __('一覧へ') }}
                 </x-dropdown-link>
                 @endhasanyrole
+
+                <x-dropdown-link :href="route('profile.edit')" class="text-lg">
+                    {{ __('プロフィール') }}
+                </x-dropdown-link>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <x-dropdown-link :href="route('logout')"
+                            onclick="event.preventDefault();
+                                        this.closest('form').submit();" class="text-lg">
+                        {{ __('ログアウト') }}
+                    </x-dropdown-link>
+                </form>
             </div>
         </div>
     </div>

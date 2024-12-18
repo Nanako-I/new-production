@@ -87,7 +87,7 @@ class FoodController extends Controller
     $people = Person::all();
     $request->session()->regenerateToken();
     // return view('people', compact('food', 'people'));
-    return redirect()->route('people.index');
+    return redirect()->route('people.index')->with('success', '登録完了しました。');
     }
 
     /**

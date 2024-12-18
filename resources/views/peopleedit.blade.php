@@ -61,11 +61,10 @@
     </div> 
 
     <div style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
-    <span class="mt-1 text-sm text-blue-500 underline cursor-pointer invite-siblings">兄弟も招待する</span>
+    <!-- <span class="mt-1 text-sm text-blue-500 underline cursor-pointer invite-siblings">兄弟も招待する</span> -->
     
-    <div class="sibling-list" id="siblingList">
+    <!-- <div class="sibling-list" id="siblingList">
         <h4>招待する兄弟を選択してください:</h4>
-        <!-- ここに施設の人物リストを表示 -->
         @foreach($facilitypeople as $facilityperson)
             <div>
                 <input type="checkbox" id="person_{{ $facilityperson->id }}" name="siblings[]" value="{{ $facilityperson->id }}">
@@ -73,7 +72,7 @@
             </div>
         @endforeach
         <button id="generateUrlsButton">URLを生成</button>
-    </div>
+    </div> -->
 
     <!-- 修正フォーム -->
     <form action="{{ route('people.update', $person->id) }}" method="POST" enctype="multipart/form-data">

@@ -18,7 +18,7 @@
             </div>
         </div>
     </form>
-    <form action="{{ route('options.item.update', ['people_id' => $person->id, 'id' => $optionItem->id]) }}" method="POST">
+    <form id="option-form" action="{{ route('options.item.update', ['people_id' => $person->id, 'id' => $optionItem->id]) }}" method="POST">
     @csrf
          
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -67,7 +67,7 @@
                                     </div>
                                 @endforeach
 
-                                <textarea name="bikou" class="w-full max-w-lg" style="height: 200px;">{{ $optionItem->bikou }}</textarea>
+                                <textarea id="bikou" name="bikou" class="w-full max-w-lg" style="height: 200px;">{{ $optionItem->bikou }}</textarea>
 
                                 <button type="submit" class="bg-gray-800 text-white px-6 py-3 font-bold rounded mt-4">更新</button>
                             </form>
@@ -76,5 +76,26 @@
         </div>
     </div>
 </form>
+
+<script>
+    document.getElementById('option-form').addEventListener('submit', function(event) {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        const textarea = document.getElementById('bikou');
+        let isChecked = false;
+
+        // チェックボックスが1つでもチェックされているか確認
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                isChecked = true;
+            }
+        });
+
+        // チェックボックスがすべて未チェックかつ備考欄が空の場合
+        if (!isChecked && textarea.value.trim() === '') {
+            event.preventDefault(); // フォームの送信をキャンセル
+            alert('チェックボックスもしくは備考欄に入力してください');
+        }
+    });
+</script>
 
 </x-app-layout>

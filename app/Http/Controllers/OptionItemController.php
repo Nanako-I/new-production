@@ -103,7 +103,7 @@ class OptionItemController extends Controller
    $request->session()->regenerateToken();
 
     //    return view('people', compact('people', 'selectedItems', 'options'));
-    return redirect()->route('people.index');
+    return redirect()->route('people.index')->with('success', '登録完了しました。');
     }
 
     public function change(Request $request, $people_id, $id)
@@ -228,7 +228,7 @@ class OptionItemController extends Controller
     }
 
     // return view('people', compact('people', 'selectedItems', 'options', 'personOptions', 'optionItem', 'option'));
-    return redirect()->route('people.index');
+    return redirect()->route('people.index')->with('success', '更新しました。');
     }
 
     /**
