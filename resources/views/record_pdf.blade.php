@@ -701,7 +701,7 @@
 
         <thead>
             <tr>
-                <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left text-sm leading-4 font-medium text-gray-600 uppercase tracking-wider" colspan="7">本日行った内容</th>
+              <th colspan="3" style="width: 180px;">本日行った内容</th>
             </tr>
         </thead>
         <tbody>
@@ -711,25 +711,27 @@
                 @endphp
                 @if($correspondingOption)
                     <tr>
-                        <td class="py-2 px-4 border-b border-gray-200">{{ $correspondingOption->title }}</td>
+                        <td>{{ $correspondingOption->title }}</td>
                         @for($i = 1; $i <= 5; $i++)
                             @php
                                 $optionItemKey = "item{$i}";
                                 $optionItemValue = json_decode($optionItem->$optionItemKey);
                                 $correspondingItemValue = $correspondingOption->$optionItemKey;
                             @endphp
-                            <td class="py-2 px-4 border-b border-gray-200">
-                                @if(!empty($optionItemValue) && is_array($optionItemValue) && count($optionItemValue) > 0 && $correspondingItemValue)
+                            @if(!empty($optionItemValue) && is_array($optionItemValue) && count($optionItemValue) > 0 && $correspondingItemValue)
+                                <td>
                                     {{ $correspondingItemValue }}
-                                @endif
-                            </td>
-                        @endfor
-                        <td class="py-2 px-4 border-b border-gray-200">
-                            @if($optionItem->bikou !== null)
-                                {{ $optionItem->bikou }}
+                                </td>
                             @endif
-                        </td>
-                    </tr>
+                        @endfor
+                        </tr>
+                        <tr>
+                          <td>
+                              @if($optionItem->bikou !== null)
+                                  {{ $optionItem->bikou }}
+                              @endif
+                          </td>
+                        </tr>
                 @endif
             @endforeach
         </tbody>
