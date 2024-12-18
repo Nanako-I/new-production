@@ -13,9 +13,18 @@ class TermsAgreementController extends Controller
 
 
 
-    public function showAdmin()
+    public function showAdmin(Request $request)
 {
-    return view('admin.terms-agreement');
+    $termsFilePath = resource_path('texts/admin-terms.txt');
+        $privacypolicyFilePath = resource_path('texts/privacypolicy.txt');
+
+        // ファイルの内容を読み込む
+        $termsText = file_get_contents($termsFilePath);
+        $privacypolicyText = file_get_contents($privacypolicyFilePath);
+
+       
+
+        return view('admin.terms-agreement', compact('termsText','privacypolicyText'));
 }
 
 // 施設管理者用の利用規約同意

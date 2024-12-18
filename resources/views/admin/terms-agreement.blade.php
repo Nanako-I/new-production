@@ -9,28 +9,47 @@
                     
                     <div class="mb-6">
                         <div class="border p-4 mb-4 h-48 overflow-y-auto">
-                            <h3 class="font-bold mb-2">施設管理者向け利用規約</h3>
-                            <p>（ここに施設管理者向け利用規約の内容を記載）</p>
+                            <!-- 利用規約の内容 -->
+                            <h3 class="font-bold mb-2">利用規約</h3>
+                            <style>
+                                .terms-text {
+                                    white-space: pre-wrap; /* 改行と空白をそのまま表示 */
+                                    margin: 20px;
+                                    font-size: 14px;
+                                    line-height: 1.6;
+                                }
+                            </style>
+                            <div class="terms-text">
+                                {{ $termsText }}
+                            </div>
                         </div>
                         
                         <div class="border p-4 mb-4 h-48 overflow-y-auto">
+                            <!-- プライバシーポリシーの内容 -->
                             <h3 class="font-bold mb-2">プライバシーポリシー</h3>
-                            <p>（ここにプライバシーポリシーの内容を記載）</p>
+                            <style>
+                                .privacypolicy-text {
+                                    white-space: pre-wrap; /* 改行と空白をそのまま表示 */
+                                    margin: 20px;
+                                    font-size: 14px;
+                                    line-height: 1.6;
+                                }
+                            </style>
+                            <div class="privacypolicy-text">
+                                {{ $privacypolicyText }}
+                            </div>
                         </div>
                         
                         <div class="flex flex-col space-y-4">
                             <label class="flex items-center">
-                                <input type="checkbox" name="terms_accepted" value="1" class="form-checkbox" required>
+                                <input type="checkbox" name="terms_accepted" class="form-checkbox" required>
                                 <span class="ml-2">利用規約に同意します</span>
                             </label>
                             
                             <label class="flex items-center">
-                                <input type="checkbox" name="privacy_accepted" value="1" class="form-checkbox" required>
+                                <input type="checkbox" name="privacy_accepted" class="form-checkbox" required>
                                 <span class="ml-2">プライバシーポリシーに同意します</span>
                             </label>
-                            
-                            <input type="hidden" name="terms_accepted_at" value="{{ now() }}">
-                            <input type="hidden" name="privacy_accepted_at" value="{{ now() }}">
                         </div>
                     </div>
 
