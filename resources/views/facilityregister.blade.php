@@ -4,7 +4,11 @@
         
         <!-- ユーザー情報の隠しフィールド -->
         <input type="hidden" name="user_id" value="{{ auth()->user()->id }}">
-        
+        @if ($errors->has('facility_key'))
+                <div style="color: red;">
+                    {{ $errors->first('facility_key') }}
+                </div>
+            @endif
         <!-- Facility ID -->
         <div class="flex flex-col items-center justify-center">
             <p class="text-gray-900 font-bold text-xl">事業所キー</p>

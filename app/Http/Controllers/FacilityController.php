@@ -38,8 +38,11 @@ class FacilityController extends Controller
     {
        // バリデーション
     $storeData = $request->validate([
-        'facility_key' => 'required|string|max:10|unique:facilities,facility_key',
+        'facility_key' => 'required|string|max:10|regex:/^[a-zA-Z0-9]{1,10}$/|unique:facilities,facility_key',
         'facility_name' => 'required|string|max:255',
+    ], [
+        'facility_key.regex' => '施設IDは1から10桁までのアルファベットまたは数字でなければなりません。',
+        'facility_key.unique' => 'この施設IDは既に登録されています。',
     ]);
 
     // 事業所を作成
