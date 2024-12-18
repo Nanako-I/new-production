@@ -1,12 +1,12 @@
 <x-guest-layout>
     <!-- デバッグ表示を追加 -->
-    @if(isset($userData))
+    <!-- @if(isset($userData))
         <div>
             <p>利用規約とプライバシーポリシーの同意状態:</p>
             <p>利用規約: {{ $userData['terms_accepted'] ? '同意済み' : '未同意' }}</p>
             <p>プライバシーポリシー: {{ $userData['privacy_accepted'] ? '同意済み' : '未同意' }}</p>
         </div>
-    @endif
+    @endif -->
 
     <!-- 既存のフォーム -->
     <form action="{{ route('hogoshanumber.store') }}" method="POST">

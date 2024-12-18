@@ -8,19 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class TermsAgreementController extends Controller
 {
-    public function show(Request $request)
-{
-    $encryptedId = $request->query('encrypted_id');
-    $personId = Crypt::decryptString($encryptedId);
-
-    // Store the personId in the session
-    session(['temp_person_id' => $personId]);
-
-    // Fetch the person and any other necessary data
-    $person = Person::findOrFail($personId);
-
-    return view('terms-agreement', compact('person'));
-}
+    // 保護者向けの利用規約を表示させる処理はweb.phpに記載
 
 
 

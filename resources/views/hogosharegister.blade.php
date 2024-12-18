@@ -90,10 +90,10 @@
         </ul>
     </div>
 @endif
-                @if(session('terms_accepted') && session('privacy_accepted'))
+                <!-- @if(session('terms_accepted') && session('privacy_accepted'))
     <p>利用規約に同意しました: {{ session('terms_accepted_at') }}</p>
     <p>プライバシーポリシーに同意しました: {{ session('privacy_accepted_at') }}</p>
-@endif  
+@endif   -->
         <!-- Name -->
         <div class="mt-4 flex space-x-4">      
         <div class="flex-1">

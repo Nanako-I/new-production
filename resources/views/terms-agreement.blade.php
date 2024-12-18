@@ -20,13 +20,33 @@
                         <div class="border p-4 mb-4 h-48 overflow-y-auto">
                             <!-- 利用規約の内容 -->
                             <h3 class="font-bold mb-2">利用規約</h3>
-                            <p>（ここに利用規約の内容を記載）</p>
+                            <style>
+                                .terms-text {
+                                    white-space: pre-wrap; /* 改行と空白をそのまま表示 */
+                                    margin: 20px;
+                                    font-size: 14px;
+                                    line-height: 1.6;
+                                }
+                            </style>
+                            <div class="terms-text">
+                                {{ $termsText }}
+                            </div>
                         </div>
                         
                         <div class="border p-4 mb-4 h-48 overflow-y-auto">
                             <!-- プライバシーポリシーの内容 -->
                             <h3 class="font-bold mb-2">プライバシーポリシー</h3>
-                            <p>（ここにプライバシーポリシーの内容を記載）</p>
+                            <style>
+                                .privacypolicy-text {
+                                    white-space: pre-wrap; /* 改行と空白をそのまま表示 */
+                                    margin: 20px;
+                                    font-size: 14px;
+                                    line-height: 1.6;
+                                }
+                            </style>
+                            <div class="privacypolicy-text">
+                                {{ $privacypolicyText }}
+                            </div>
                         </div>
                         
                         <div class="flex flex-col space-y-4">
@@ -63,3 +83,8 @@
     </div>
 </x-guest-layout>
 
+<style>
+.terms-text {
+    white-space: pre-wrap; /* 改行と空白をそのまま表示 */
+}
+</style>

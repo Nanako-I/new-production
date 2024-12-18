@@ -312,6 +312,14 @@ Route::get('/passcodeform', function () {
 // });
 Route::middleware(['web'])->group(function () {
     Route::get('/terms-agreement', function (Request $request) {
+        // テキストファイル(保護者利用規約)のパス
+        $termsFilePath = resource_path('texts/hogosha-terms.txt');
+        $privacypolicyFilePath = resource_path('texts/privacypolicy.txt');
+
+        // ファイルの内容を読み込む
+        $termsText = file_get_contents($termsFilePath);
+        $privacypolicyText = file_get_contents($privacypolicyFilePath);
+
         if (!$request->hasValidSignature()) {
             abort(401, '無効または期限切れのURLです。');
         }
@@ -327,7 +335,7 @@ Route::middleware(['web'])->group(function () {
             abort(400, '無効なIDです。');
         }
 
-        return view('terms-agreement', compact('people_id'));
+        return view('terms-agreement', compact('people_id','termsText','privacypolicyText'));
     })->name('terms.show');
 });
 
