@@ -1255,6 +1255,10 @@
                                           <p class="text-gray-900 font-bold text-xl">食事登録の種類</p>
     <div style="display: flex; flex-direction: row; align-items: center; margin: 10px 0;">
         <label class="mr-4">
+            <input type="radio" name="meal_type" value="oyatsu_only" class="mr-2">
+            間食のみ
+        </label>
+        <label class="mr-4">
             <input type="radio" name="meal_type" value="lunch_only" class="mr-2">
             昼食のみ
         </label>
@@ -1327,6 +1331,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
                    // 両方のデフォルト値を 'あり' に
                 lunchSelect.value = 'あり';
+                oyatsuSelect.value = 'あり';
+            }else if (this.value === 'oyatsu_only') {
+                lunchSection.style.display = 'none';
+                oyatsuSection.style.display = 'block';
+
+                   // 昼食のデフォルト値を 'なし' に
+                lunchSelect.value = 'なし';
                 oyatsuSelect.value = 'あり';
             }
         });

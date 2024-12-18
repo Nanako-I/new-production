@@ -55,8 +55,9 @@
                                             <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
                                                 <select name="lunch" class="mx-1 my-1.5" style="width: 6rem;">
                                                     
-                                                    <option value="あり"{{ $lastFood->lunch === 'あり' ? ' selected' : '' }}>あり</option>
-                                                    <option value="なし"{{ $lastFood->lunch === 'なし' ? ' selected' : '' }}>なし</option>
+                                                    <option value="登録なし" {{ is_null($lastFood->lunch) ? 'selected' : '' }}>選択</option>
+                                                    <option value="あり" {{ $lastFood->lunch === 'あり' ? 'selected' : '' }}>あり</option>
+                                                    <option value="なし" {{ $lastFood->lunch === 'なし' ? 'selected' : '' }}>なし</option>
                                                 </select>
                                             </div>
                                       </div>
@@ -69,10 +70,9 @@
                                         <p class="text-gray-900 font-bold text-xl">間食</p>
                                             <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
                                                 <select name="oyatsu" class="mx-1 my-1.5" style="width: 6rem;">
-                                                    <<option value="あり"{{ $lastFood->oyatsu === 'あり' ? ' selected' : '' }}>あり</option>
-                                                    <option value="なし"{{ $lastFood->oyatsu === 'なし' ? ' selected' : '' }}>なし</option>
-                                                    <!--<option value="あり">あり</option>-->
-                                                    <!--<option value="なし">なし</option>-->
+                                                    <option value="登録なし" {{ is_null($lastFood->oyatsu) ? 'selected' : '' }}>選択</option>
+                                                    <option value="あり" {{ $lastFood->oyatsu === 'あり' ? 'selected' : '' }}>あり</option>
+                                                    <option value="なし" {{ $lastFood->oyatsu === 'なし' ? 'selected' : '' }}>なし</option>
                                                 </select>
                                             </div>
                                       </div>

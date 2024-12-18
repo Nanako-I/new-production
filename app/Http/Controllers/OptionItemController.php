@@ -106,37 +106,34 @@ class OptionItemController extends Controller
     return redirect()->route('people.index');
     }
 
-//     public function change(Request $request, $people_id, $id)
-// {
-//     $person = Person::findOrFail($people_id);
-//     $optionItem = OptionItem::findOrFail($id); // ここで $optionItem を取得
-//     $option = Option::where('id', $optionItem->option_id)->first();
-
-//     return view('optionchange', compact('person', 'optionItem', 'option')); // $optionItem をビューに渡す
-// }
-public function change(Request $request, $people_id, $id)
-{
-    $person = Person::findOrFail($people_id);
-    $optionItem = OptionItem::findOrFail($id);
-    $option = Option::where('id', $optionItem->option_id)->first();
-
-    $validItems = [];
-    for ($i = 1; $i <= 5; $i++) {
-        $itemKey = "item{$i}";
-        if (!empty($option->$itemKey)) {
-            $itemValue = json_decode($optionItem->$itemKey, true);
-            $validItems[$itemKey] = [
-                'optionData' => $option->$itemKey,
-                'itemData' => $itemValue,
-                'isChecked' => is_array($itemValue) && in_array('1', $itemValue)
-            ];
+    public function change(Request $request, $people_id, $id)
+    {
+        $person = Person::findOrFail($people_id);
+        $optionItem = OptionItem::findOrFail($id);
+        $option = Option::where('id', $optionItem->option_id)->first();
+    
+        // optionsテーブルからtitleを取得
+        $optionTitle = $option ? $option->title : 'タイトルが見つかりません';
+    
+        // Get only the items that have data in the options table
+        $validItems = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $itemKey = "item{$i}";
+            $itemData = json_decode($optionItem->$itemKey, true);
+            $isChecked = is_array($itemData) && in_array("1", $itemData);
+    
+            if (!empty($option->$itemKey)) {
+                $validItems[$itemKey] = [
+                    'optionData' => $option->$itemKey,
+                    'itemData' => json_decode($optionItem->$itemKey),
+                    'isChecked' => $isChecked
+                ];
+            }
         }
+    
+        return view('optionchange', compact('person', 'optionItem', 'option', 'validItems', 'optionTitle'));
     }
 
-    \Log::info('Valid Items:', $validItems);
-
-    return view('optionchange', compact('person', 'optionItem', 'option', 'validItems'));
-}
     /**
      * Update the specified resource in storage.
      *

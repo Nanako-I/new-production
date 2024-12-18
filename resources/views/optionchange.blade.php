@@ -14,7 +14,7 @@
         </style>
         <div class ="flex items-center justify-center"  style="padding: 20px 0;">
             <div class="flex flex-col items-center">
-                <h2>{{$person->last_name}}{{$person->first_name}}さんのトレーニング登録</h2>
+                <h2>{{$person->last_name}}{{$person->first_name}}さんの{{ $optionTitle }}登録</h2>
             </div>
         </div>
     </form>
