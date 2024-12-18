@@ -29,15 +29,26 @@
     /*display: flex; /* flexコンテナーとして設定 */
     /*justify-content: flex-end; /* 右端に寄せる */
   }
-    .stamp-box {
-          width: 120px; /* はんこより少し大きめに設定 */
-          height: 120px; /* はんこより少し大きめに設定 */
-          border: 1px solid #000; /* 黒い実線のボーダー */
-          display: flex;
-          justify-content: center;
-          align-items: center;
-           /*display: none; */
-        }
+  .hanko-area {
+    display: flex;
+    align-items: flex-start; /* 上揃え */
+    justify-content: flex-start; /* 左揃え */
+    gap: 10px; /* 要素間のスペース */
+}
+
+.hanko-area textarea {
+    width: 200px; /* 必要に応じて調整 */
+    height: 100px; /* 必要に応じて調整 */
+}
+
+.stamp-box {
+    width: 120px; /* 必要に応じて調整 */
+    height: 120px; /* 必要に応じて調整 */
+    border: 1px solid #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
         /*.stamp-box .hanko {*/
           #hanko {
             font-size: 16px; /* Sassの変数は使用できないため、直接指定 */
@@ -137,10 +148,10 @@
               ダウンロード
           </button>
         </a> -->
-        <a href="{{ url('chat/'.$person->id) }}" class="relative ml-2" style="display: flex; align-items: center;">
+        <!-- <a href="{{ url('chat/'.$person->id) }}" class="relative ml-2" style="display: flex; align-items: center;">
           <i class="fa-solid fa-comments text-sky-500 icon-container mr-5 " style="font-size: 3em; padding: 0 5px; transition: transform 0.2s;"></i>
           @csrf
-        </a>
+        </a> -->
       </div> 
     </div> 
     <style>
@@ -789,7 +800,7 @@
         @if (!$stampExists)
             <form id="hanko-form" action="{{ route('recordstamp.store', $person->id) }}" method="POST">
                 @csrf
-                <p class="text-gray-900 font-bold text-xl px-3">確認後、お名前をご記入いただき「押印する」ボタンを押してください↓</p>
+                <p class="text-gray-900 font-bold text-xl px-3 pt-4">ご確認後、お名前をご記入いただき「押印する」ボタンを押してください↓</p>
                 
                 <div style="display: flex; flex-direction: column; justify-content: flex-start; margin: 10px 0;">
                     <input type="hidden" name="people_id" value="{{ $person->id }}">
@@ -799,20 +810,21 @@
                     <button id="hanko-btn" type="submit" class="inline-flex items-center w-32 px-6 py-3 mt-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
                         押印する
                     </button>
+                    <div class="oya-stamp-box">	
+                      <div class="stamp-box mt-3">	
+                          <div id="hanko">	
+                              <span>確認済</span>	
+                              <hr noshade>	
+                              <span>{{ $today }}</span>	
+                              <hr noshade>	
+                              <span id="hanko-name"></span>	
+                          </div>	
+                      </div>	
+                  </div>	
                 </div>
             </form>
 
-            <div class="oya-stamp-box">	
-                <div class="stamp-box mt-3">	
-                    <div id="hanko">	
-                        <span>確認済</span>	
-                        <hr noshade>	
-                        <span>{{ $today }}</span>	
-                        <hr noshade>	
-                        <span id="hanko-name"></span>	
-                    </div>	
-                </div>	
-            </div>	
+           
         @endif
 
 

@@ -196,6 +196,12 @@
         @endif
       </td>
     </tr>
+    <tr>
+      <td class="px-4 py-2" colspan="3">
+        送り：{{ $time->pick_up ? 'あり' : 'なし' }}、
+        迎え：{{ $time->send ? 'あり' : 'なし' }}
+      </td>
+    </tr>
 @endforeach
   </tbody>
 </table>

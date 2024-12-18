@@ -237,6 +237,23 @@
                         <p class="text-gray-900 font-bold text-xl px-3">{{ $usageTime }}</p>
                     @endif
                 </div>
+                @if($time->pick_up)
+                <p class="text-gray-900 font-bold text-xl px-3">送り：あり</p>
+                @else
+                <p class="text-gray-900 font-bold text-xl px-3">送り：なし</p>
+                @endif
+
+                <!-- 迎えの表示 -->
+                @if($time->send)
+                <p class="text-gray-900 font-bold text-xl px-3">迎え：あり</p>
+                @else
+                <p class="text-gray-900 font-bold text-xl px-3">迎え：なし</p>
+                @endif
+
+                <!-- 欠席の表示 -->
+                @if($time->is_absent)
+                <p class="text-gray-900 font-bold text-xl px-3">欠席</p>
+                @endif
             @endforeach
         </div>
         <hr style="border: 1px solid #666; margin: 0 auto; width: 100%;">
