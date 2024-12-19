@@ -23,6 +23,14 @@
                 </div>
             </div>
 
+            @hasanyrole('super administrator|facility staff administrator|facility staff user|facility staff reader')
+            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+                <div class="max-w-xl">
+                    @include('profile.partials.update-customId-form')
+                </div>
+            </div>
+            @endhasanyrole
+
             <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                 <div class="max-w-xl">
                     @include('profile.partials.update-password-form')
