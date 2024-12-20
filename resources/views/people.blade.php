@@ -42,6 +42,10 @@
   
   body {
     font-family: 'Noto Sans JP', sans-serif; /* フォントをArialに設定 */
+  }
+
+  .backcolor {
+    font-family: 'Noto Sans JP', sans-serif; /* フォントをArialに設定 */
   background: linear-gradient(135deg, rgb(209, 253, 255,0.5), rgb(253, 219, 146,1));
   }
   
@@ -52,7 +56,7 @@
       rel="stylesheet">
         
            
-   <div class="flex flex-col items-center justify-center w-full my-2">
+   <!-- <div class="flex flex-col items-center justify-center w-full my-2">
         <style>
          @import url('https://fonts.googleapis.com/css2?family=Arial&display=swap');
             h1 {
@@ -60,12 +64,12 @@
           }
         </style>
       <h1 class="sm:text-2xl text-3xl font-bold title-font mb-4 text-gray-900" _msttexthash="91611" _msthidden="1" _msthash="63"></h1>
-    </div>
+    </div> -->
     
  <!-- 利用者情報 -->
 
 @hasanyrole('super administrator|facility staff administrator|facility staff user|facility staff reader')
-  <div class="flex flex-row justify-start w-screen">
+  <div class="backcolor flex flex-row justify-start w-screen">
   <!-- <div class="flex flex-row justify-start w-screen overflow-x-auto"> -->
     <div class="slider">
     @csrf
@@ -216,7 +220,6 @@
                                                 <a href="{{ url('hogoshatext/'.$person->id) }}" class="relative">
                                                     <summary class="text-red-500 font-bold text-xl">登録する</summary>
                                                     @csrf
-                                                    <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
                                                 </a>
                                             @endif
                                         </div>
@@ -1217,9 +1220,13 @@
                                     
                                    <div class="flex items-center justify-center p-4">
                                         @php
-                                           $lastFood = $person->foods->last();
+                                           $today = \Carbon\Carbon::now()->toDateString();
+                                            $lastFood = $person->foods()
+                                                ->whereDate('created_at', $today)
+                                                ->latest()  // 最新のレコードを取得
+                                                ->first();
                                         @endphp
-                                            @if (!$lastFood || $lastFood->created_at->diffInHours(now()) >= 6)
+                                        @if (!$lastFood || !$lastFood->created_at->isSameDay(now()))
                                             
                                     <!-- 検温フォーム -->
                                        <style>
@@ -2214,7 +2221,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 <a href="{{ url('notebookwriting/'.$person->id) }}" class="relative">
                                                     <summary class="text-red-500 font-bold text-xl">登録する</summary>
                                                     @csrf
-                                                    <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
                                                 </a>
                                             @endif
                                         </div>
