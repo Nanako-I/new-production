@@ -30,7 +30,7 @@ class Person extends Model
        
     }
     
-    // 中間テーブルpeople_familyと紐づける↓
+    //  // 中間テーブルpeople_familiesテーブルで紐づける↓
     public function people_family(): BelongsToMany
     {
   //↓ belongsToMany('多対多の相手側のクラス名…ClassName::class','中間テーブルの名前',　'このモデルを参照する中間テーブルの外部キー名', '相手側のモデルを参照する中間テーブルの外部キー名')

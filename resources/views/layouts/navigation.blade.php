@@ -81,6 +81,12 @@
                             {{ __('新規の利用者登録') }}
                         </x-nav-link>
                     </div>
+
+                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('calendar') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
+                         <x-nav-link :href="url('brother-invitation')" :active="request()->is('brother.invitation')">
+                            {{ __('利用者とご家族一覧') }}
+                        </x-nav-link>
+                    </div>
                     
                      <!-- <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('calendar') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
                          <x-nav-link :href="url('calendar')" :active="request()->is('calendar')">
@@ -152,6 +158,10 @@
                     {{ __('新規の利用者登録') }}
                 </x-dropdown-link>
 
+                <x-dropdown-link :href="url('brother-invitation')" class="text-lg">
+                    {{ __('利用者とご家族一覧') }}
+                </x-dropdown-link>
+
                 <!-- <x-dropdown-link :href="url('before-invitation')" class="text-lg">
                     {{ __('保護者を招待する') }}
                 </x-dropdown-link> -->
@@ -216,8 +226,12 @@
                     {{ __('利用者の新規登録') }}
                 </x-dropdown-link>
 
-                <x-dropdown-link :href="url('show.items')" class="text-lg">
+                <x-dropdown-link :href="route('show.items', ['id' => auth()->user()->facility_staffs()->first()->id])" class="text-lg">
                     {{ __('事業所の共通記録追加') }}
+                </x-dropdown-link>
+
+                <x-dropdown-link :href="url('brother-invitation')" class="text-lg">
+                    {{ __('利用者とご家族一覧') }}
                 </x-dropdown-link>
 
                 <!-- <x-dropdown-link :href="url('before-invitation')" class="text-lg">
