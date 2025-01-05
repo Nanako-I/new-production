@@ -149,15 +149,16 @@
         </div>
     </form>
 
-    <form action="{{ route('people.delete', ['id'=>$person->id]) }}" method="POST">
-    @csrf
+    
         <div class="flex justify-center my-4">
-            <button class="delete-btn font-semibold px-4 py-2 bg-red-500 text-lg text-white rounded-md hover:bg-red-600" data-id="{{ $person->id }}" data-toggle="modal" data-target="#confirmDeleteModal">
+            <button class="delete-btn font-semibold px-4 py-2 bg-gray-600 text-lg text-white rounded-md hover:bg-gray-500" data-toggle="modal" data-target="#confirmDeleteModal">
                 利用者を削除する
             </button>
         </div>
-    </form>
+    
 <!-- モーダルダイアログ -->
+<form action="{{ route('people.delete', ['id'=>$person->id]) }}" method="POST">
+@csrf
     <div class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center hidden" id="confirmDeleteModal">
         <div class="modal-overlay absolute w-full h-full bg-gray-600 opacity-50"></div>
 
@@ -181,12 +182,12 @@
                 <!--Footer-->
                 <div class="flex justify-end pt-2">
                     <button type="button" class="px-4 bg-blue-800 p-3 rounded-lg text-white hover:bg-blue-400 mr-2" data-dismiss="modal">キャンセル</button>
-                    <button type="button" class="px-4 bg-red-500 p-3 rounded-lg text-white hover:bg-red-400" id="deleteBtn">削除</button>
+                    <button type="button" class="px-4 bg-red-500 p-3 rounded-lg text-white hover:bg-red-400" id="confirmDeleteButton" data-id="{{ $person->id }}">削除</button>
                 </div>
             </div>
         </div>
     </div>
-
+</form>
  <script src="https://unpkg.com/vue@3.2.47/dist/vue.global.prod.js"></script>
  <!--jquery3.6.4をCDN経由で呼び出し↓-->
  <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
@@ -198,14 +199,14 @@ var deleteForm; // 削除するフォームを保存する変数
 
 document.querySelectorAll('.delete-btn').forEach(button => {
     button.addEventListener('click', function() {
-        const personId = this.getAttribute('data-id');
-        alert('削除する利用者のID: ' + personId);
-        deleteForm = this.closest('form'); // フォームを取得して保存
         document.getElementById('confirmDeleteModal').classList.remove('hidden');
     });
 });
 
-document.getElementById('deleteBtn').addEventListener('click', function() {
+document.getElementById('confirmDeleteButton').addEventListener('click', function() {
+    const personId = this.getAttribute('data-id');
+        // alert('削除する利用者のID: ' + personId);
+        deleteForm = this.closest('form'); // フォームを取得して保存
     deleteForm.submit(); // モーダルの削除ボタンがクリックされたらフォームを送信
     document.getElementById('confirmDeleteModal').classList.add('hidden');
 });

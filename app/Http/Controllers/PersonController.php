@@ -851,7 +851,7 @@ public function updateFacilityItems(Request $request, $facility_id)
          // 手動で関連するoptionsレコードを削除
         DB::table('options')->where('people_id', $person->id)->delete();
         $person->delete();
-        return redirect('/people');
+        return redirect()->route('people.index')->with('success', '利用者の削除が完了しました。');
        
     
     }
