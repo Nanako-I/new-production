@@ -844,10 +844,15 @@ public function updateFacilityItems(Request $request, $facility_id)
      * @param  \App\Models\Person  $person
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Person $person)
+    public function destroy($id)
     {
-
+       
+        $person = Person::find($id);
+         // 手動で関連するoptionsレコードを削除
+        DB::table('options')->where('people_id', $person->id)->delete();
         $person->delete();
         return redirect('/people');
+       
+    
     }
 }

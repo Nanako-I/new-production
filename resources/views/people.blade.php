@@ -691,13 +691,11 @@
                                                                         <p class="text-gray-900 font-bold text-xl px-1">{{ $option->$itemKey }}</p>
                                                                     @endif
                                                                 @endfor
-                                                                <p class="text-gray-600 text-sm">{{ $optionItem->created_at->format('H:i') }}</p>
                                                             </div>
                                                         @endforeach
                                                         
                                                         <a href="{{ url('optionchange/' . $person->id . '/' . $optionItem->id) }}" class="text-stone-500">
                                                             <i class="fa-solid fa-pencil text-stone-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
-                                                            編集
                                                         </a>
                                                     </div>
                                                 @endif

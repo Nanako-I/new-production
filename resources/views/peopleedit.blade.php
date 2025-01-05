@@ -148,11 +148,75 @@
             </div>
         </div>
     </form>
-    <script src="https://unpkg.com/vue@3.2.47/dist/vue.global.prod.js"></script>
+
+    <form action="{{ route('people.delete', ['id'=>$person->id]) }}" method="POST">
+    @csrf
+        <div class="flex justify-center my-4">
+            <button class="delete-btn font-semibold px-4 py-2 bg-red-500 text-lg text-white rounded-md hover:bg-red-600" data-id="{{ $person->id }}" data-toggle="modal" data-target="#confirmDeleteModal">
+                利用者を削除する
+            </button>
+        </div>
+    </form>
+<!-- モーダルダイアログ -->
+    <div class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center hidden" id="confirmDeleteModal">
+        <div class="modal-overlay absolute w-full h-full bg-gray-600 opacity-50"></div>
+
+            <!--<div class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">-->
+            <div class="modal-container bg-white w-full max-w-xs mx-auto rounded shadow-lg z-50 overflow-y-auto">
+            <!-- Add margin if you want to see some of the overlay behind the modal-->
+            <div class="modal-content py-4 text-left px-6">
+                <!--Title-->
+                <div class="flex justify-between items-center pb-3">
+                    <p class="text-2xl font-bold">本当に{{ $person->last_name }}{{ $person->first_name }}さんを削除しますか？</p>
+                    <div class="modal-close cursor-pointer z-50" data-dismiss="modal">
+                        <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                            <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <!--Body-->
+                <p class="font-bold">削除したデータは復元できません。</p>
+
+                <!--Footer-->
+                <div class="flex justify-end pt-2">
+                    <button type="button" class="px-4 bg-blue-800 p-3 rounded-lg text-white hover:bg-blue-400 mr-2" data-dismiss="modal">キャンセル</button>
+                    <button type="button" class="px-4 bg-red-500 p-3 rounded-lg text-white hover:bg-red-400" id="deleteBtn">削除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ <script src="https://unpkg.com/vue@3.2.47/dist/vue.global.prod.js"></script>
  <!--jquery3.6.4をCDN経由で呼び出し↓-->
  <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
 
  <script>
+// 利用者削除ボタン・モーダルの処理↓
+document.addEventListener('DOMContentLoaded', function () {
+var deleteForm; // 削除するフォームを保存する変数
+
+document.querySelectorAll('.delete-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const personId = this.getAttribute('data-id');
+        alert('削除する利用者のID: ' + personId);
+        deleteForm = this.closest('form'); // フォームを取得して保存
+        document.getElementById('confirmDeleteModal').classList.remove('hidden');
+    });
+});
+
+document.getElementById('deleteBtn').addEventListener('click', function() {
+    deleteForm.submit(); // モーダルの削除ボタンがクリックされたらフォームを送信
+    document.getElementById('confirmDeleteModal').classList.add('hidden');
+});
+
+document.querySelectorAll('[data-dismiss="modal"]').forEach(button => {
+    button.addEventListener('click', function() {
+        document.getElementById('confirmDeleteModal').classList.add('hidden');
+    });
+});
+});
+
    function createIcon(iconClass, label) {
     const icon = document.createElement('div');
     icon.className = 'flex flex-col items-center cursor-pointer';
@@ -369,6 +433,8 @@ function removeExistingElements() {
         alert('エラーが発生しました。');
     });
 });
+
+
 </script>
 
 <style>
@@ -415,7 +481,7 @@ function removeExistingElements() {
 
 
 
-<script>
+<!-- <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Get all elements with the class 'invite-siblings'
     const inviteSiblingsLinks = document.querySelectorAll('.invite-siblings');
@@ -469,6 +535,8 @@ document.getElementById('generateUrlsButton').addEventListener('click', function
     const urls = createEncryptedUrls();
     // ここでURLを使用する処理を追加（例：表示、送信など）
 });
-</script>
+
+
+</script> -->
 </body>
 </x-app-layout>
