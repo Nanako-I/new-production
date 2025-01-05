@@ -161,7 +161,7 @@
         @csrf
     <input type="hidden" name="people_id" value="{{ $person->id }}">
     <div id="add-item-modal" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 hidden">
-        <div class="bg-white rounded-lg p-6 w-1/2">
+        <div class="bg-white rounded-lg p-6 w-1/2" id="modalContent">
             <h3 class="text-lg font-semibold mb-4">新しい記録項目を追加</h3>
 
             <!-- エラーメッセージの表示 -->
@@ -202,8 +202,11 @@
 
                 <!-- 項目入力フィールド（最初の一つ） -->
                 @foreach(old('item', []) as $i => $value)
-                    <div class="item-field mb-2">
+                    <div class="item-field mb-2 flex items-center">
                         <input type="text" name="item[]" class="border border-gray-300 rounded-md w-full px-3 py-2" value="{{ $value }}" placeholder="項目を入力" maxlength="32">
+                        <button type="button" class="remove-item-field ml-2 text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                         @error("item.$i")
                             <p class="text-red-500 text-base mt-2">{{ $message }}</p>
                         @enderror
@@ -212,8 +215,11 @@
 
                 <!-- 最初の1つの入力フィールドを表示 -->
                 @if(count(old('item', [])) === 0)
-                    <div class="item-field mb-2">
+                    <div class="item-field mb-2 flex items-center">
                         <input type="text" name="item[]" class="border border-gray-300 rounded-md w-full px-3 py-2" placeholder="項目を入力" maxlength="32">
+                        <button type="button" class="remove-item-field ml-2 text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     </div>
                 @endif
             </div>
@@ -286,14 +292,32 @@
             closeModalButton.addEventListener('click', closeModal);
 
             // 項目入力フィールドを追加する関数
-            function addItemField() {
-                const itemFieldHTML = `
-                    <div class="item-field mb-2">
-                        <input type="text" name="item[]" class="border border-gray-300 rounded-md w-full px-3 py-2" placeholder="項目を入力" maxlength="32">
-                    </div>
-                `;
-                itemFieldsContainer.insertAdjacentHTML('beforeend', itemFieldHTML);
-            }
+            const maxItems = 5; // 最大項目数
+
+            addItemFieldButton.addEventListener('click', function() {
+                const currentItemFields = itemFieldsContainer.querySelectorAll('.item-field').length;
+                if (currentItemFields < maxItems) {
+                    const itemFieldHTML = `
+                        <div class="item-field mb-2 flex items-center">
+                            <input type="text" name="item[]" class="border border-gray-300 rounded-md w-full px-3 py-2" placeholder="項目を入力" maxlength="32">
+                            <button type="button" class="remove-item-field ml-2 text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    `;
+                    itemFieldsContainer.insertAdjacentHTML('beforeend', itemFieldHTML);
+                } else {
+                    alert('記録項目は最大5つまでです。');
+                }
+            });
+
+            // ゴミ箱アイコンをクリックしたときにフィールドを削除
+            itemFieldsContainer.addEventListener('click', function(e) {
+                if (e.target.closest('.remove-item-field')) {
+                    const itemField = e.target.closest('.item-field');
+                    itemField.remove();
+                }
+            });
 
             // 「＋」ボタンのイベントリスナー
             addItemFieldButton.addEventListener('click', addItemField);
@@ -479,6 +503,8 @@
                         formErrorMessage.textContent = error.response?.data?.message || 'エラーが発生しました。再度お試しください。';
                     });
             }
-        });
+
+            
+});
     </script>
 </x-app-layout>
