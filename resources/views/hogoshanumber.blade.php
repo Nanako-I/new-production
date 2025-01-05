@@ -66,7 +66,7 @@
             </div> -->
             
             <div class="flex flex-col items-center justify-center pt-2">
-                <p class="text-gray-900 font-bold text-xl">ご家族の生年月日</p>
+                <p class="text-gray-900 font-bold text-xl">お子さまの生年月日をご入力ください</p>
                 <input name="date_of_birth" type="date" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm text-xl font-bold border-gray-300 rounded-md" placeholder="生年月日">
             </div>
             

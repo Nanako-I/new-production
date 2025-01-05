@@ -1,16 +1,20 @@
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 <x-app-layout>
 
-    <!--ヘッダー[START]-->
-
-    <!--ヘッダー[END]-->
 
         <!-- バリデーションエラーの表示に使用-->
        <!-- resources/views/components/errors.blade.php -->
+<!-- 保護者の登録完了のメッセージ表示に使用-->
+    @if (session('success') || isset($success))
+    <div class="bg-green-500 text-white p-4 rounded-lg mb-4">
+        {!! session('success') ?? $success !!}
+    </div>
+    @endif
+<!-- hogoshaのrouteに戻った時の成功メッセージを表示させるように書いてあったが、現状の導入先で活用しているコード箇所はなさそう-->
         @if (session('success'))
         <div class="bg-green-500 text-white p-4 rounded-lg mb-4">
-                {{ session('success') }}
-            </div>
+            {!! session('success') !!}
+        </div>
         @endif
 
         @if (count($errors) > 0)

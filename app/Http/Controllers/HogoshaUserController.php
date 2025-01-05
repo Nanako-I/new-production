@@ -552,7 +552,7 @@ if (!$person) {
             
             if (!$registerData) {
             // throw new \Exception('セッションの登録データが見つかりませんでした。');
-            $error = 'セッションの登録データが見つかりませんでした。';
+            $error = '登録処理中にエラーが発生しました。お手数ですが再度ご登録をお試しください。';
             return view('hogoshanumber', compact('error'));
         }
 
@@ -596,12 +596,14 @@ if (!$person) {
             Log::error('メール送信に失敗しました。', ['email' => $user->email, 'error' => $e->getMessage()]);
         }
             // hogosha ビューにデータを渡して表示
-            return view('hogosha', compact('people', 'unreadMessages'));
+            return view('hogosha', compact('people', 'unreadMessages'))
+                   ->with('success', 'ご登録完了ありがとうございます。<br>メールにて今後こちらのアプリへのログインのURLをお送りしておりますのでご確認ください。');
+           
         } catch (\Exception $e) {
             DB::rollBack();
             // Log::error('登録処理中のエラー: ' . $e->getMessage());
             // Log::error('エラーの詳細: ' . $e->getTraceAsString());
-            $error = '登録処理中にエラーが発生しました。もう一度お試しください。';
+            $error = '登録処理中にエラーが発生しました。お手数ですが再度ご登録をお試しください。';
             return view('hogoshanumber', compact('error'));
         }
     } else {
