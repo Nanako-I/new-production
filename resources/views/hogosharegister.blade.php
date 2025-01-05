@@ -64,6 +64,12 @@
             background-color: rgba(0, 0, 0, 0.5); /* 薄いグレー */
             z-index: 999; /* モーダルの下に表示 */
         }
+
+        .error-message {
+            color: #f00; /* 赤色 */
+            font-weight: bold; /* 太字 */
+            font-size: 1.1em; /* 少し大きく */
+        }
     </style>
 </head>
 @if (isset($error))
@@ -100,13 +106,13 @@
             <x-input-label for="last_name" :value="__('姓')" class="large-label" />
             <x-text-input id="last_name" class="block mt-1 w-full" type="text" name="last_name" :value="old('last_name')" required autofocus autocomplete="last_name" />
             <span id="last_name_error" class="error"></span>
-            <x-input-error :messages="$errors->get('last_name')" class="mt-2" />
+            <x-input-error :messages="$errors->get('last_name')" class="error-message" />
         </div>
         <div class="flex-1">
             <x-input-label for="first_name" :value="__('名')" class="large-label" />
             <x-text-input id="first_name" class="block mt-1 w-full" type="text" name="first_name" :value="old('first_name')" required autocomplete="first_name" />
             <span id="first_name_error" class="error"></span>
-            <x-input-error :messages="$errors->get('first_name')" class="mt-2" />
+            <x-input-error :messages="$errors->get('first_name')" class="error-message" />
         </div>
     </div>
 
@@ -114,14 +120,14 @@
         <div class="flex-1">
             <x-input-label for="last_name_kana" :value="__('セイ(カナ)')" class="large-label" />
             <x-text-input id="last_name_kana" class="block mt-1 w-full" type="text" name="last_name_kana" :value="old('last_name_kana')" autocomplete="last_name_kana" />
-            <span id="last_name_kana_error" class="error"></span>
-            <x-input-error :messages="$errors->get('last_name_kana')" class="mt-2" />
+            <span id="last_name_kana_error" class="error-message"></span>
+            <x-input-error :messages="$errors->get('last_name_kana')" class="error-message" />
         </div>
         <div class="flex-1">
             <x-input-label for="first_name_kana" :value="__('メイ(カナ)')" class="large-label" />
             <x-text-input id="first_name_kana" class="block mt-1 w-full" type="text" name="first_name_kana" :value="old('first_name_kana')" autocomplete="first_name_kana" />
-            <span id="first_name_kana_error" class="error"></span>
-            <x-input-error :messages="$errors->get('first_name_kana')" class="mt-2" />
+            <span id="first_name_kana_error" class="error-message"></span>
+            <x-input-error :messages="$errors->get('first_name_kana')" class="error-message" />
         </div>
     </div>
 
@@ -129,24 +135,24 @@
     <div class="mt-4">
         <x-input-label for="email" :value="__('Email')" />
         <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-        <span id="email_error" class="error"></span>
-        <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <span id="email_error" class="error-message"></span>
+        <x-input-error :messages="$errors->get('email')" class="error-message" />
     </div>
 
     <!-- Password -->
     <div class="mt-4">
-        <x-input-label for="password" :value="__('パスワード（英語大文字小文字・数字を含む8文字以上）')" />
+        <x-input-label for="password" :value="__('パスワード（アルファベット大文字小文字・数字を含む8文字以上）')" />
         <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-        <span id="password_error" class="error"></span>
-        <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        <span id="password_error" class="error-message"></span>
+        <x-input-error :messages="$errors->get('password')" class="error-message" />
     </div>
 
     <!-- Confirm Password -->
     <div class="mt-4">
         <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
         <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
-        <span id="password_confirmation_error" class="error"></span>
-        <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+        <span id="password_confirmation_error" class="error-message"></span>
+        <x-input-error :messages="$errors->get('password_confirmation')" class="error-message" />
     </div>
         
         
@@ -174,32 +180,32 @@
 
     <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // const form = document.getElementById('registerForm');
-    // const inputs = form.querySelectorAll('input');
-    // const submitButton = form.querySelector('button[type="submit"]');
+    const form = document.getElementById('registerForm');
+    const inputs = form.querySelectorAll('input');
+    const submitButton = form.querySelector('button[type="submit"]');
 
-    // inputs.forEach(input => {
-    //     input.addEventListener('input', function() {
-    //         validateField(this);
-    //     });
-    // });
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            validateField(this);
+        });
+    });
 
-    // form.addEventListener('submit', function(e) {
-    //     e.preventDefault();
-    //     if (validateForm()) {
-    //         submitForm();
-    //     }
-    // });
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (validateForm()) {
+            submitForm();
+        }
+    });
 
-    // function validateForm() {
-    //     let isValid = true;
-    //     inputs.forEach(input => {
-    //         if (!validateField(input)) {
-    //             isValid = false;
-    //         }
-    //     });
-    //     return isValid;
-    // }
+    function validateForm() {
+        let isValid = true;
+        inputs.forEach(input => {
+            if (!validateField(input)) {
+                isValid = false;
+            }
+        });
+        return isValid;
+    }
 
     function validateField(field) {
         const errorSpan = document.getElementById(field.id + '_error');
@@ -316,92 +322,6 @@ document.addEventListener('DOMContentLoaded', function() {
 //     }
 });
 
-// document.getElementById('registerForm').addEventListener('submit', function(event) {
-//     event.preventDefault(); // フォームのデフォルトの送信を防ぐ
-
-//     const formData = new FormData(this);
-
-//     fetch(this.action, {
-//         method: 'POST',
-//         body: formData,
-//         headers: {
-//             'X-Requested-With': 'XMLHttpRequest'
-//         }
-//     })
-//     .then(response => {
-//         if (!response.ok) {
-//             throw new Error('Network response was not ok');
-//         }
-//         return response.json();
-//     })
-//     .then(data => {
-//         console.log('レスポンスデータ:', data); // レスポンスデータをコンソールに出力
-
-//         if (data.success) {
-//             alert(data.message);
-//             window.location.href = data.redirect;
-//         } else {
-//             alert('エラー: ' + (data.message || '不明なエラーが発生しました。'));
-//         }
-//     })
-//     .catch(error => {
-//         console.error('エラー:', error);
-//         alert('登録処理中にエラーが発生しました。もう一度お試しください。');
-//     });
-// });
-// document.addEventListener('DOMContentLoaded', function() {
-//     const form = document.getElementById('registerForm');
-//     const submitButton = form.querySelector('button[type="submit"]');
-
-//     function validateForm() {
-//         let isValid = true;
-//         inputs.forEach(input => {
-//             if (!validateField(input)) {
-//                 isValid = false;
-//             }
-//         });
-//         return isValid;
-//     }
-
-//     form.addEventListener('submit', function(e) {
-//         e.preventDefault();
-//         if (validateForm()) {
-//             submitForm();
-//         }
-//     });
-
-//     function submitForm() {
-//         // 送信ボタンを無効化
-//         submitButton.disabled = true;
-
-//         // FormDataオブジェクトの作成
-//         const formData = new FormData(form);
-
-//         // AJAXリクエストの送信
-//         fetch(form.action, {
-//             method: 'POST',
-//             body: formData,
-//             headers: {
-//                 'X-Requested-With': 'XMLHttpRequest'
-//             }
-//         })
-//         .then(response => response.json())
-//         .then(data => {
-//             if (data.success) {
-//                 window.location.href = data.redirect;
-//             } else {
-//                 // エラー処理
-//                 displayErrors(data.errors);
-//                 submitButton.disabled = false;
-//             }
-//         })
-//         .catch(error => {
-//             console.error('エラー:', error);
-//             alert('登録処理中にエラーが発生しました。もう一度お試しください。');
-//             submitButton.disabled = false;
-//         });
-//     }});
-
 document.getElementById('registerButton').addEventListener('click', function() {
     // モーダルメッセージを設定
     const personName = "{{ $person->last_name }} {{ $person->first_name }}";
@@ -468,6 +388,8 @@ document.getElementById('modalOverlay').addEventListener('click', function() {
     document.getElementById('confirmationModal').style.display = 'none';
     document.getElementById('modalOverlay').style.display = 'none';
 });
+
+
 </script>
 </body>
 </html>

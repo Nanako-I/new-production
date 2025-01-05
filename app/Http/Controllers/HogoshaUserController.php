@@ -15,6 +15,7 @@ use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Mail;
 
 use App\Models\User;
 use App\Models\Facility;
@@ -22,6 +23,7 @@ use App\Models\Person;
 use App\Models\Role;
 use App\Models\Chat;
 use Carbon\Carbon;
+use App\Mail\RegistrationCompleted;
 
 class HogoshaUserController extends Controller
 {
@@ -583,6 +585,16 @@ if (!$person) {
             ->where('is_read', false)
             ->where('user_identifier', '!=', $user->id)
             ->exists();
+            // dd($user->email);
+            // メール送信 
+            try {
+            Mail::to($user->email)->send(new RegistrationCompleted($user));
+            // メール送信が成功した場合のログ
+            Log::info('メールが正常に送信されました。', ['email' => $user->email]);
+        } catch (\Exception $e) {
+            // メール送信が失敗した場合のログ
+            Log::error('メール送信に失敗しました。', ['email' => $user->email, 'error' => $e->getMessage()]);
+        }
             // hogosha ビューにデータを渡して表示
             return view('hogosha', compact('people', 'unreadMessages'));
         } catch (\Exception $e) {
