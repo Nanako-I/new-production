@@ -363,8 +363,13 @@ $headers = [
      * @param  \App\Models\Speech  $speech
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Speech $speech)
+    public function destroy($id)
     {
-        //
+       
+        $lastNotebook = Notebook::find($id);
+    if ($lastNotebook) {
+        $lastNotebook->delete();
+    }
+        return redirect()->route('people.index')->with('success', '削除が完了しました。');
     }
 }

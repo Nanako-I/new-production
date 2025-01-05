@@ -116,6 +116,17 @@
             表示
           </button>  
      </form> 
+
+     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('selected_date');
+
+            dateInput.addEventListener('change', function() {
+                // 日付が選択されたらフォームを自動送信
+                document.getElementById('date-form').submit();
+            });
+        });
+    </script>
     @if($stampExists && $isConfirmed)
       <div class="bg-green-50 text-green-700 px-6 py-3 rounded-lg font-medium text-center text-xl">
           {{ $selectedDate }}の記録はご家族確認済みです
@@ -192,13 +203,12 @@
   <div class="container px-5 pb-24 mx-auto flex flex-wrap" _msthidden="10">
    <div class="flex flex-col flex-wrap lg:py-6 -mb-10 lg:w-1/2 lg:pl-12 lg:text-left text-center" _msthidden="9">
 
-  @if ($timesOnSelectedDate->count() > 0)
+   @if ($timesOnSelectedDate->count() > 0)
    <div class="flex flex-col mb-10 lg:items-start items-center" _msthidden="3">
         <div class="w-12 h-12 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 mb-5">
-         
             <i class="fa-solid fa-clock text-gray-700" style="font-size: 1.5em; transition: transform 0.2s;"></i>
-         </div>
-        <div class="flex-grow p-4" _msthidden="3">
+        </div>
+        <div class="time-date flex-grow p-4 w-full" _msthidden="3">
           <h2 class="text-gray-900 text-lg title-font font-medium mb-3" _msttexthash="204971" _msthidden="1" _msthash="743">利用日</h2>
           
           @foreach ($timesOnSelectedDate as $index => $time)
@@ -207,6 +217,8 @@
                     $startTime = $time->start_time ? \Carbon\Carbon::parse($time->start_time) : null;
                     $endTime = $time->end_time ? \Carbon\Carbon::parse($time->end_time) : null;
                     $usageTime = $startTime && $endTime ? $startTime->diff($endTime)->format('%H時間%I分') : null;
+                    $today = \Carbon\Carbon::now()->toDateString();
+                    $isToday = $time->date === $today;
                 @endphp
 
                 <div class="flex justify-start text-left items-start">
@@ -218,72 +230,94 @@
                     </p>
                 </div>
 
-                <div class="flex justify-start text-left items-start">
-                    @if (is_null($startTime) && is_null($endTime))
-                        <p class="text-gray-900 font-bold text-xl px-3">時間未登録</p>
-                    @elseif (is_null($startTime))
-                        <p class="text-gray-900 font-bold text-xl px-3">未設定～{{ $endTime->format('H時i分') }}</p>
-                    @elseif (is_null($endTime))
-                        <p class="text-gray-900 font-bold text-xl px-3">{{ $startTime->format('H時i分') }}～未設定</p>
-                    @else
-                        <p class="text-gray-900 font-bold text-xl px-3">{{ $startTime->format('H時i分') }}</p>
-                        ～ 
-                        <p class="text-gray-900 font-bold text-xl px-3">{{ $endTime->format('H時i分') }}</p>
-                    @endif
-                </div>
-                
-                <div class="flex justify-start text-left items-start">
-                    @if ($usageTime)
-                        <p class="text-gray-900 font-bold text-xl px-3">{{ $usageTime }}</p>
-                    @endif
-                </div>
-                @if($time->pick_up)
-                <p class="text-gray-900 font-bold text-xl px-3">送り：あり</p>
-                @else
-                <p class="text-gray-900 font-bold text-xl px-3">送り：なし</p>
-                @endif
+                <div class="flex justify-between items-center w-full">
+                    <div class="flex-grow">
+                        <div class="flex justify-start text-left items-start">
+                            @if (is_null($startTime) && is_null($endTime))
+                                <p class="text-gray-900 font-bold text-xl px-3">時間未登録</p>
+                            @elseif (is_null($startTime))
+                                <p class="text-gray-900 font-bold text-xl px-3">未設定～{{ $endTime->format('H時i分') }}</p>
+                            @elseif (is_null($endTime))
+                                <p class="text-gray-900 font-bold text-xl px-3">{{ $startTime->format('H時i分') }}～未設定</p>
+                            @else
+                                <p class="text-gray-900 font-bold text-xl px-3">{{ $startTime->format('H時i分') }}</p>
+                                ～ 
+                                <p class="text-gray-900 font-bold text-xl px-3">{{ $endTime->format('H時i分') }}</p>
+                            @endif
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <div>
+                                @if ($usageTime)
+                                    <p class="text-gray-900 font-bold text-xl px-3">{{ $usageTime }}</p>
+                                @endif
+                            </div>
+                            <div>
+                                <a href="{{ url('timechange/'.$person->id . '/'.$time->id) }}" class="flex items-center ml-4">
+                                <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="flex justify-start text-left items-start">
+                         <!-- 迎えの表示 -->
+                          @if($time->send)
+                          <p class="text-gray-900 font-bold text-xl px-3">迎え：あり</p>
+                          @else
+                          <p class="text-gray-900 font-bold text-xl px-3">迎え：なし</p>
+                          @endif
+                        </div>
 
-                <!-- 迎えの表示 -->
-                @if($time->send)
-                <p class="text-gray-900 font-bold text-xl px-3">迎え：あり</p>
-                @else
-                <p class="text-gray-900 font-bold text-xl px-3">迎え：なし</p>
-                @endif
+                        <div class="flex justify-start text-left items-start">
+                          @if($time->pick_up)
+                          <p class="text-gray-900 font-bold text-xl px-3">送り：あり</p>
+                          @else
+                          <p class="text-gray-900 font-bold text-xl px-3">送り：なし</p>
+                          @endif
+                        </div>                        
 
-                <!-- 欠席の表示 -->
-                @if($time->is_absent)
-                <p class="text-gray-900 font-bold text-xl px-3">欠席</p>
-                @endif
+                        <!-- 欠席の表示 -->
+                        @if($time->is_absent)
+                        <p class="text-gray-900 font-bold text-xl px-3">欠席</p>
+                        @endif
+                    </div>
+                </div>
             @endforeach
         </div>
         <hr style="border: 1px solid #666; margin: 0 auto; width: 100%;">
-      </div>
-    @endif
+    </div>
+@endif
 
-   @if ($foodsOnSelectedDate->count() > 0)
+@if ($foodsOnSelectedDate->count() > 0)
    <div class="flex flex-col mb-10 lg:items-start items-center" _msthidden="3">
-        <div class="w-12 h-12 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 mb-5">
-         
+        <div class="w-12 h-12 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 mb-5">        
             <i class="fa-solid fa-bowl-rice text-gray-700" style="font-size: 1.5em; transition: transform 0.2s;"></i>
-         </div>
-        <div class="flex-grow p-4" _msthidden="3">
+        </div>
+        <div class="flex-grow p-4 w-full" _msthidden="3">
           <h2 class="text-gray-900 text-lg title-font font-medium mb-3" _msttexthash="204971" _msthidden="1" _msthash="743">食事</h2>
           
           @foreach ($foodsOnSelectedDate as $index => $food)
-            <div class="flex justify-start text-left items-start">
-                <p class="text-gray-900 font-bold text-xl px-3">{{ $food->lunch == 'あり' ? '昼食' : ($food->lunch != 'なし' ? $food->lunch : '') }}</p>
-                <p class="text-gray-900 font-bold text-xl px-3">{{ $food->lunch_bikou }}</p>
+          <div class="flex justify-between items-center w-full mb-4">
+            <div class="flex flex-col justify-start text-left items-start flex-grow">
+                <div class="flex items-center mb-2">
+                    <p class="text-gray-900 font-bold text-xl">{{ $food->lunch == 'あり' ? '昼食' : ($food->lunch != 'なし' ? $food->lunch : '') }}</p>
+                    <p class="text-gray-900 font-bold text-xl ml-3">{{ $food->lunch_bikou }}</p>
+                </div>
+                <div class="flex items-center">
+                    <p class="text-gray-900 font-bold text-xl">{{ $food->oyatsu == 'あり' ? '間食' : ($food->oyatsu != 'なし' ? $food->oyatsu : '') }}</p>
+                    <p class="text-gray-900 font-bold text-xl ml-3">{{ $food->oyatsu_bikou }}</p>
+                </div>
             </div>
-            
-            <div class="flex justify-start text-left items-start">
-                <p class="text-gray-900 font-bold text-xl px-3">{{ $food->oyatsu == 'あり' ? '間食' : ($food->oyatsu != 'なし' ? $food->oyatsu : '') }}</p>
-                <p class="text-gray-900 font-bold text-xl px-3">{{ $food->oyatsu_bikou }}</p>
-            </div>
+            <a href="{{ route('food.change', ['people_id' => $person->id, 'id' => $food->id]) }}" class="flex items-center">
+              @csrf
+              <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
+            </a>
+          </div>
           @endforeach
+        
         </div>
         <hr style="border: 1px solid #666; margin: 0 auto; width: 100%;">
-      </div>
-    @endif
+   </div>
+@endif
 
     @if($temperaturesOnSelectedDate->count() > 0)
       <div class="flex flex-col mb-10 lg:items-start items-center" _msthidden="3">
@@ -291,28 +325,36 @@
             <i class="fa-solid fa-thermometer text-gray-700" style="font-size: 1.5em; transition: transform 0.2s;"></i>
         </div>
         <div class="flex-grow" _msthidden="3">
+        <div class="flex-grow p-4">
           <h2 class="text-gray-900 text-lg title-font font-medium mb-3" _msttexthash="232921" _msthidden="1" _msthash="740">体温</h2>
-          
-          @foreach ($temperaturesOnSelectedDate as $index => $temperature)
-            <div class="flex justify-around text-left items-start">
-              <p class="text-gray-900 font-bold text-xl px-3">{{ $temperature->created_at->format('H:i') }}</p>
-              <p class="text-gray-900 font-bold text-xl px-3">{{ $temperature->temperature }}℃</p>
-            </div>
-          
-              @if($temperature->bikou !== null)
-                <p class="text-gray-900 font-bold text-xl px-3">{{ $temperature->bikou }}</p>
-              @endif
-            <div class="pt-2">
-              <!-- 最後の要素でない場合のみ <hr> を表示 -->
-              @if(!$loop->last)
-                <hr style="border: 1px dashed #666; margin: 0 auto; width: 100%;">
-              @endif
-            </div>
-        @endforeach
+          <div class="flex justify-between items-center w-full">
+          <div class="flex flex-col w-full">
+            @foreach ($temperaturesOnSelectedDate as $index => $temperature)
+              <div class="flex justify-around text-left items-start">
+                <p class="text-gray-900 font-bold text-xl">{{ $temperature->created_at->format('H:i') }}</p>
+                <p class="text-gray-900 font-bold text-xl px-3">{{ $temperature->temperature }}℃</p>
+              </div>
+            
+                @if($temperature->bikou !== null)
+                  <p class="text-gray-900 font-bold text-xl">{{ $temperature->bikou }}</p>
+                @endif
+              <div class="pt-2">
+                <!-- 最後の要素でない場合のみ <hr> を表示 -->
+                @if(!$loop->last)
+                  <hr style="border: 1px dashed #666; margin: 0 auto; width: 100%;">
+                @endif
+              </div>
+          @endforeach
+          </div>
+            <a href="{{ url('temperatureedit/' . $person->id) }}" class="text-stone-500">
+              <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
+            </a>
+          </div>
+        </div>
         </div>
        <hr style="border: 1px solid #666; margin: 0 auto; width: 100%;">
     </div>
-      @endif  
+    @endif  
 
     @if ($bloodpressuresOnSelectedDate->count() > 0)
     <div class="flex flex-col mb-10 lg:items-start items-center" _msthidden="3">
@@ -776,30 +818,37 @@
             $correspondingOption = $correspondingOptions[$optionItem->id] ?? null;
         @endphp
         @if($correspondingOption)
-            <div class="flex flex-col mb-10 lg:items-start items-center">
+            <div class="flex flex-col my-5 lg:items-start items-center" _msthidden="3">
                 <div class="w-12 h-12 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 mb-5">
                     <i class="fa-solid fa-people-group text-gray-700" style="font-size: 1.5em; transition: transform 0.2s;"></i>
                 </div>
                 <div class="flex-grow p-4">
-                    <h2 class="text-gray-900 text-lg title-font font-medium mb-3">{{ $correspondingOption->title }}</h2>
-                    <div class="flex justify-around text-left items-start">
-                        @for($i = 1; $i <= 5; $i++)
-                            @php
-                                $optionItemKey = "item{$i}";
-                                $optionItemValue = json_decode($optionItem->$optionItemKey);
-                                $correspondingItemValue = $correspondingOption->$optionItemKey;
-                            @endphp
-                            @if(!empty($optionItemValue) && is_array($optionItemValue) && count($optionItemValue) > 0 && $correspondingItemValue)
-                                <p class="text-gray-900 font-bold text-xl px-3">{{ $correspondingItemValue }}</p>
-                            @endif
-                        @endfor
+                  <h2 class="text-gray-900 text-lg title-font font-medium mb-3">{{ $correspondingOption->title }}</h2>
+                    <div class="flex justify-between items-center w-full">
+                      <div class="flex justify-around text-left items-start">
+                      @php $itemCounter = 0; @endphp
+                          @for($i = 1; $i <= 5; $i++)
+                              @php
+                                  $optionItemKey = "item{$i}";
+                                  $optionItemValue = json_decode($optionItem->$optionItemKey);
+                                  $correspondingItemValue = $correspondingOption->$optionItemKey;
+                              @endphp
+                              @if(!empty($optionItemValue) && is_array($optionItemValue) && count($optionItemValue) > 0 && $correspondingItemValue)
+                                <p class="text-gray-900 font-bold text-xl {{ $itemCounter > 0 ? 'pl-2' : '' }}">{{ $correspondingItemValue }}</p>
+                                @php $itemCounter++; @endphp
+                              @endif
+                          @endfor
+                      </div>
+                      @if($optionItem->bikou !== null)
+                          <p class="text-gray-900 font-bold text-xl px-3">{{ $optionItem->bikou }}</p>
+                      @endif
+                      <a href="{{ url('optionchange/' . $person->id . '/' . $optionItem->id) }}" class="text-stone-500">
+                      <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
+                      </a>
                     </div>
-                    @if($optionItem->bikou !== null)
-                        <p class="text-gray-900 font-bold text-xl px-3">{{ $optionItem->bikou }}</p>
-                    @endif
                 </div>
-                <hr style="border: 1px solid #666; margin: 0 auto; width: 100%;">
-            </div>
+              </div>
+            <hr style="border: 1px solid #666; margin: 0 auto; width: 100%;">
         @endif
     @endforeach
 @endif
@@ -808,19 +857,24 @@
 
 
       @if($lastNotebook)
-      <div class="flex flex-col mb-10 lg:items-start items-center" _msthidden="3">
+      <div class="flex flex-col mb-10 mt-5 lg:items-start items-center" _msthidden="3">
         <div class="w-12 h-12 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 mb-5">
             <i class="fa-solid fa-brush text-gray-700" style="font-size: 1.5em; transition: transform 0.2s;"></i>
         </div>
-        <div class="flex-grow p-4" _msthidden="3">
-          <h2 class="text-gray-900 text-lg title-font font-medium mb-3" _msttexthash="204971" _msthidden="1" _msthash="743">1日の活動・様子</h2>
-            <div class="flex justify-around text-left items-start">
-              
+          <div class="flex-grow p-4" _msthidden="3">
+            <h2 class="text-gray-900 text-lg title-font font-medium mb-3" _msttexthash="204971" _msthidden="1" _msthash="743">1日の活動・様子</h2>
+            <div class="flex justify-between items-center w-full">
+              <div class="flex justify-around text-left items-start">
                 <p class="text-gray-900 font-bold text-xl px-3">{{ $lastNotebook->notebook }}</p>
-         </div>
-        <hr style="border: 1px solid #666; margin: 0 auto; width: 100%;">
-      </div>
-      @endif
+              </div>
+              <a href="{{ route('notebook.change', ['people_id' => $person->id, 'id' => $lastNotebook->id]) }}" class="relative ml-2 flex items-center">
+                @csrf
+                <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s; vertical-align: middle;"></i>
+              </a>
+            </div>
+          <hr style="border: 1px solid #666; margin: 0 auto; width: 100%;">
+        </div>
+        @endif
     
 
    

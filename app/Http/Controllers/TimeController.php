@@ -186,8 +186,13 @@ class TimeController extends Controller
      * @param  \App\Models\Time  $time
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Time $time)
-    {
-        //
-    }
+    public function destroy($id) 
+        {
+            $lastTime = Time::find($id);       
+            if ($lastTime) {
+        
+              $lastTime->delete();
+            }       
+            return redirect()->route('people.index')->with('success', '削除が完了しました。');
+        }
 }

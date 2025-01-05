@@ -150,6 +150,7 @@ Route::post('facilityregister', [FacilityController::class, 'store'])->name('fac
 
 Route::resource('people', PersonController::class);
 Route::post('/people/{person}/associate-line-account', [PersonController::class, 'associateLineAccount'])->name('associate.line.account');
+Route::post('people/{id}',[PersonController::class,'destroy'])->name('people.delete');
 
 // 認証されていないユーザー向けのビュー
 Route::get('/before-login', function () {
@@ -364,7 +365,7 @@ Route::get('times/{people_id}/edit', [TimeController::class, 'edit'])->name('tim
 // 利用時間編集↓
 Route::get('timechange/{people_id}/{id}', [TimeController::class, 'change'])->name('time.change');
 Route::post('timechange/{people_id}/{id}',[TimeController::class,'update'])->name('time_update');
-
+Route::post('timechange/{id}',[TimeController::class,'destroy'])->name('time.delete');
 
 Route::resource('people', PersonController::class);
 
@@ -397,6 +398,7 @@ Route::post('/options-item/{people_id}/{id}', [OptionItemController::class, 'sto
 // 記録項目の登録済内容の編集
 Route::get('optionchange/{people_id}/{id}', [OptionItemController::class, 'change'])->name('options.item.change');
 Route::patch('optionchange/{people_id}/{id}', [OptionItemController::class, 'update'])->name('options.item.update');
+Route::post('optionchange/{id}', [OptionItemController::class, 'destroy'])->name('option.delete');
 
 Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 // Route::get('/logout', 'Auth\LoginController@logout')->name('logout');
@@ -586,6 +588,8 @@ Route::post('notebookwriting/{people_id}', [NotebookController::class,'store'])-
 // 編集↓
 Route::get('notebookchange/{people_id}/{id}', [NotebookController::class, 'change'])->name('notebook.change');
 Route::post('notebookchange/{people_id}/{id}',[NotebookController::class,'update'])->name('notebook_update');
+Route::post('notebookchange/{id}',[NotebookController::class,'update'])->name('notebook_update');
+Route::post('notebookchange/{id}',[NotebookController::class,'destroy'])->name('notebook.delete');
 
 // 連絡帳(保護者側)↓
 Route::get('recordstamp/{people_id}', [RecordController::class, 'RecordStampshow'])->name('recordstamp.edit');

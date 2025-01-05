@@ -124,7 +124,7 @@
                 </button>
                 <div id="result-div"></div>
           </div>
-          <form action="{{ route('notebook_update', ['people_id' => $person->id, 'id' => $lastNotebook->id]) }}" method="POST" class="w-full max-w-lg mx-auto mt-4">
+    <form action="{{ route('notebook_update', ['people_id' => $person->id, 'id' => $lastNotebook->id]) }}" method="POST" class="w-full max-w-lg mx-auto mt-4">
           
       @csrf
         <div style="display: flex; flex-direction: column; align-items: center; margin: 10px 0;">
@@ -143,12 +143,75 @@
                 修正
             </button>
         </div>
+      </form>
          <p id="amivoiceApiKeyContainer" data-api-key="{{ $json_response }}"></p>
+
+      <form action="{{ route('notebook.delete', [ 'id' => $lastNotebook->id]) }}" method="POST">
+        @csrf
+          <div class="flex justify-center my-4">
+              <button type="button" class="delete-btn font-semibold px-4 py-2 bg-gray-600 text-lg text-white rounded-md hover:bg-gray-500" data-id="{{ $lastNotebook->id  }}" data-toggle="modal" data-target="#confirmDeleteModal">
+              このデータを削除する
+              </button>
+          </div>
+      </form>
 </div>
-</form>
+
+
+
+
+<!-- モーダルダイアログ -->
+<div class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center hidden" id="confirmDeleteModal">
+    <div class="modal-overlay absolute w-full h-full bg-gray-600 opacity-50"></div>
+
+    <div class="modal-container bg-white w-full max-w-xs mx-auto rounded shadow-lg z-50 overflow-y-auto">
+        <div class="modal-content py-4 text-left px-6">
+            <!--Title-->
+            <div class="flex justify-between items-center pb-3">
+                <p class="text-2xl font-semibold">本当に削除しますか？</p>
+                <div class="modal-close cursor-pointer z-50" data-dismiss="modal">
+                <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                    <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                </svg>
+                </div>
+            </div>
+
+            <!--Body-->
+            <p class="text-base font-normal">削除したデータは復元できません。</p>
+            <!--Footer-->
+            <div class="flex justify-end pt-2">
+                <button type="button" class="px-4 bg-blue-800 p-3 rounded-lg text-white hover:bg-blue-400 mr-2" data-dismiss="modal">キャンセル</button>
+                <button type="button" class="px-4 bg-red-500 p-3 rounded-lg text-white hover:bg-red-400" id="deleteBtn">削除</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="messages" class="hidden"></div>
 
+
 <script type="text/javascript">
+
+document.addEventListener('DOMContentLoaded', function () {
+    var deleteForm; // 削除するフォームを保存する変数
+
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            deleteForm = this.closest('form'); // フォームを取得して保存
+            document.getElementById('confirmDeleteModal').classList.remove('hidden');
+        });
+    });
+
+    document.getElementById('deleteBtn').addEventListener('click', function() {
+        deleteForm.submit(); // モーダルの削除ボタンがクリックされたらフォームを送信
+        document.getElementById('confirmDeleteModal').classList.add('hidden');
+    });
+
+    document.querySelectorAll('[data-dismiss="modal"]').forEach(button => {
+        button.addEventListener('click', function() {
+            document.getElementById('confirmDeleteModal').classList.add('hidden');
+        });
+    });
+});
 
 setTimeout(() => {
 	

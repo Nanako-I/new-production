@@ -188,6 +188,6 @@ public function edit(Request $request, $people_id)
     if ($food) {
         $food->delete();
     }
-        return redirect()->route('people.index');
+        return redirect()->route('people.index')->with('success', '削除が完了しました。');
     }
 }

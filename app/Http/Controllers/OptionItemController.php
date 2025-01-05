@@ -241,7 +241,7 @@ class OptionItemController extends Controller
        
         public function destroy($id) 
         {
-            $option = Option::find($id);
+            $option = OptionItem::find($id);
         
             if ($option) {
         

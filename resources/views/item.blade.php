@@ -100,14 +100,14 @@
 
             <!-- タイトル入力フィールド -->
             <input type="hidden" name="facility_id" value="{{ $facility->id }}">
-            <label for="new-item-title" class="block text-gray-700 text-base font-bold mb-2">タイトル</label>
+            <label for="new-item-title" class="block text-gray-700 text-base font-bold mb-2">タイトル (例：宿題など)</label>
             <input type="text" id="new-item-title" name="title" class="border border-gray-300 rounded-md w-full px-3 py-2 mb-4" placeholder="タイトルを入力" maxlength="32">
 
           
 
             <!-- 項目入力フィールドのコンテナ -->
             <div id="item-fields-container">
-                <label class="block text-gray-700 text-base font-bold mb-2">記録項目</label>
+                <label class="block text-gray-700 text-base font-bold mb-2">記録項目 (例：漢字ドリル、計算ドリルなど)</label>
                
 
                 <!-- 項目入力フィールド（最初の一つ） -->
