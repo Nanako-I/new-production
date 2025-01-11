@@ -59,11 +59,32 @@ class PersonController extends Controller
 
         $firstFacility = $facilities->first();
         if ($firstFacility) {
-            // $people = $firstFacility->people_facilities()->get();
-             // ユーザーの施設に関連付けられているpeopleを取得
-            $people = Person::whereHas('people_facilities', function ($query) use ($facilityIds) {
-                $query->whereIn('facilities.id', $facilityIds);
-            })->get();
+            // リレーションを事前にロード
+            $people = Person::with([
+                    'people_facilities', 
+                    'scheduled_visits',
+                    'times',
+                    'temperatures',
+                    'creatives',
+                    'activities',
+                    'trainings',
+                    'lifestyles',
+                    'foods',
+                    'bloodpressures',
+                    'toilets',
+                    'waters',
+                    'medicines',
+                    'tubes',
+                    'kyuuins',
+                    'hossas',
+                    'speeches',
+                    'notebooks',
+                
+                ])
+                ->whereHas('people_facilities', function ($query) use ($facilityIds) {
+                    $query->whereIn('facilities.id', $facilityIds);
+                })->get();
+
             // dd($people);
             // 本日の日付を取得
             $today = \Carbon\Carbon::now()->toDateString();
