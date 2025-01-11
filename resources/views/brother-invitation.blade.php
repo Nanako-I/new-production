@@ -193,7 +193,9 @@
             userCards.forEach(card => {
                 card.addEventListener('click', function() {
                     const familyData = JSON.parse(this.getAttribute('data-family'));
+                    console.log(familyData);
                     const userData = JSON.parse(this.getAttribute('data-user'));
+                    console.log(userData);
                     familyList.innerHTML = ''; // リストをクリア
 
                     if (familyData && familyData.length > 0) {
@@ -206,7 +208,7 @@
                             const subList = document.createElement('ul');
                             subList.classList.add('pl-5');
                             const subLi = document.createElement('li');
-                            subLi.textContent = `登録済利用者: ${userData.last_name} ${userData.first_name}`;
+                            subLi.textContent = `登録済利用者: ${userData.last_name} ${userData.first_name}、利用者 三郎`;
                             subLi.style.color = 'black'; // テキストカラーを黒に設定
                             subList.appendChild(subLi);
                             familyList.appendChild(subList);
