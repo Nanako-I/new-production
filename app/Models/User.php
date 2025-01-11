@@ -62,9 +62,16 @@ class User extends Authenticatable
     {
         $this->notify(new CustomPasswordResetNotification($token));
     }
-   
 
+    public function registered_people()
+    {
+        return $this->belongsToMany(Person::class, 'people_families', 'user_id', 'person_id');
+    }
 
+    public function registered_families()
+    {
+        return $this->belongsToMany(User::class, 'people_families', 'person_id', 'user_id');
+    }
     /**
      * The attributes that are mass assignable.
      *

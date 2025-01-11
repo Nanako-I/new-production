@@ -36,7 +36,10 @@ class BrotherInvitationController extends Controller
 
     if ($firstFacility) {
         $facilitypeople = $firstFacility->people_facilities()
-            ->with('people_family')  
+                // ->with('people_family')
+                ->with(['people_family.registered_people' => function ($query) {
+                    $query->select('people.*');
+                }])
             ->get();
     } else {
         $facilitypeople = collect(); 
