@@ -28,162 +28,161 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 class BrotherInvitationController extends Controller
 {
     public function show()
-{
-    $user = Auth::user();
-    
-    $facility = $user->facility_staffs()->first();
-    $firstFacility = $facility;
+    {
+        $user = Auth::user();
 
-    if ($firstFacility) {
-        $facilitypeople = $firstFacility->people_facilities()
-                // ->with('people_family')
+        $facility = $user->facility_staffs()->first();
+        $firstFacility = $facility;
+
+        if ($firstFacility) {
+            $facilitypeople = $firstFacility->people_facilities()
                 ->with(['people_family.registered_people' => function ($query) {
                     $query->select('people.*');
                 }])
-            ->get();
-    } else {
-        $facilitypeople = collect(); 
+                ->get();
+        } else {
+            $facilitypeople = collect();
+        }
+
+        $person = $facilitypeople->first();
+
+        return view('brother-invitation', compact('person', 'facility', 'facilitypeople'));
     }
 
-    $person = $facilitypeople->first();
+    public function register(Request $request)
+    {
+        \Log::info('Request data: ', $request->all());
 
-    return view('brother-invitation', compact('person', 'facility', 'facilitypeople'));
-}
-
-public function register(Request $request)
-{
-    \Log::info('Request data: ', $request->all());
-
-    $validatedData = $request->validate([
-        'person_id' => 'required|integer|exists:people,id',
-        'user_id' => 'required|integer|exists:users,id',
-    ]);
-
-    try {
-        DB::table('people_families')->insert([
-            'person_id' => $validatedData['person_id'],
-            'user_id' => $validatedData['user_id'],
-            'created_at' => now(),
-            'updated_at' => now(),
+        $validatedData = $request->validate([
+            'person_id' => 'required|integer|exists:people,id',
+            'user_id' => 'required|integer|exists:users,id',
         ]);
 
-        return response()->json(['success' => true]);
-    } catch (\Exception $e) {
-        \Log::error('Error linking user and family: ' . $e->getMessage());
-        return response()->json(['success' => false, 'error' => $e->getMessage()]);
+        try {
+            DB::table('people_families')->insert([
+                'person_id' => $validatedData['person_id'],
+                'user_id' => $validatedData['user_id'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            \Log::error('Error linking user and family: ' . $e->getMessage());
+            return response()->json(['success' => false, 'error' => $e->getMessage()]);
+        }
     }
-}
-//   public function show()
-//   {
-//       $user = Auth::user();
-      
-//       $facility = $user->facility_staffs()->first();
-//       $firstFacility = $facility;
+    //   public function show()
+    //   {
+    //       $user = Auth::user();
 
-//       $people = $user->people_family()->get();
-      
-//       // Retrieve people associated with the first facility
-//       if ($firstFacility) {
-//           $facilitypeople = $firstFacility->people_facilities()->get();
-//       } else {
-//           $facilitypeople = collect(); // Use an empty collection if no people are registered
-//       }
+    //       $facility = $user->facility_staffs()->first();
+    //       $firstFacility = $facility;
 
-//       // Get the first person from the facility people collection
-//       $person = $facilitypeople->first();
+    //       $people = $user->people_family()->get();
 
-//       if ($person) {
-//           // Generate URL using the current person's ID
-//           $encryptedId = Crypt::encryptString($person->id);
-//           $url = URL::temporarySignedRoute(
-//               'terms.show', 
-//               now()->addHours(24), 
-//               ['encrypted_id' => $encryptedId]
-//           );
-          
-//           \Log::info('Generated URL: ' . $url);
-//           \Log::info('Person ID: ' . $person->id);
-//           \Log::info('People family count: ' . $people->count());
+    //       // Retrieve people associated with the first facility
+    //       if ($firstFacility) {
+    //           $facilitypeople = $firstFacility->people_facilities()->get();
+    //       } else {
+    //           $facilitypeople = collect(); // Use an empty collection if no people are registered
+    //       }
 
-//           $qrCode = QrCode::size(200)->generate($url);
-//       } else {
-//           $url = null;
-//           $qrCode = null;
-//           \Log::info('No person found in the facility');
-//       }
+    //       // Get the first person from the facility people collection
+    //       $person = $facilitypeople->first();
 
-//       // Add this line to check if $facilitypeople has data
-//       \Log::info('Facility people count: ' . $facilitypeople->count());
+    //       if ($person) {
+    //           // Generate URL using the current person's ID
+    //           $encryptedId = Crypt::encryptString($person->id);
+    //           $url = URL::temporarySignedRoute(
+    //               'terms.show', 
+    //               now()->addHours(24), 
+    //               ['encrypted_id' => $encryptedId]
+    //           );
 
-//       return view('brother-invitation', compact('url', 'qrCode', 'person', 'facility', 'facilitypeople'));
-//   }
+    //           \Log::info('Generated URL: ' . $url);
+    //           \Log::info('Person ID: ' . $person->id);
+    //           \Log::info('People family count: ' . $people->count());
 
-  // public function generateUrls(Request $request)
-  // {
-  //     $ids = $request->input('ids');
-  //     $urls = [];
+    //           $qrCode = QrCode::size(200)->generate($url);
+    //       } else {
+    //           $url = null;
+    //           $qrCode = null;
+    //           \Log::info('No person found in the facility');
+    //       }
 
-  //     foreach ($ids as $id) {
-  //         $encryptedId = Crypt::encryptString($id);
-  //         $url = URL::temporarySignedRoute(
-  //             'terms.show', 
-  //             now()->addHours(24), 
-  //             ['encrypted_id' => $encryptedId]
-  //         );
-  //         $urls[] = $url;
-  //     }
+    //       // Add this line to check if $facilitypeople has data
+    //       \Log::info('Facility people count: ' . $facilitypeople->count());
 
-  //     return response()->json(['urls' => $urls]);
-  // }
+    //       return view('brother-invitation', compact('url', 'qrCode', 'person', 'facility', 'facilitypeople'));
+    //   }
 
-//   public function generateUrl(Request $request)
-//     {
-//         try {
-//             $ids = $request->input('ids');
-            
-//             if (empty($ids)) {
-//                 return response()->json(['error' => 'No IDs provided'], 400);
-//             }
+    // public function generateUrls(Request $request)
+    // {
+    //     $ids = $request->input('ids');
+    //     $urls = [];
 
-//             // 複数のIDを連結して暗号化
-//             $encryptedIds = Crypt::encryptString(implode(',', $ids));
-            
-//             $url = URL::temporarySignedRoute(
-//                 'terms.show', 
-//                 now()->addHours(24), 
-//                 ['encrypted_ids' => $encryptedIds]
-//             );
+    //     foreach ($ids as $id) {
+    //         $encryptedId = Crypt::encryptString($id);
+    //         $url = URL::temporarySignedRoute(
+    //             'terms.show', 
+    //             now()->addHours(24), 
+    //             ['encrypted_id' => $encryptedId]
+    //         );
+    //         $urls[] = $url;
+    //     }
 
-//             return response()->json(['url' => $url]);
-//         } catch (\Exception $e) {
-//             Log::error('URL generation error: ' . $e->getMessage());
-//             return response()->json(['error' => 'An error occurred while generating the URL: ' . $e->getMessage()], 500);
-//         }
-//     }
-  // public function generateUrl(Request $request)
-  //   {
-  //       try {
-  //           $ids = $request->input('ids');
-            
-  //           if (empty($ids)) {
-  //               return response()->json(['error' => 'No IDs provided'], 400);
-  //           }
+    //     return response()->json(['urls' => $urls]);
+    // }
 
-  //           // 複数のIDを連結して暗号化
-  //           $encryptedIds = Crypt::encryptString(implode(',', $ids));
-            
-  //           $url = URL::temporarySignedRoute(
-  //               'terms.show', 
-  //               now()->addHours(24), 
-  //               ['encrypted_ids' => $encryptedIds]
-  //           );
+    //   public function generateUrl(Request $request)
+    //     {
+    //         try {
+    //             $ids = $request->input('ids');
 
-  //           return response()->json(['url' => $url]);
-  //       } catch (\Exception $e) {
-  //           \Log::error('URL generation error: ' . $e->getMessage());
-  //           return response()->json(['error' => 'An error occurred while generating the URL: ' . $e->getMessage()], 500);
-  //       }
-  //   }
+    //             if (empty($ids)) {
+    //                 return response()->json(['error' => 'No IDs provided'], 400);
+    //             }
+
+    //             // 複数のIDを連結して暗号化
+    //             $encryptedIds = Crypt::encryptString(implode(',', $ids));
+
+    //             $url = URL::temporarySignedRoute(
+    //                 'terms.show', 
+    //                 now()->addHours(24), 
+    //                 ['encrypted_ids' => $encryptedIds]
+    //             );
+
+    //             return response()->json(['url' => $url]);
+    //         } catch (\Exception $e) {
+    //             Log::error('URL generation error: ' . $e->getMessage());
+    //             return response()->json(['error' => 'An error occurred while generating the URL: ' . $e->getMessage()], 500);
+    //         }
+    //     }
+    // public function generateUrl(Request $request)
+    //   {
+    //       try {
+    //           $ids = $request->input('ids');
+
+    //           if (empty($ids)) {
+    //               return response()->json(['error' => 'No IDs provided'], 400);
+    //           }
+
+    //           // 複数のIDを連結して暗号化
+    //           $encryptedIds = Crypt::encryptString(implode(',', $ids));
+
+    //           $url = URL::temporarySignedRoute(
+    //               'terms.show', 
+    //               now()->addHours(24), 
+    //               ['encrypted_ids' => $encryptedIds]
+    //           );
+
+    //           return response()->json(['url' => $url]);
+    //       } catch (\Exception $e) {
+    //           \Log::error('URL generation error: ' . $e->getMessage());
+    //           return response()->json(['error' => 'An error occurred while generating the URL: ' . $e->getMessage()], 500);
+    //       }
+    //   }
 
     // public function show()
     // {
@@ -228,4 +227,3 @@ public function register(Request $request)
     //     return response()->json(['urls' => $urls]);
     // }
 }
-  

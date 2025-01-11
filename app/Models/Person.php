@@ -227,6 +227,10 @@ public function foods()
         
     }
 
+    public function registered_families()
+    {
+        return $this->belongsToMany(User::class, 'people_families', 'person_id', 'user_id');
+    }
     // リクエストのルート名を取得
     protected static function booted()
 {

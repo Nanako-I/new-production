@@ -36,14 +36,14 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
-    
+
     public function roles()
     {
         // /↓ belongsToMany('多対多の相手側のクラス名…ClassName::class','中間テーブルの名前',　'このモデルを参照する中間テーブルの外部キー名', '相手側のモデルを参照する中間テーブルの外部キー名')
         return $this->belongsToMany(Role::class, 'model_has_roles', 'model_id', 'role_id');
     }
-    
-   // 中間テーブルuser_rolesと紐づける↓
+
+    // 中間テーブルuser_rolesと紐づける↓
 
     public function user_roles(): BelongsToMany
     {
@@ -57,7 +57,7 @@ class User extends Authenticatable
         return $this->hasMany(Temperature::class, 'user_id');
     }
 
-    
+
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new CustomPasswordResetNotification($token));
@@ -67,11 +67,8 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Person::class, 'people_families', 'user_id', 'person_id');
     }
+ 
 
-    public function registered_families()
-    {
-        return $this->belongsToMany(User::class, 'people_families', 'person_id', 'user_id');
-    }
     /**
      * The attributes that are mass assignable.
      *

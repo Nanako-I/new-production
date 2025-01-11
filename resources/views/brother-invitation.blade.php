@@ -263,15 +263,16 @@
 
                                 // この家族に紐づけられている全ての利用者を表示
                                 if (family.registered_people && family.registered_people.length > 0) {
-                                        const subLi = document.createElement('li');
-                                        const registeredUsers = family.registered_people
-                                            .map(person => `${person.last_name} ${person.first_name}`)
-                                            .join('、');
-                                        subLi.textContent = `登録済利用者: ${registeredUsers}`;
-                                        subLi.style.color = 'black';
-                                        subList.appendChild(subLi);
+                                    const subLi = document.createElement('li');
+                                    const registeredUsers = family.registered_people
+                                        .map(person => `${person.last_name} ${person.first_name}`)
+                                        .join('、');
+                                    subLi.textContent = `登録済利用者: ${registeredUsers}`;
+                                    subLi.style.color = 'black';
+                                    subList.appendChild(subLi);
                                 }
                                 familyList.appendChild(subList);
+
 
                                 selectedFamilyName = `${family.last_name} ${family.first_name}`;
                                 selectedFamilyId = family.id;
@@ -298,6 +299,7 @@
                             li.textContent = '登録された家族はいません';
                             familyList.appendChild(li);
                             addFamilyBtn.style.display = 'none';
+
                         }
 
                         userList.style.display = 'none';
