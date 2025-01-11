@@ -63,22 +63,22 @@ class PersonController extends Controller
             $people = Person::with([
                     'people_facilities', 
                     'scheduled_visits',
-                    'times',
-                    'temperatures',
-                    'creatives',
-                    'activities',
-                    'trainings',
-                    'lifestyles',
-                    'foods',
-                    'bloodpressures',
-                    'toilets',
-                    'waters',
-                    'medicines',
-                    'tubes',
-                    'kyuuins',
-                    'hossas',
-                    'speeches',
-                    'notebooks',
+                    // 'times',
+                    // 'temperatures',
+                    // 'creatives',
+                    // 'activities',
+                    // 'trainings',
+                    // 'lifestyles',
+                    // 'foods',
+                    // 'bloodpressures',
+                    // 'toilets',
+                    // 'waters',
+                    // 'medicines',
+                    // 'tubes',
+                    // 'kyuuins',
+                    // 'hossas',
+                    // 'speeches',
+                    // 'notebooks',
                 
                 ])
                 ->whereHas('people_facilities', function ($query) use ($facilityIds) {
@@ -102,25 +102,35 @@ class PersonController extends Controller
             //     $people = collect([]); // 空のコレクションにする
             // }
 
-            foreach ($people as $person) {
-                $unreadMessages = Chat::where('people_id', $person->id)
-                                    ->where('is_read', false)
-                                    ->where('user_identifier', '!=', $user->id)
-                                    ->exists();
+        // チャットで未読がある場合に表示させるコード（チャットは一旦反映させていないためコメントアウト）
+        //     foreach ($people as $person) {
+        //         $unreadMessages = Chat::where('people_id', $person->id)
+        //                             ->where('is_read', false)
+        //                             ->where('user_identifier', '!=', $user->id)
+        //                             ->exists();
             
-                $person->unreadMessages = $unreadMessages;
-                \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
-        }
+        //         $person->unreadMessages = $unreadMessages;
+        //         \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
+        // }
 
-        foreach ($people as $person) {
-            $unreadMessages = HogoshaText::where('people_id', $person->id)
-                                ->where('is_read', false)
-                                ->where('user_identifier', '!=', $user->id)
-                                ->exists();
+    //     foreach ($people as $person) {
+    //         $unreadMessages = HogoshaText::where('people_id', $person->id)
+    //                             ->where('is_read', false)
+    //                             ->where('user_identifier', '!=', $user->id)
+    //                             ->exists();
         
-            $person->unreadMessages = $unreadMessages;
-            \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
-    }
+    //         $person->unreadMessages = $unreadMessages;
+    //         // \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
+    // }
+    $unreadMessages = HogoshaText::whereIn('people_id', $people->pluck('id'))
+    ->where('is_read', false)
+    ->where('user_identifier', '!=', $user->id)
+    ->get()
+    ->groupBy('people_id');
+
+foreach ($people as $person) {
+    $person->unreadMessages = isset($unreadMessages[$person->id]);
+}
 
         $selectedItems = [];
         
@@ -130,11 +140,20 @@ class PersonController extends Controller
         
         $today = \Carbon\Carbon::now()->toDateString();
 
-        foreach ($people as $person) {
-            $person->todayOptionItems = OptionItem::where('people_id', $person->id)
-                ->whereDate('created_at', $today)
-                ->get();
-        }
+        // foreach ($people as $person) {
+        //     $person->todayOptionItems = OptionItem::where('people_id', $person->id)
+        //         ->whereDate('created_at', $today)
+        //         ->get();
+        // }
+        $todayOptionItems = OptionItem::whereIn('people_id', $people->pluck('id'))
+        ->whereDate('created_at', $today)
+        ->get()
+        ->groupBy('people_id');
+    
+    foreach ($people as $person) {
+        $person->todayOptionItems = $todayOptionItems[$person->id] ?? collect();
+    }
+
     
        // optionsテーブルから必要なデータを取得
        $options = Option::whereIn('people_id', $people->pluck('id'))
@@ -192,7 +211,7 @@ class PersonController extends Controller
                               ->exists();
     
         $person->unreadMessages = $unreadMessages;
-        \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
+        // \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
     }
 
     $selectedItems = [];
@@ -435,9 +454,9 @@ class PersonController extends Controller
         ['encrypted_id' => $encryptedId]
     );
     
-    \Log::info('Generated URL: ' . $url);
-    \Log::info('Person ID: ' . $person->id);
-    \Log::info('People family count: ' . $people->count());
+    // \Log::info('Generated URL: ' . $url);
+    // \Log::info('Person ID: ' . $person->id);
+    // \Log::info('People family count: ' . $people->count());
 
     $qrCode = QrCode::size(200)->generate($url);
     $firstFacility = $facility->first();
@@ -450,7 +469,7 @@ class PersonController extends Controller
     }
 
     // Add this line to check if $facilitypeople has data
-    \Log::info('Facility people count: ' . $facilitypeople->count());
+    // \Log::info('Facility people count: ' . $facilitypeople->count());
 
     return view('peopleedit', compact('url', 'qrCode', 'person', 'facility', 'facilitypeople'));
 }
