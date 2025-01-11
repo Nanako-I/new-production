@@ -82,11 +82,11 @@
                         </x-nav-link>
                     </div>
 
-                    <!-- <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('calendar') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
+                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('calendar') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
                          <x-nav-link :href="url('brother-invitation')" :active="request()->is('brother.invitation')">
                             {{ __('利用者とご家族一覧') }}
                         </x-nav-link>
-                    </div> -->
+                    </div>
                     
                      <!-- <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('calendar') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
                          <x-nav-link :href="url('calendar')" :active="request()->is('calendar')">
