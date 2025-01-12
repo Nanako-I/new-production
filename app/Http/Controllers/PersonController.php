@@ -58,13 +58,15 @@ class PersonController extends Controller
         $roleIds = $user->roles->pluck('id');
 
         $firstFacility = $facilities->first();
+        // 本日の日付を取得
+        $today = \Carbon\Carbon::now()->toDateString();
         if ($firstFacility) {
             // リレーションを事前にロード
             $people = Person::with([
-                    'people_facilities', 
-                    'scheduled_visits',
-                    'times',
-                    'temperatures',
+                    // 'people_facilities', 
+                    // 'scheduled_visits',
+                    // 'times',
+                    // 'temperatures',
                     'creatives',
                     'activities',
                     'trainings',
@@ -79,15 +81,31 @@ class PersonController extends Controller
                     'hossas',
                     'speeches',
                     'notebooks',
-                
-                ])
+                    
+                        'people_facilities',
+                        'scheduled_visits' => function ($query) use ($today) {
+                            $query->whereDate('arrival_datetime', $today)
+                                  ->orWhereDate('exit_datetime', $today);
+                        },
+                        'times',
+                        'temperatures' => function ($query) use ($today) {
+                            $query->whereDate('created_at', $today)
+                                  ->orderBy('created_at', 'asc');
+                        },
+                        'option_items' => function ($query) use ($today) {
+                            $query->whereDate('created_at', $today);
+                        },
+                        'options' => function ($query) {
+                            $query->where('flag', 1);
+                        }
+                    ])
+            
                 ->whereHas('people_facilities', function ($query) use ($facilityIds) {
                     $query->whereIn('facilities.id', $facilityIds);
                 })->get();
 
             // dd($people);
-            // 本日の日付を取得
-            $today = \Carbon\Carbon::now()->toDateString();
+            
             // $people = $firstFacility->people_facilities()->get();
 
             // 本日訪問予定がある人物のみを取得(送迎は開発途中のためコメントアウト。一旦利用者全員表示させる)
@@ -145,10 +163,11 @@ foreach ($people as $person) {
         //         ->whereDate('created_at', $today)
         //         ->get();
         // }
-        $todayOptionItems = OptionItem::whereIn('people_id', $people->pluck('id'))
-        ->whereDate('created_at', $today)
-        ->get()
-        ->groupBy('people_id');
+
+        // $todayOptionItems = OptionItem::whereIn('people_id', $people->pluck('id'))
+        // ->whereDate('created_at', $today)
+        // ->get()
+        // ->groupBy('people_id');
     
     foreach ($people as $person) {
         $person->todayOptionItems = $todayOptionItems[$person->id] ?? collect();
@@ -156,14 +175,14 @@ foreach ($people as $person) {
 
     
        // optionsテーブルから必要なデータを取得
-       $options = Option::whereIn('people_id', $people->pluck('id'))
-        ->get(['id', 'people_id', 'title', 'item1', 'item2', 'item3', 'item4', 'item5']);
-        $personOptions = [];
-        foreach ($people as $person) {
-            $personOptions[$person->id] = Option::where('people_id', $person->id)
-                ->where('flag', 1)
-                ->get();
-        }
+    //    $options = Option::whereIn('people_id', $people->pluck('id'))
+    //     ->get(['id', 'people_id', 'title', 'item1', 'item2', 'item3', 'item4', 'item5']);
+    //     $personOptions = [];
+    //     foreach ($people as $person) {
+    //         $personOptions[$person->id] = Option::where('people_id', $person->id)
+    //             ->where('flag', 1)
+    //             ->get();
+    //     }
 
         // 各利用者の訪問データを取得して送迎の要否を確認(送迎は開発途中のためコメントアウト）
         // foreach ($people as $person) {
@@ -171,7 +190,8 @@ foreach ($people as $person) {
         //     $person->transport = $scheduledVisit ? $scheduledVisit->transport : '未登録';
         // }
 
-    return view('people', compact('people', 'selectedItems', 'options', 'personOptions'));
+    // return view('people', compact('people', 'selectedItems', 'options', 'personOptions'));
+    return view('people', compact('people'));
     }
     else {
         // $people = collect([]); // 空のコレクションを作成
