@@ -596,22 +596,33 @@ if (!$person) {
             Log::error('メール送信に失敗しました。', ['email' => $user->email, 'error' => $e->getMessage()]);
         }
             // hogosha ビューにデータを渡して表示
-            return response()->view('hogosha', compact('people', 'unreadMessages'))
-                   ->with('success', 'ご登録ありがとうございます。<br>メールにて今後こちらのアプリへのログインのURLをお送りしておりますのでご確認ください。');
+            session()->flash('success', 'ご登録ありがとうございます。<br>メールにて今後こちらのアプリへのログインのURLをお送りしておりますのでご確認ください。');
+return response()->view('hogosha', compact('people', 'unreadMessages'));
            
         } catch (\Exception $e) {
             DB::rollBack();
             // Log::error('登録処理中のエラー: ' . $e->getMessage());
             // Log::error('エラーの詳細: ' . $e->getTraceAsString());
-            $error = '登録処理中にエラーが発生しました。お手数ですが再度ご登録をお試しください。';
-            return view('hogoshanumber', compact('error'));
+            // ユーザーが既に存在する場合は、hogoshaビューにリダイレクト
+        $existingUser = User::where('email', $registerData['email'])->first();
+        if ($existingUser) {
+            Auth::login($existingUser);
+            $people = $existingUser->people_family()->get();
+            $unreadMessages = Chat::where('people_id', $person->id)
+                ->where('is_read', false)
+                ->where('user_identifier', '!=', $existingUser->id)
+                ->exists();
+            
+            // セッションをクリア
+            session()->forget(['birth_date_attempts', 'user_data', 'temp_person_id']);
+            session()->flash('success', 'ご登録ありがとうございます。<br>メールにて今後こちらのアプリへのログインのURLをお送りしておりますのでご確認ください。');
+            return response()->view('hogosha', compact('people', 'unreadMessages'));
         }
-    } else {
-        $error = '生年月日が一致する利用者が存在しません。<br>施設側でご家族の生年月日がこのアプリに正しく登録されているかお問い合わせください';
+
+        $error = '登録処理中にエラーが発生しました。お手数ですが再度ご登録をお試しください。';
         return view('hogoshanumber', compact('error'));
     }
-
-}
+}}
 
     public function store(Request $request)
     {

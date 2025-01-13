@@ -11,11 +11,11 @@
     </div>
     @endif
 <!-- hogoshaのrouteに戻った時の成功メッセージを表示させるように書いてあったが、現状の導入先で活用しているコード箇所はなさそう-->
-        @if (session('success'))
+        <!-- @if (session('success'))
         <div class="bg-green-500 text-white p-4 rounded-lg mb-4">
             {!! session('success') !!}
         </div>
-        @endif
+        @endif -->
 
         @if (count($errors) > 0)
             <!-- Form Error List -->
