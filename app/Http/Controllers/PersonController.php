@@ -58,54 +58,36 @@ class PersonController extends Controller
         $roleIds = $user->roles->pluck('id');
 
         $firstFacility = $facilities->first();
-        // 本日の日付を取得
-        $today = \Carbon\Carbon::now()->toDateString();
         if ($firstFacility) {
             // リレーションを事前にロード
             $people = Person::with([
-                    // 'people_facilities', 
-                    // 'scheduled_visits',
-                    // 'times',
+                    'people_facilities', 
+                    'scheduled_visits',
+                    'times',
                     // 'temperatures',
-                    'creatives',
-                    'activities',
-                    'trainings',
-                    'lifestyles',
-                    'foods',
-                    'bloodpressures',
-                    'toilets',
-                    'waters',
-                    'medicines',
-                    'tubes',
-                    'kyuuins',
-                    'hossas',
-                    'speeches',
-                    'notebooks',
-                    
-                        'people_facilities',
-                        'scheduled_visits' => function ($query) use ($today) {
-                            $query->whereDate('arrival_datetime', $today)
-                                  ->orWhereDate('exit_datetime', $today);
-                        },
-                        'times',
-                        'temperatures' => function ($query) use ($today) {
-                            $query->whereDate('created_at', $today)
-                                  ->orderBy('created_at', 'asc');
-                        },
-                        'option_items' => function ($query) use ($today) {
-                            $query->whereDate('created_at', $today);
-                        },
-                        'options' => function ($query) {
-                            $query->where('flag', 1);
-                        }
-                    ])
-            
+                    // 'creatives',
+                    // 'activities',
+                    // 'trainings',
+                    // 'lifestyles',
+                    // 'foods',
+                    // 'bloodpressures',
+                    // 'toilets',
+                    // 'waters',
+                    // 'medicines',
+                    // 'tubes',
+                    // 'kyuuins',
+                    // 'hossas',
+                    // 'speeches',
+                    // 'notebooks',
+                
+                ])
                 ->whereHas('people_facilities', function ($query) use ($facilityIds) {
                     $query->whereIn('facilities.id', $facilityIds);
                 })->get();
 
             // dd($people);
-            
+            // 本日の日付を取得
+            $today = \Carbon\Carbon::now()->toDateString();
             // $people = $firstFacility->people_facilities()->get();
 
             // 本日訪問予定がある人物のみを取得(送迎は開発途中のためコメントアウト。一旦利用者全員表示させる)
@@ -120,35 +102,25 @@ class PersonController extends Controller
             //     $people = collect([]); // 空のコレクションにする
             // }
 
-        // チャットで未読がある場合に表示させるコード（チャットは一旦反映させていないためコメントアウト）
-        //     foreach ($people as $person) {
-        //         $unreadMessages = Chat::where('people_id', $person->id)
-        //                             ->where('is_read', false)
-        //                             ->where('user_identifier', '!=', $user->id)
-        //                             ->exists();
+            foreach ($people as $person) {
+                $unreadMessages = Chat::where('people_id', $person->id)
+                                    ->where('is_read', false)
+                                    ->where('user_identifier', '!=', $user->id)
+                                    ->exists();
             
-        //         $person->unreadMessages = $unreadMessages;
-        //         \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
-        // }
+                $person->unreadMessages = $unreadMessages;
+                \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
+        }
 
-    //     foreach ($people as $person) {
-    //         $unreadMessages = HogoshaText::where('people_id', $person->id)
-    //                             ->where('is_read', false)
-    //                             ->where('user_identifier', '!=', $user->id)
-    //                             ->exists();
+        foreach ($people as $person) {
+            $unreadMessages = HogoshaText::where('people_id', $person->id)
+                                ->where('is_read', false)
+                                ->where('user_identifier', '!=', $user->id)
+                                ->exists();
         
-    //         $person->unreadMessages = $unreadMessages;
-    //         // \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
-    // }
-    $unreadMessages = HogoshaText::whereIn('people_id', $people->pluck('id'))
-    ->where('is_read', false)
-    ->where('user_identifier', '!=', $user->id)
-    ->get()
-    ->groupBy('people_id');
-
-foreach ($people as $person) {
-    $person->unreadMessages = isset($unreadMessages[$person->id]);
-}
+            $person->unreadMessages = $unreadMessages;
+            \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
+    }
 
         $selectedItems = [];
         
@@ -158,31 +130,21 @@ foreach ($people as $person) {
         
         $today = \Carbon\Carbon::now()->toDateString();
 
-        // foreach ($people as $person) {
-        //     $person->todayOptionItems = OptionItem::where('people_id', $person->id)
-        //         ->whereDate('created_at', $today)
-        //         ->get();
-        // }
-
-        // $todayOptionItems = OptionItem::whereIn('people_id', $people->pluck('id'))
-        // ->whereDate('created_at', $today)
-        // ->get()
-        // ->groupBy('people_id');
-    
-    foreach ($people as $person) {
-        $person->todayOptionItems = $todayOptionItems[$person->id] ?? collect();
-    }
-
+        foreach ($people as $person) {
+            $person->todayOptionItems = OptionItem::where('people_id', $person->id)
+                ->whereDate('created_at', $today)
+                ->get();
+        }
     
        // optionsテーブルから必要なデータを取得
-    //    $options = Option::whereIn('people_id', $people->pluck('id'))
-    //     ->get(['id', 'people_id', 'title', 'item1', 'item2', 'item3', 'item4', 'item5']);
-    //     $personOptions = [];
-    //     foreach ($people as $person) {
-    //         $personOptions[$person->id] = Option::where('people_id', $person->id)
-    //             ->where('flag', 1)
-    //             ->get();
-    //     }
+       $options = Option::whereIn('people_id', $people->pluck('id'))
+        ->get(['id', 'people_id', 'title', 'item1', 'item2', 'item3', 'item4', 'item5']);
+        $personOptions = [];
+        foreach ($people as $person) {
+            $personOptions[$person->id] = Option::where('people_id', $person->id)
+                ->where('flag', 1)
+                ->get();
+        }
 
         // 各利用者の訪問データを取得して送迎の要否を確認(送迎は開発途中のためコメントアウト）
         // foreach ($people as $person) {
@@ -190,8 +152,7 @@ foreach ($people as $person) {
         //     $person->transport = $scheduledVisit ? $scheduledVisit->transport : '未登録';
         // }
 
-    // return view('people', compact('people', 'selectedItems', 'options', 'personOptions'));
-    return view('people', compact('people'));
+    return view('people', compact('people', 'selectedItems', 'options', 'personOptions'));
     }
     else {
         // $people = collect([]); // 空のコレクションを作成
@@ -231,7 +192,7 @@ foreach ($people as $person) {
                               ->exists();
     
         $person->unreadMessages = $unreadMessages;
-        // \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
+        \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
     }
 
     $selectedItems = [];
@@ -474,9 +435,9 @@ foreach ($people as $person) {
         ['encrypted_id' => $encryptedId]
     );
     
-    // \Log::info('Generated URL: ' . $url);
-    // \Log::info('Person ID: ' . $person->id);
-    // \Log::info('People family count: ' . $people->count());
+    \Log::info('Generated URL: ' . $url);
+    \Log::info('Person ID: ' . $person->id);
+    \Log::info('People family count: ' . $people->count());
 
     $qrCode = QrCode::size(200)->generate($url);
     $firstFacility = $facility->first();
@@ -489,7 +450,7 @@ foreach ($people as $person) {
     }
 
     // Add this line to check if $facilitypeople has data
-    // \Log::info('Facility people count: ' . $facilitypeople->count());
+    \Log::info('Facility people count: ' . $facilitypeople->count());
 
     return view('peopleedit', compact('url', 'qrCode', 'person', 'facility', 'facilitypeople'));
 }
