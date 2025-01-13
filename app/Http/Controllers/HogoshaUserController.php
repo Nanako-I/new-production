@@ -596,8 +596,8 @@ if (!$person) {
             Log::error('メール送信に失敗しました。', ['email' => $user->email, 'error' => $e->getMessage()]);
         }
             // hogosha ビューにデータを渡して表示
-            return view('hogosha', compact('people', 'unreadMessages'))
-                   ->with('success', 'ご登録完了ありがとうございます。<br>メールにて今後こちらのアプリへのログインのURLをお送りしておりますのでご確認ください。');
+            return response()->view('hogosha', compact('people', 'unreadMessages'))
+                   ->with('success', 'ご登録ありがとうございます。<br>メールにて今後こちらのアプリへのログインのURLをお送りしておりますのでご確認ください。');
            
         } catch (\Exception $e) {
             DB::rollBack();

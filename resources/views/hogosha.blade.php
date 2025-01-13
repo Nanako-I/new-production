@@ -40,7 +40,12 @@
 <style>
   /* フォントを指定 */
 
+  
   body {
+    font-family: 'Noto Sans JP', sans-serif; /* フォントをArialに設定 */
+  }
+
+  .slider {
     font-family: 'Noto Sans JP', sans-serif; /* フォントをArialに設定 */
   background: linear-gradient(135deg, rgb(209, 253, 255,0.5), rgb(253, 219, 146,1));
   }
@@ -52,7 +57,7 @@
 
            <!--<section class="text-gray-600 body-font" _msthidden="29">-->
   <!--<div class="container px-5 py-24 mx-auto" _msthidden="29">-->
-   <div class="flex flex-col items-center justify-center w-full my-2">
+   <!-- <div class="flex flex-col items-center justify-center w-full my-2">
         <style>
          /* @import url('https://fonts.googleapis.com/css2?family=Arial&display=swap'); */
             h1 {
@@ -60,7 +65,7 @@
           }
         </style>
       <h1 class="sm:text-2xl text-3xl font-bold title-font mb-4 text-gray-900" _msttexthash="91611" _msthidden="1" _msthash="63"></h1>
-    </div>
+    </div> -->
 
     <!-- 現在の本 -->
 
@@ -74,7 +79,7 @@
         @foreach ($people as $person)
         <!--$person->load('temperatures');-->
           <div class="p-2 h-full lg:w-1/3 md:w-full flex">
-           <div class="slide height:auto  border-2 p-2 p-4 w-full md:w-64 lg:w-100 rounded-lg bg-white">
+           <div class="slide height:auto  border-2 p-2 p-4 w-full md:w-64 lg:w-100 rounded-lg bg-white my-4">
              <style>
               .slide {
                 width:100vw;
@@ -96,11 +101,11 @@
                 <div class="h-30 flex flex-row items-center rounded-lg bg-white width:100vw relative z-0">
                   <!--ハンバーガーメニューが表示された時は、下に表示されるようz-0をつける-->
 
-                  @if ($person->filename)
+                  <!-- @if ($person->filename)
                       <img alt="team" class="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 rounded-full mr-4" src="{{ asset('storage/sample/person_photo/' . $person->filename) }}">
                     @else
                       <img alt="team" class="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 rounded-full mr-4" src="https://dummyimage.com/80x80">
-                    @endif
+                    @endif -->
 
                         <style>
                           /* フォントを指定 */
