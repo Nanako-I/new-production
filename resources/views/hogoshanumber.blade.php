@@ -21,6 +21,18 @@
                 {!! $error !!}
             </div>
         @endif
+        <!-- <p>
+    @if (isset($personId))
+        Person ID: {{ $personId }}<br>
+        @if (isset($dateOfBirth))
+            Date of Birth: {{ $dateOfBirth }}
+        @else
+            Date of Birth は見つかりませんでした。
+        @endif
+    @else
+        Person ID は設定されていません。
+    @endif
+</p> -->
 
         @if (isset($userData))
             <input type="hidden" id="last_name" name="last_name" value="{{ $userData['last_name'] }}">
