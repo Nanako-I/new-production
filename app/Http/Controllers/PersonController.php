@@ -160,6 +160,85 @@ class PersonController extends Controller
 }
 }
 
+public function getContent($id)
+    {
+        $person = Person::findOrFail($id);
+        // ログインしているユーザーの情報↓
+        $user = auth()->user();
+
+        $user->facility_staffs()->first();
+
+        // facility_staffsメソッドからuserの情報をゲットする↓
+        $facilities = $user->facility_staffs()->get();
+        $facilityIds = $facilities->pluck('id')->toArray();
+
+        $roles = $user->user_roles()->get(); // これでロールが取得できる
+
+        $rolename = $user->getRoleNames(); // ロールの名前を取得
+        $isSuperAdmin = $user->hasRole(RoleType::FacilityStaffAdministrator);
+
+        // ロールのIDを取得する場合
+        $roleIds = $user->roles->pluck('id');
+
+        $firstFacility = $facilities->first();
+        $people = Person::with([
+            'people_facilities', 
+            'scheduled_visits',
+            'times',
+            // 'temperatures',
+            // 'creatives',
+            // 'activities',
+            // 'trainings',
+            // 'lifestyles',
+            // 'foods',
+            // 'bloodpressures',
+            // 'toilets',
+            // 'waters',
+            // 'medicines',
+            // 'tubes',
+            // 'kyuuins',
+            // 'hossas',
+            // 'speeches',
+            // 'notebooks',
+        
+        ])
+        ->whereHas('people_facilities', function ($query) use ($facilityIds) {
+            $query->whereIn('facilities.id', $facilityIds);
+        })->get();
+            $unreadMessages = HogoshaText::where('people_id', $person->id)
+                                ->where('is_read', false)
+                                ->where('user_identifier', '!=', $user->id)
+                                ->exists();
+        
+            $person->unreadMessages = $unreadMessages;
+            \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
+ 
+
+        $selectedItems = [];
+        
+    
+            $selectedItems[$person->id] = json_decode($person->selected_items, true) ?? [];
+
+        
+        $today = \Carbon\Carbon::now()->toDateString();
+
+            $person->todayOptionItems = OptionItem::where('people_id', $person->id)
+                ->whereDate('created_at', $today)
+                ->get();
+
+    
+       // optionsテーブルから必要なデータを取得
+       $options = Option::whereIn('people_id', $people->pluck('id'))
+        ->get(['id', 'people_id', 'title', 'item1', 'item2', 'item3', 'item4', 'item5']);
+        $personOptions = [];
+
+            $personOptions[$person->id] = Option::where('people_id', $person->id)
+                ->where('flag', 1)
+                ->get();
+
+                return view('partials._people_content',compact('people', 'person','selectedItems', 'options', 'personOptions'));
+    }
+
     public function show($id)
 {
     $person = Person::findOrFail($id);

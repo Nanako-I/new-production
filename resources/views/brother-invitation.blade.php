@@ -1,5 +1,10 @@
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 <x-app-layout>
+        @if(session('success'))
+            <div class="bg-green-500 text-white p-4 rounded-lg mb-4">
+                {{ session('success') }}
+            </div>
+        @endif
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight" style="width: 100%;">
             {{ __('ご家族と利用者リスト') }}

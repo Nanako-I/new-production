@@ -1,5 +1,7 @@
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 <x-app-layout>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+<script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
         @if ($errors->any())
             <div style="color: red; font-weight: bold; background-color: #ffe6e6; border: 2px solid red; padding: 10px; border-radius: 5px;">
                 <ul style="list-style-type: none; padding-left: 0;">
@@ -56,15 +58,7 @@
       rel="stylesheet">
         
            
-   <!-- <div class="flex flex-col items-center justify-center w-full my-2">
-        <style>
-         @import url('https://fonts.googleapis.com/css2?family=Arial&display=swap');
-            h1 {
-            font-family: Arial, sans-serif; /* フォントをArialに設定 */
-          }
-        </style>
-      <h1 class="sm:text-2xl text-3xl font-bold title-font mb-4 text-gray-900" _msttexthash="91611" _msthidden="1" _msthash="63"></h1>
-    </div> -->
+   
     
  <!-- 利用者情報 -->
 
@@ -75,8 +69,10 @@
     @csrf
     
 <!-- 左半分: 利用者情報 -->
+
 <div class="p-4 overflow-x-auto md:overflow-y-auto">
     @foreach ($people as $person)
+    
         <div class="inline-block md:block bg-white rounded-lg shadow-md p-4 mb-4 cursor-pointer person-info" 
              data-person-id="{{ $person->id }}"
              data-last-name="{{ $person->last_name }}"
@@ -108,14 +104,50 @@
                                         </a>
                                     @endif
                                 @endif
+                                
                                         </div>
+                                  
                                     @endforeach
+
+                                    
+
                                 </div>
-           
-       
+           <!-- 右半分: 利用者詳細情報 -->
+                                <div id="person-details" class="p-4 flex flex-col overflow-y-auto">
+<!-- ここに部分ビューの内容が表示されます -->
+</div>
         @endhasanyrole
         </div>   
-    
+        
+        <style>
+                        .slider {
+                            display: flex;
+                            flex-wrap: wrap;
+                            justify-content: left; /* 中央揃え */
+                            gap: 10px; /* スライド間の余白 */
+                            overflow-x: scroll; /* 水平方向にスクロール可能 */
+                            white-space: nowrap; /* 子要素を横並びにする */
+                            width: 100%;
+                        }
+
+                        .slider > div{
+                            width: 100%;
+                        }
+
+                        @media screen and (min-width: 768px){
+                            .slider > div{
+                                width: 49%;
+                                max-height: 80vh;
+                            }
+                        }
+
+                        
+                        .slide {
+                        background: rgb(244,244,244);                       
+                      }
+                </style>
+
+
 <!--</section>-->
 </div>
  
@@ -124,29 +156,85 @@
 </body>
 </html>
 <script>
+// document.addEventListener('DOMContentLoaded', function() {
+//     const personElements = document.querySelectorAll('.person-info');
+//     const recordLists = document.querySelectorAll('[id^="record-list-"]');
+
+//     personElements.forEach(element => {
+//         element.addEventListener('click', function() {
+//             const personId = this.getAttribute('data-person-id');
+            
+//             // Hide all record lists
+//             recordLists.forEach(list => {
+//                 list.classList.add('hidden');
+//             });
+
+//             // Show the selected person's record list
+//             const selectedRecordList = document.getElementById(`record-list-${personId}`);
+//             if (selectedRecordList) {
+//                 selectedRecordList.classList.remove('hidden');
+//             }
+//         });
+//     });
+// });
+
 document.addEventListener('DOMContentLoaded', function() {
     const personElements = document.querySelectorAll('.person-info');
-    const recordLists = document.querySelectorAll('[id^="record-list-"]');
 
-    personElements.forEach(element => {
-        element.addEventListener('click', function() {
+    personElements.forEach(personElement => {
+        personElement.addEventListener('click', function() {
             const personId = this.getAttribute('data-person-id');
-            
-            // Hide all record lists
-            recordLists.forEach(list => {
-                list.classList.add('hidden');
-            });
-
-            // Show the selected person's record list
-            const selectedRecordList = document.getElementById(`record-list-${personId}`);
-            if (selectedRecordList) {
-                selectedRecordList.classList.remove('hidden');
-            }
-
-            // Optionally, you can add AJAX call here to fetch and update records
-            // fetchRecords(personId);
+            console.log(personId);
+            fetch(`/people/${personId}/content`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('person-details').innerHTML = html;
+                })
+                .catch(error => console.error('Error fetching person details:', error));
         });
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const personDetailsContainer = document.getElementById('person-details');
+
+    // イベントデリゲーションを使用して、動的に追加されたラジオボタンにイベントを設定
+    personDetailsContainer.addEventListener('change', function(event) {
+        if (event.target.matches('input[name="meal_type"]')) {
+            const lunchSection = document.getElementById('lunch-section');
+            const oyatsuSection = document.getElementById('oyatsu-section');
+            const lunchSelect = document.querySelector('select[name="lunch"]');
+            const oyatsuSelect = document.querySelector('select[name="oyatsu"]');
+            const submitButton = document.getElementById('submit-button');
+
+            // ラジオボタンが選択されたら送信ボタンを表示
+            submitButton.classList.remove('hidden');
+            if (event.target.value === 'lunch_only') {
+                lunchSection.style.display = 'block';
+                oyatsuSection.style.display = 'none';
+
+                // lunch のデフォルト値を 'あり' に、oyatsu のデフォルト値を 'なし' に
+                lunchSelect.value = 'あり';
+                oyatsuSelect.value = 'なし';
+
+            } else if (event.target.value === 'lunch_and_oyatsu') {
+                lunchSection.style.display = 'block';
+                oyatsuSection.style.display = 'block';
+
+                // 両方のデフォルト値を 'あり' に
+                lunchSelect.value = 'あり';
+                oyatsuSelect.value = 'あり';
+            } else if (event.target.value === 'oyatsu_only') {
+                lunchSection.style.display = 'none';
+                oyatsuSection.style.display = 'block';
+
+                // 昼食のデフォルト値を 'なし' に
+                lunchSelect.value = 'なし';
+                oyatsuSelect.value = 'あり';
+            }
+        }
+    });
+});
+
 </script>
 </x-app-layout>

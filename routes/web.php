@@ -37,6 +37,7 @@ use App\Http\Controllers\OptionItemController;//追加した記録項目に登�
 use App\Http\Controllers\TimeController;//利用時間を登録するコントローラー
 use App\Http\Controllers\PhotoController;
 
+use App\Http\Controllers\AchievementController;//追記
 use App\Http\Controllers\ActivityController;//追記
 use App\Http\Controllers\TrainingController;//追記
 use App\Http\Controllers\LifestyleController;//追記
@@ -149,6 +150,8 @@ Route::get('/facilityregister', [FacilityController::class, 'create'])->name('fa
 Route::post('facilityregister', [FacilityController::class, 'store'])->name('facilityregister.store');
 
 Route::resource('people', PersonController::class);
+// Route::get('people_content/{id}', [PersonController::class, 'people_content'])->name('people_content.show');
+Route::get('/people/{id}/content', [PersonController::class, 'getContent'])->name('people.content');
 Route::post('/people/{person}/associate-line-account', [PersonController::class, 'associateLineAccount'])->name('associate.line.account');
 Route::post('people/{id}',[PersonController::class,'destroy'])->name('people.delete');
 
@@ -372,6 +375,10 @@ Route::resource('people', PersonController::class);
 // 利用者全員のリスト
 Route::get('/peoplelist', [PersonController::class, 'list'])->name('people.list');
 
+// できたことの選択項目
+Route::get('/achievement/{people_id}', [AchievementController::class, 'show'])->name('achievement.show');
+Route::get('/achievement-content/{people_id}', [AchievementController::class, 'contentshow'])->name('achievement.content.show');
+Route::get('/achievement-detail/{people_id}', [AchievementController::class, 'detailshow'])->name('achievement.detail.show');
 
 // 登録項目選択
 Route::get('/selected-item/{people_id}/{id}', [PersonController::class, 'showSelectedItems'])->name('show.selected.items');
