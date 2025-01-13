@@ -234,6 +234,36 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    
+    // イベントデリゲーションを使用して、動的に追加されたフォームにイベントを設定
+    // personDetailsContainer.addEventListener('submit', function(event) {
+    //     const form = event.target;
+    //     const actionPattern = new RegExp('^' + form.action.replace(/:\w+/g, '\\d+'));
+        
+    //     if (actionPattern.test(form.action)) {
+    //         const checkboxes = form.querySelectorAll('.option-checkbox');
+    //         const bikou = form.querySelector('.option-bikou');
+    //         const hasInputField = form.querySelector('input[name="has_input"]');
+
+    //         updateHasInput();
+    //         if (hasInputField.value === '0') {
+    //             event.preventDefault();
+    //             alert('チェックボックス、もしくは備考欄に入力してください。');
+    //         }
+
+    //         checkboxes.forEach(checkbox => {
+    //             checkbox.addEventListener('change', updateHasInput);
+    //         });
+
+    //         bikou.addEventListener('input', updateHasInput);
+
+    //         function updateHasInput() {
+    //             let hasChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+    //             let hasBikou = bikou.value.trim() !== '';
+    //             hasInputField.value = (hasChecked || hasBikou) ? '1' : '0';
+    //         }
+    //     }
+    // });
 });
 
 </script>

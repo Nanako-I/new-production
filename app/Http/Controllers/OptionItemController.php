@@ -39,11 +39,14 @@ class OptionItemController extends Controller
             'has_input' => 'required|boolean',
         ]);
     
-        if ($request->has_input == false) {
-            return redirect()->back()
-                ->withErrors(['error_'.$request->option_id => 'チェックもしくは備考欄に入力してください。'])
-                ->withInput();
-        }
+        // if ($request->has_input == false) {
+        //     return redirect()->back()
+        //         ->withErrors(['error_'.$request->option_id => 'チェックもしくは備考欄に入力してください。'])
+        //         ->withInput();
+        // }
+       
+
+        
     
         OptionItem::create([
             'people_id' => $request->people_id,

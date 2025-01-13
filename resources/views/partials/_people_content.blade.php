@@ -544,9 +544,9 @@
                                                     }
                                                 </style>
 
-@php
-    $todayItems = $person->todayOptionItems ? $person->todayOptionItems->where('option_id', $option->id) : collect();
-@endphp
+                                            @php
+                                                $todayItems = $person->todayOptionItems ? $person->todayOptionItems->where('option_id', $option->id) : collect();
+                                            @endphp
 
                                                 @if($todayItems->isEmpty())
                                                     <form action="{{ route('options.item.store', ['people_id' => $person->id, 'id' => $option->id]) }}" method="POST">
