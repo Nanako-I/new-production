@@ -51,7 +51,7 @@ class BrotherInvitationController extends Controller
 
     public function register(Request $request)
     {
-        \Log::info('Request data: ', $request->all());
+        // \Log::info('Request data: ', $request->all());
 
         $validatedData = $request->validate([
             'person_id' => 'required|integer|exists:people,id',
@@ -66,9 +66,14 @@ class BrotherInvitationController extends Controller
                 'updated_at' => now(),
             ]);
 
-            return response()->json(['success' => true]);
+             // 二重送信防止
+            $request->session()->regenerateToken();
+            return redirect()
+            ->route('brother.invitation')
+            ->with('success', 'ご家族との紐づけが完了しました');
+
         } catch (\Exception $e) {
-            \Log::error('Error linking user and family: ' . $e->getMessage());
+            // \Log::error('Error linking user and family: ' . $e->getMessage());
             return response()->json(['success' => false, 'error' => $e->getMessage()]);
         }
     }

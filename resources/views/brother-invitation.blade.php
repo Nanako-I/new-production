@@ -115,6 +115,12 @@
                 /* 赤色 */
                 color: white;
             }
+
+
+            li {
+                font-weight: bold; /* 文字を太くする */
+                color: black; /* 文字色を濃くする */
+            }
         </style>
 
         <div class="flex">
@@ -124,6 +130,14 @@
                 <div class="bg-white rounded-lg shadow-md p-4 mb-4 cursor-pointer user-card" data-family="{{ json_encode($facilityperson->people_family) }}" data-user="{{ json_encode(['id' => $facilityperson->id, 'last_name' => $facilityperson->last_name, 'first_name' => $facilityperson->first_name]) }}">
                     <h3 class="text-gray-900 font-bold text-lg">{{ $facilityperson->last_name }} {{ $facilityperson->first_name }}</h3>
                     <p class="text-gray-700">生年月日: {{ $facilityperson->date_of_birth }}</p>
+                    <p class="text-gray-700">
+                        家族: 
+                        @if($facilityperson->people_family->isNotEmpty())
+                            {{ $facilityperson->people_family->map(fn($family) => $family->last_name . ' ' . $family->first_name)->join('、') }}
+                        @else
+                            登録された家族はいません
+                        @endif
+                    </p>
                 </div>
                 @endforeach
             </div>
@@ -132,11 +146,10 @@
             <div class="w-1/2 p-4">
                 <div class="bg-white rounded-lg shadow-md p-4" id="family-info">
                     <h3 class="text-gray-900 font-bold text-xl mb-2">家族情報</h3>
-                    <p>左側のリストから利用者を選択してください。</p>
                     <ul id="family-list" class="list-disc pl-5"></ul>
-                    <button id="add-family-btn" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded" style="display: none;">家族を追加</button>
+                    <button id="add-family-btn" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded" style="display: none;">他の利用者を紐づける</button>
                     <div id="userList" class="user-list">
-                        <h4 class="font-semibold">施設に紐づく利用者一覧:</h4>
+                        <h4 class="font-semibold" id="family-name-header">さんと紐づけたい利用者を選択してください。</h4>
                         <ul class="list-disc pl-5">
                             @foreach($facilitypeople as $facilityperson)
                             <li>
@@ -272,12 +285,11 @@
                                     const registeredUsers = family.registered_people
                                         .map(person => `${person.last_name} ${person.first_name}`)
                                         .join('、');
-                                    subLi.textContent = `登録済利用者: ${registeredUsers}`;
+                                    subLi.textContent = `お子さん: ${registeredUsers}`;
                                     subLi.style.color = 'black';
                                     subList.appendChild(subLi);
                                 }
                                 familyList.appendChild(subList);
-
 
                                 selectedFamilyName = `${family.last_name} ${family.first_name}`;
                                 selectedFamilyId = family.id;
@@ -304,10 +316,13 @@
                             li.textContent = '登録された家族はいません';
                             familyList.appendChild(li);
                             addFamilyBtn.style.display = 'none';
-
                         }
 
                         userList.style.display = 'none';
+
+                        // 家族名を更新
+                        const familyNameHeader = document.getElementById('family-name-header');
+                        familyNameHeader.textContent = `${selectedFamilyName}さんと紐づけたい利用者を選択してください。`;
                     });
                 });
 
@@ -321,7 +336,7 @@
                         if (this.checked) {
                             currentCheckbox = this;
                             selectedUserData = JSON.parse(this.getAttribute('data-user'));
-                            confirmationMessage1.textContent = `利用者${selectedUserData.last_name} ${selectedUserData.first_name}さんをご家族${selectedFamilyName}さんと紐づけますか？`;
+                            confirmationMessage1.textContent = `${selectedUserData.last_name} ${selectedUserData.first_name}さんをご家族${selectedFamilyName}さんと紐づけますか？`;
                             confirmationModal1.style.display = 'block';
 
                             // Hidden inputsに値を設定
@@ -333,7 +348,7 @@
 
                 yesButton.addEventListener('click', function() {
                     confirmationModal1.style.display = 'none';
-                    confirmationMessage2.textContent = `紐づけると利用者${selectedUserData.last_name} ${selectedUserData.first_name}さんの情報を${selectedFamilyName}さんが確認できるようになります。`;
+                    confirmationMessage2.textContent = `紐づけると${selectedUserData.last_name} ${selectedUserData.first_name}さんの情報を${selectedFamilyName}さんが確認できるようになります。`;
                     confirmationModal2.style.display = 'block';
                 });
 
@@ -380,6 +395,9 @@
                         }
                     }
                 });
+
+                const familyNameHeader = document.getElementById('family-name-header');
+                familyNameHeader.textContent = `${selectedFamilyName}さんと紐づけたい利用者を選択してください。`;
             });
         </script>
     </body>

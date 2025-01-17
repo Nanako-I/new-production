@@ -82,11 +82,11 @@
                         </x-nav-link>
                     </div>
 
-                    <!-- <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('calendar') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
+                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('calendar') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
                          <x-nav-link :href="url('brother-invitation')" :active="request()->is('brother.invitation')">
                             {{ __('利用者とご家族一覧') }}
                         </x-nav-link>
-                    </div> -->
+                    </div>
                     
                      <!-- <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('calendar') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
                          <x-nav-link :href="url('calendar')" :active="request()->is('calendar')">
@@ -158,9 +158,9 @@
                     {{ __('新規の利用者登録') }}
                 </x-dropdown-link>
 
-                <!-- <x-dropdown-link :href="url('brother-invitation')" class="text-lg">
+                <x-dropdown-link :href="url('brother-invitation')" class="text-lg">
                     {{ __('利用者とご家族一覧') }}
-                </x-dropdown-link> -->
+                </x-dropdown-link>
 
                 <x-dropdown-link :href="'https://www.canva.com/design/DAGaNXIK_64/TkYZvV0IKlAVxGrSxnSLPA/watch?utm_content=DAGaNXIK_64&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hf2a6166ea9'" class="text-lg">
                     {{ __('使い方①') }}
@@ -246,9 +246,9 @@
                     {{ __('使い方②') }}
                 </x-dropdown-link>
 
-                <!-- <x-dropdown-link :href="url('brother-invitation')" class="text-lg">
+                <x-dropdown-link :href="url('brother-invitation')" class="text-lg">
                     {{ __('利用者とご家族一覧') }}
-                </x-dropdown-link> -->
+                </x-dropdown-link>
 
                 <!-- <x-dropdown-link :href="url('before-invitation')" class="text-lg">
                     {{ __('保護者を招待する') }}
