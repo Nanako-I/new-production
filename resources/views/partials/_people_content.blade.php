@@ -90,15 +90,21 @@
                                         
                                         <!-- リアルタイムで新着メッセージが届いた場合にNewと表示 -->
                                         <!-- <a href="{{ url('chat/'.$person->id) }}" id="person-{{ $person->id }}" class="relative ml-2" style="display: flex; align-items: center;">
-                                            <summary class="text-red-500 font-bold text-xl">連絡する</summary>
+                                            
                                             @csrf
-                                            <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i> -->
-
+                                            
+                                            @php
+                                            $user = auth()->user();
+                                            $unreadChats = $person->chats()
+                                            ->where('is_read', false)
+                                            ->where('user_identifier', '!=', $user->id)
+                                            ->exists();
+                                            @endphp -->
                                             <!-- 未読メッセージがある場合に new マークを表示 -->
-                                            <!-- @if($person->unreadMessages)
-                                                <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-sm font-bold">New</span>
+                                            <!-- @if($unreadChats)
+                                                <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">New</span>
                                             @else
-                                                <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-sm font-bold" style="display: none;">New</span>
+                                                <span id="contact-guardian-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold" >保護者に連絡する</span>
                                             @endif
                                         </a>
                                     </div>
@@ -126,7 +132,9 @@
                                                 @if($person->unreadMessages)
                                                     <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">New</span>
                                                 @else
-                                                <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">登録する</span>
+                                                <span id="new-indicator-{{ $person->id }}" class="text-red-500 text-xl font-bold">
+                                                <summary class="text-red-500 font-bold text-xl">登録する</summary>
+                                                </span>
                                                 @endif
                                                 </a>
                                             @else
@@ -253,12 +261,12 @@
                                                                 </div>
 
                                                                 <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
-                                                                    <input type="time" name="start_time" id="scheduled-time">
+                                                                    <input type="time" step="300" name="start_time" id="scheduled-time">
                                                                     <p class="text-gray-900 font-bold text-xl px-1.5">～</p>
                                                                 </div>
 
                                                                 <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
-                                                                    <input type="time" name="end_time" id="scheduled-time">
+                                                                    <input type="time" step="300" name="end_time" id="scheduled-time">
                                                                 </div>
 
                                                                 <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">

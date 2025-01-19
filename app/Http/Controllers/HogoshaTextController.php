@@ -14,11 +14,11 @@ class HogoshaTextController extends Controller
     $person = Person::findOrFail($people_id);
     $user = Auth::user();
     $selectedDate = $request->input('selected_date', \Carbon\Carbon::now()->toDateString());
-    $selectedDateStart = \Carbon\Carbon::parse($selectedDate)->startOfDay();    
-    $selectedDateEnd = \Carbon\Carbon::parse($selectedDate)->endOfDay();
+    // $selectedDateStart = \Carbon\Carbon::parse($selectedDate)->startOfDay();    
+    // $selectedDateEnd = \Carbon\Carbon::parse($selectedDate)->endOfDay();
 
     $hogoshatexts = HogoshaText::where('people_id', $people_id)
-                   ->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd])
+                //    ->whereBetween('created_at', [$selectedDateStart, $selectedDateEnd])
                    ->get();
 
     if ($request->ajax()) {

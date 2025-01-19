@@ -103,13 +103,13 @@ class PersonController extends Controller
             // }
 
             foreach ($people as $person) {
-                $unreadMessages = Chat::where('people_id', $person->id)
+                $unreadChats = Chat::where('people_id', $person->id)
                                     ->where('is_read', false)
                                     ->where('user_identifier', '!=', $user->id)
                                     ->exists();
             
-                $person->unreadMessages = $unreadMessages;
-                \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
+                $person->unreadChats = $unreadChats;
+                \Log::info("Person {$person->id} unread messages: " . ($unreadChats ? 'true' : 'false'));
         }
 
         foreach ($people as $person) {
@@ -152,7 +152,7 @@ class PersonController extends Controller
         //     $person->transport = $scheduledVisit ? $scheduledVisit->transport : '未登録';
         // }
 
-    return view('people', compact('people', 'selectedItems', 'options', 'personOptions'));
+    return view('people', compact('people', 'selectedItems', 'options', 'personOptions','unreadChats'));
     }
     else {
         // $people = collect([]); // 空のコレクションを作成
