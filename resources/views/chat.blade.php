@@ -4,16 +4,15 @@
         <head>
             @vite(['resources/css/app.css', 'resources/js/app.js'])
             <meta name="csrf-token" content="{{ csrf_token() }}">
-        <!-- <link rel="stylesheet" href="{{ asset('css/app.css') }}"> -->
-        <!-- <script src="{{ asset('js/app.js') }}" defer></script> -->
-            <script>
+      
+            <!-- <script>
                 const peopleId = "{{ $person->id }}";
                 window.sessionUserIdentifier = "{{ session('user_identifier') }}";
                 window.peopleId = "{{ $person->id }}";
 
                 window.UserId={{ auth()->id()}};
-            </script>
-            <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+            </script> -->
+            <!-- <script src="https://js.pusher.com/7.0/pusher.min.js"></script> -->
             <style>
             * {
                 margin: 0;
@@ -40,6 +39,11 @@
                 font-family: Arial, sans-serif;
                 font-size: 20px;
             }
+
+            .contact-header {
+            display: block; /* 確実に表示されるようにする */
+            color: black; /* 必要に応じて色を設定 */
+        }
 
             #chatbot {
                 position: fixed;
@@ -95,25 +99,10 @@
             }
 
 
-            /* @media screen and (max-width: 700px) {
-                #chatbot-body {
-                width: 100%;
-                height: calc(100vh - 150px);
-                padding-top: 10px;
-                padding-bottom: 10px;
-                background: #FFF;
-                box-sizing: border-box;
-                overflow-x: hidden;
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-                position: absolute;
-                top: 0;
-                bottom: 80px;
-                }
-            } */
+        
             #chatbot-body {
                 width: 100%;
-                height: calc(100vh - 180px); /* 画面の高さから80pxを引いた値 */
+                height: calc(100vh - 240px); /* 画面の高さから80pxを引いた値 */
                 padding-top: 10px;
                 padding-bottom: 10px;
                 background: #FFF;
@@ -125,6 +114,7 @@
                 top: 0;
                 left: 0;
                 right: 0;
+                background: linear-gradient(135deg, rgb(209, 253, 255,0.5), rgb(253, 219, 146,1));
             }
 
             #chatbot-body.chatbot-body-zoom {
@@ -148,37 +138,36 @@
             }
 
             #chatbot-footer {
-                width: 100%;
-                height: 60px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                box-sizing: border-box;
-                background: #FFF;
-                border-top: 1.5px solid #EEE;
                 position: fixed;
-                
                 bottom: 0;
                 left: 0;
-                padding: 10px;
-                z-index: 1000;
+                width: 100%;
+                height: 80px; /* 固定の高さを設定 */
+                /* margin: 10px 30px; */
+                background-color: #f9f9f9;
+                border-top: 1px solid #ccc;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
             @media screen and (min-width: 700px) {
                 #chatbot-footer {
                     width: 100%;
-                    margin: 0 auto;
+                    margin: 0 40;
                 }
             }
 
             @media screen and (min-width: 700px) {
                 #chatbot-footer.chatbot-footer-zoom {
+                    width: 100%;
                     margin-bottom: 0;
                 }
             }
 
             @media screen and (max-width: 700px) {
                 #chatbot-footer.chatbot-footer-zoom {
+                    width: 100%;
                     position: fixed;
                     margin-bottom: 0;
                 }
@@ -209,25 +198,12 @@
                 outline: none;
             }
 
-            #chatbot-submit {
-                cursor: pointer;
-                height: 35px;
-                padding: 0 20px;
-                margin-left: 10px;
-                margin-right: 15px;
-                font-size: 16px;
-                background: #335C80;
-                color: white;
-                display: block;
-                border: none;
-                box-sizing: border-box;
-                border-radius: 7px;
-            }
-
-            #chatbot-submit:active {
-                outline: 0;
-                background: #86ABBF;
-            }
+            
+            .textarea-container {
+                    position: relative;
+                    width: 100%;
+                }
+                        
 
             #chatbot-ul {
                 padding: 0;
@@ -252,47 +228,25 @@
                 display: flex;
             }
 
-            .self {
-                justify-content: flex-end;
-            }
-
-            .other {
-                justify-content: flex-start;
-            }
-
             .message-container {
-                overflow-wrap: break-word;
-                max-width: 70%;
-                margin: 0.5rem 1rem;
-                padding: 0.5rem;
-                font-size: 1.125rem;
-                font-weight: bold;
-                border-radius: 0.5rem;
-                display: inline-block;
-            }
-
-            .self-message {
-                background-color: #c3e1ff;
-                color: #1a202c;
-                border-color: #4299e1;
-                text-align: left;
+                height: calc(100vh - 100px); /* 画面の高さからfooterの高さを引く */
+                overflow-y: auto; /* 縦スクロールを有効にする */
+                padding-bottom: 20px; /* footerとの間にスペースを作る */
             }
 
             .other-message {
-                background-color: #b2f5ea;
-                color: #1a202c;
-                border-color: #000;
-                text-align: left;
+                background-color: #ebf8ff; /* bg-blue-50 */
+                border: 2px solid #3b82f6; /* border-blue-500 */
             }
 
-            .text-right {
-                text-align: right;
-            }
+            .self-message {
+                    background-color: #ffffff; /* bg-white */
+                    border: 2px solid #808080; /* 灰色のボーダー */
+                }
 
-            .text-left {
-                text-align: left;
-            }
+            
 
+            
             .text-sm {
                 font-size: 0.7rem;
             }
@@ -301,8 +255,40 @@
                 font-weight: normal;
             }
 
-        </style>
+            #chatbot-text {
+                width: 95%;
+                height: 60px; /* footer内での高さを設定 */
+                box-sizing: border-box;
+                padding: 10px;
+                border: 1px solid #ccc;
+                background-color: #fff;
+            }
 
+            /* PC画面用のスタイル */
+           
+                #chatbot-text {
+                    width: 100%; /* PC画面では幅を100%に設定 */
+                }
+
+                #send-button {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 40px;
+        padding: 0 20px;
+        border: none;
+        background-color: #000; /* 背景を黒に設定 */
+        color: #fff; /* 文字色を白に設定 */
+        font-size: 16px; /* 文字サイズを大きく設定 */
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    #send-button:hover {
+        background-color: #333; /* ホバー時の背景色を少し明るく */
+    }
+</style>
     </head>
     <body class="font-sans antialiased" >
     <!-- <body class="font-sans antialiased" style="margin-bottom: 60px;"> -->
@@ -325,9 +311,10 @@
             <ul id="chatbot-ul" class="chat-messages">
                     @foreach ($chats as $chat)
                     <li class="{{ $chat->user_identifier == session('user_identifier') ? 'self' : 'other' }}">
-                        <div class="message-container {{ $chat->user_identifier == session('user_identifier') ? 'self-message' : 'other-message' }}">
+                        <div class="p-4 rounded-lg shadow mb-4 w-full {{ $chat->user_identifier == session('user_identifier') ? 'self-message' : 'other-message' }}">
+                        <!-- <div class="p-4 rounded-lg shadow mb-4 w-full {{ $chat->user_identifier == session('user_identifier') ? 'bg-blue-50 border-2 border-blue-500' : 'bg-white' }}"> -->
                             <div style="overflow-wrap: break-word;">
-                                <p style="overflow-wrap: break-word;" class="text-gray-900">{{ $chat->message }}</p>
+                                <p style="overflow-wrap: break-word;" class="text-gray-900 font-bold">{{ $chat->message }}</p>
                                 @if($chat->filename)
                                     <img alt="team" class="w-80 h-64" 
                                         
@@ -339,7 +326,7 @@
 
                                 @endif
                             </div>
-                            <p class="text-sm font-normal {{ $chat->user_identifier == session('user_identifier') ? 'text-right' : 'text-left' }}">
+                            <p class="font-normal text-black {{ $chat->user_identifier == session('user_identifier') }}">
                                 {{ $chat->created_at }} ＠{{ $chat->user_identifier == session('user_identifier') ? session('user_name') : $chat->last_name . $chat->first_name }}
                             </p>
                         </div>
@@ -355,13 +342,17 @@
             
                 <input type="hidden" name="user_identifier" value="{{ session('user_identifier') }}">
                 <input type="hidden" name="last_name" value="{{ $user_name }}">
-                <label for="filename" style="cursor: pointer;">
+                <label for="filename" class="hidden" style="cursor: pointer;">
                     <i class="fa-regular fa-image mt-2" style="font-size: 2em;"></i>
                     <input name="filename" id="filename" type="file" style="display: none;" onChange="uploadFile1()">
                 </label>
-                <input type="text" id="chatbot-text" class="browser-default" name="message" placeholder="テキストを入力" required
+                
+                <div class="textarea-container">
+                    <!-- <textarea name="text" id="chatbot-text" class="notebook font-bold p-4 rounded-lg shadow">{{ old('text') }}</textarea> -->
+                    <input type="text" id="chatbot-text" class="browser-default" name="message" placeholder="テキストを入力" required
                         style="word-wrap: break-word;" data-user-identifier="{{ session('user_identifier') }}">
-                <button type="submit" id="chatbot-submit">送信</button>
+                    <button type="submit" id="send-button" class="font-semibold">送信</button>
+                </div>
            
         </form>
     </div>
@@ -376,42 +367,56 @@
 
         chatToBottom();
 
-        const chatForm = document.getElementById('chat-form');
-        if (chatForm) {
-            chatForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                var formData = new FormData(chatForm);
+    //     const chatForm = document.getElementById('chat-form');
+    //     if (chatForm) {
+    //         chatForm.addEventListener('submit', function(e) {
+    //             e.preventDefault();
+    //             var formData = new FormData(chatForm);
 
-                const isFileSelected = document.getElementById('filename').files.length > 0;
+    //             const isFileSelected = document.getElementById('filename').files.length > 0;
 
-                if (isFileSelected) {
-                    formData.append('message', '写真が送信されました');
-                }
+    //             if (isFileSelected) {
+    //                 formData.append('message', '写真が送信されました');
+    //             }
 
-                fetch(this.action, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Data:', data);
-                    if (data.error) {
-                        throw new Error(data.error);
-                    }
-                    document.getElementById('chatbot-text').value = '';
-                    document.getElementById('filename').value = '';
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('メッセージの送信に失敗しました。');
-                });
-            }, { once: true });
-        }
+    //             fetch(this.action, {
+    //                 method: 'POST',
+    //                 body: formData
+    //             })
+    //             .then(response => {
+    //                 if (!response.ok) {
+    //                     throw new Error('Network response was not ok');
+    //                 }
+    //                 return response.json();
+    //             })
+    //             .then(data => {
+    //                 console.log('Data:', data);
+    //                 if (data.error) {
+    //                     throw new Error(data.error);
+    //                 }
+    //                 document.getElementById('chatbot-text').value = '';
+    //                 document.getElementById('filename').value = '';
+    //             })
+    //             .catch(error => {
+    //                 console.error('Error:', error);
+    //                 alert('メッセージの送信に失敗しました。');
+    //             });
+    //         }, { once: true });
+    //     }
+    // });
+
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     var chatForm = document.getElementById('chat-form');
+    //     var fileInput = document.getElementById('filename');
+
+    //     chatForm.addEventListener('submit', function(event) {
+    //         event.preventDefault();
+    //         if (fileInput && fileInput.files.length > 0) {
+    //             console.log('ファイルが選択されています');
+    //         } else {
+    //             console.log('ファイルが選択されていません');
+    //         }
+    //     });
     });
 </script>
 </body>

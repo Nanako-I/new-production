@@ -20,24 +20,26 @@ class HogoshaController extends Controller
         \Log::info('HogoshaController index method started.');
 
     //   / 全件データ取得して一覧表示する↓
-        // $people は変数名　Person::でPersonモデルにアクセスする
-        $hogosha = Hogosha::all();
-        $people = Person::all();
+        
+        // 現在ログインしているユーザーを取得
+      $user = Auth::user();
+
+      // ユーザーが関連付けられている全てのPerson（利用者）を取得
+      $people = $user->people_family()->get();
         // ('people')に$peopleが代入される
 
-        // ログインしているユーザーを取得
-        $user = auth()->user();
+
 
         // 未読メッセージの情報を各 Person に追加
         foreach ($people as $person) {
-            $unreadMessages = Chat::where('people_id', $person->id)
-                                  ->where('is_read', false)
-                                  ->where('user_identifier', '!=', $user->id)
-                                  ->exists();
-
-            $person->unreadMessages = $unreadMessages;
-            \Log::info('Person ID: ' . $person->id . ' Unread Messages: ' . $unreadMessages);
-        }
+            $unreadChats = Chat::where('people_id', $person->id)
+                                ->where('is_read', false)
+                                ->where('user_identifier', '!=', $user->id)
+                                ->exists();
+        
+            $person->unreadChats = $unreadChats;
+            \Log::info("Person {$person->id} unread messages: " . ($unreadChats ? 'true' : 'false'));
+    }
         // 施設から連絡があった場合(hogoshatextビュー)の未読メッセージの情報を各 Person に追加↓
         foreach ($people as $person) {
             $unreadMessages = HogoshaText::where('people_id', $person->id)
@@ -101,9 +103,23 @@ class HogoshaController extends Controller
      */
     public function show($id)
 {
+ // 現在ログインしているユーザーを取得
+ $user = Auth::user();
 
-    $person = Person::findOrFail($id);
-    $hogoshas = $person->hogoshas;
+ // ユーザーが関連付けられている全てのPerson（利用者）を取得
+ $people = $user->people_family()->get();
+  
+
+    // 未読メッセージの情報を各 Person に追加
+    foreach ($people as $person) {
+        $unreadChats = Chat::where('people_id', $person->id)
+                            ->where('is_read', false)
+                            ->where('user_identifier', '!=', $user->id)
+                            ->exists();
+    
+        $person->unreadChats = $unreadChats;
+        \Log::info("Person {$person->id} unread messages: " . ($unreadChats ? 'true' : 'false'));
+}
 
     // 施設から連絡があった場合(hogoshatextビュー)の未読メッセージの情報を各 Person に追加↓
     foreach ($people as $person) {

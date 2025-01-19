@@ -125,36 +125,46 @@
 
 
                         @hasanyrole('client family user|client family reader')
-                        <!--連絡事項↓ -->
-                        <!-- 　      　<div class="border-2 p-2 rounded-lg bg-white m-2">
+                        <!--チャット↓ -->
+                              <div class="border-2 p-2 rounded-lg bg-white m-2">
                                     <div class="flex justify-start items-center">
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                         <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
                                         <i class="fa-solid fa-comments text-sky-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
-                                        <p class="font-bold text-xl ml-2">連絡</p>
+                                        <p class="font-bold text-xl ml-2">連絡する</p>
                                     </div>
-                                    <div class="flex items-center justify-center p-4"> -->
-
+                                    <div class="flex items-center justify-center p-4">
+                                    @php
+                                            $user = auth()->user();
+                                            $unreadChats = $person->chats()
+                                            ->where('is_read', false)
+                                            ->where('user_identifier', '!=', $user->id)
+                                            ->exists();
+                                            @endphp
                                                 
-                                            <!-- リアルタイムで新着メッセージが届いた場合にNewと表示 -->
-                                            <!-- <a href="{{ url('chat/'.$person->id) }}" id="person-{{ $person->id }}" class="relative ml-2" style="display: flex; align-items: center;">
-                                                <summary class="text-red-500 font-bold text-xl">連絡する</summary>
-                                                @csrf
-                                                <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i> -->
+                                 <!-- リアルタイムで新着メッセージが届いた場合にNewと表示 -->
+                                  
+                                      <!-- 登録済みの場合 -->
+                                      <a href="{{ url('chat/'.$person->id) }}" id="person-{{ $person->id }}" class="relative ml-2" style="display: flex; align-items: center;">
+                                        @csrf
+                                        @if (isset($person->unreadChats)) {{-- unreadChatsが存在する場合 --}}
+                                            @if ($person->unreadChats) {{-- unreadChatsがtrueの場合 --}}
+                                                <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">New</span>
+                                            @else {{-- unreadChatsがfalseの場合 --}}
+                                                <span id="no-new-messages-{{ $person->id }}" class="ml-2 text-gray-500 text-xl font-bold">未読なし</span>
+                                            @endif
+                                        @else {{-- unreadChatsが存在しない場合 --}}
+                                            <span id="contact-guardian-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">連絡する</span>
+                                        @endif
+                                    </a>
 
-                                                <!-- 未読メッセージがある場合に new マークを表示 -->
-                                                <!-- @if($person->unreadMessages)
-                                                    <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-sm font-bold">New</span>
-                                                @else
-                                                    <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-sm font-bold" style="display: none;">New</span>
-                                                @endif
-                                            </a>
                                     </div>
-                                </div> -->
+                                </div>
+                                
                                 <div class="border-2 p-2 rounded-lg bg-white mx-2 mb-2 mt-8">
                                           <div class="flex justify-start items-center">
                                             <i class="fa-solid fa-pencil text-orange-600" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
-                                            <p class="font-bold text-xl ml-2">施設に連絡する</p>
+                                            <p class="font-bold text-xl ml-2">事業所に連絡する</p>
                                           </div>
                                           <div class="flex items-center justify-center p-4">
                                             @php
@@ -179,9 +189,8 @@
                                             @else
                                                 <!-- 未登録の場合 -->
                                                 <a href="{{ url('hogoshatext/'.$person->id) }}" class="relative">
-                                                    <summary class="text-red-500 font-bold text-xl">連絡する</summary>
+                                                    <summary class="text-red-500 font-bold text-xl">事業所に連絡する</summary>
                                                     @csrf
-                                                    <i class="fa-solid fa-plus text-gray-900" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
                                                 </a>
                                             @endif
                                         </div>

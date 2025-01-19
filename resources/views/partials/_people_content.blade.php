@@ -78,18 +78,18 @@
                       
                       
                       <!--連絡事項（緊急の連絡はLINEで行ってもらうためチャットは一旦コメントアウト）↓ -->
-                      <!-- <div class="border-2 p-2 rounded-lg bg-white my-2">
+                      <div class="border-2 p-2 rounded-lg bg-white my-2">
                                     <div class="flex justify-start items-center">
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                         <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
                                         <i class="fa-solid fa-comments text-sky-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
                                         <p class="font-bold text-xl ml-2">連絡</p>
                                     </div>
-                                    <div class="flex items-center justify-center p-4"> -->
+                                    <div class="flex items-center justify-center p-4">
 
                                         
                                         <!-- リアルタイムで新着メッセージが届いた場合にNewと表示 -->
-                                        <!-- <a href="{{ url('chat/'.$person->id) }}" id="person-{{ $person->id }}" class="relative ml-2" style="display: flex; align-items: center;">
+                                        <a href="{{ url('chat/'.$person->id) }}" id="person-{{ $person->id }}" class="relative ml-2" style="display: flex; align-items: center;">
                                             
                                             @csrf
                                             
@@ -99,16 +99,16 @@
                                             ->where('is_read', false)
                                             ->where('user_identifier', '!=', $user->id)
                                             ->exists();
-                                            @endphp -->
+                                            @endphp
                                             <!-- 未読メッセージがある場合に new マークを表示 -->
-                                            <!-- @if($unreadChats)
+                                            @if($unreadChats)
                                                 <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">New</span>
                                             @else
                                                 <span id="contact-guardian-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold" >保護者に連絡する</span>
                                             @endif
                                         </a>
                                     </div>
-                            </div> -->
+                            </div>
 
                                     <div class="border-2 p-2 rounded-lg bg-white mb-2 mt-8">
                                           <div class="flex justify-start items-center">

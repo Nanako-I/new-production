@@ -4,10 +4,11 @@
             <span class="block sm:inline font-bold">{{ session('success') }}</span>
         </div>
     @endif
+    
    <div id="chatbot">
-        <div class="flex items-center justify-center my-2 font-bold text-2xl">
-            <h2>{{$person->last_name}}{{$person->first_name}}さんについての連絡</h2>
-        </div>
+   <div class="flex items-center justify-center my-2 text-gray-900 font-bold text-2xl">
+   <h2 class="contact-header">{{$person->last_name}}{{$person->first_name}}さんについての連絡</h2>
+    </div>
         
         <style>
             * {
@@ -35,6 +36,11 @@
                 font-family: Arial, sans-serif;
                 font-size: 20px;
             }
+
+            .contact-header {
+            display: block; /* 確実に表示されるようにする */
+            color: black; /* 必要に応じて色を設定 */
+        }
 
             #chatbot {
                 position: fixed;
@@ -120,6 +126,7 @@
                 top: 0;
                 left: 0;
                 right: 0;
+                background: linear-gradient(135deg, rgb(209, 253, 255,0.5), rgb(253, 219, 146,1));
             }
 
             #chatbot-body.chatbot-body-zoom {
@@ -292,8 +299,6 @@
                 @error('notebook')
                     <p class="text-red-500 text-lg font-bold mt-2">{{ $message }}</p>
                 @enderror
-                <!-- <label for="selected_date" class="text-gray-900 font-bold text-xl">日付選択：</label> -->
-                <!-- <input type="date" name="selected_date" id="selected_date" value="{{ $selectedDate }}"> -->
             </div>
         </form>
 
@@ -312,8 +317,7 @@
                             
                         </div>
                     @endforeach
-                @else
-                    <p class="text-center mt-4 w-full max-w-lg mx-auto">選択された日付の記録はありません。</p>
+                
                 @endif
             @show
         </ul>
@@ -334,25 +338,8 @@
             </form>
         </div>
     </div>
-    <style>
-        body {
-            font-family: 'Noto Sans JP', sans-serif;
-            background: linear-gradient(135deg, rgb(253, 219, 146,0), rgb(209, 253, 255,1));
-        }
-        h2 {
-            font-family: Arial, sans-serif;
-            font-size: 20px;
-            text-decoration: underline;
-        }
-        .center-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            min-height: 100vh;
-            width: 100%;
-            padding: 20px;
-        }
-    </style>
+ 
+       
 
 <script>
     document.addEventListener('DOMContentLoaded', (event) => {

@@ -129,16 +129,20 @@ class ChatController extends Controller
                  broadcast(new MessageSent($chat))->toOthers();
                  \Log::info('Broadcast method called for MessageSent event');
                      
-                 return response()->json([
-                     'id' => $chat->id,
-                     'message' => $request->message,
-                     'user_identifier' => $user_identifier,
-                     'user_name' => $user_name,
-                     'created_at' => $chat->created_at->format('Y-m-d H:i:s'),
-                     'filename' => $chat->filename,
-                     'last_name' => $chat->last_name,
-                     'first_name' => $chat->first_name,
-                 ]);
+                //  送信ボタンを押したらJson形式の画面が返されるのでコメントアウト
+                //  return response()->json([
+                //      'id' => $chat->id,
+                //      'message' => $request->message,
+                //      'user_identifier' => $user_identifier,
+                //      'user_name' => $user_name,
+                //      'created_at' => $chat->created_at->format('Y-m-d H:i:s'),
+                //      'filename' => $chat->filename,
+                //      'last_name' => $chat->last_name,
+                //      'first_name' => $chat->first_name,
+                //  ]);
+                $request->session()->regenerateToken();
+            return redirect()
+            ->route('chat.show', ['people_id' => $people_id]);
      
          } catch (\Exception $e) {
              \Log::error('Error in store method: ' . $e->getMessage());
@@ -202,7 +206,7 @@ class ChatController extends Controller
     $length = Chat::where('people_id', $people_id)->count();
 
 
-    // 指定されたpeople_idの最新の5件のチャットメッセージを取得
+    // 指定されたpeople_idの最新のチャットメッセージを取得
     $chats = Chat::where('people_id', $people_id)
                  ->orderBy('created_at', 'asc')
                  ->get(['*', 'filename', 'path']);

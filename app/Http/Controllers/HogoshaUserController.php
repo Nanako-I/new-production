@@ -162,10 +162,19 @@ public function register(Request $request)
 
       // ユーザーが関連付けられている全てのPerson（利用者）を取得
       $people = $user->people_family()->get();
+// 未読メッセージの情報を各 Person に追加
+foreach ($people as $person) {
+    $unreadChats = Chat::where('people_id', $person->id)
+                        ->where('is_read', false)
+                        ->where('user_identifier', '!=', $user->id)
+                        ->exists();
 
+    $person->unreadChats = $unreadChats;
+    \Log::info("Person {$person->id} unread messages: " . ($unreadChats ? 'true' : 'false'));
+}
 
       // データをビューに渡す
-      return view('hogosha', compact('people'));
+      return view('hogosha', compact('people', 'unreadChats'));
   }
    
    public function create()

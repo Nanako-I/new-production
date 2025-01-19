@@ -97,14 +97,14 @@
                                         </a>
                                 @endif
 
-                                <!-- @if ($person->unreadChats) -->
+                                @if ($person->unreadChats)
                                    <!-- 登録済みの場合 -->
-                                        <!-- <a href="{{ url('chat/'.$person->id) }}" class="relative ml-2 flex items-center">
-                                            @csrf -->
+                                        <a href="{{ url('chat/'.$person->id) }}" class="relative ml-2 flex items-center">
+                                            @csrf
                                             <!-- 未読メッセージがある場合に new マークを表示 -->
-                                            <!-- <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold"><i class="fa-regular fa-envelope text-red-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>New</span>
+                                            <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold"><i class="fa-regular fa-envelope text-red-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>New</span>
                                         </a>
-                                @endif -->
+                                @endif
          </div>
                                   
     @endforeach

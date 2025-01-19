@@ -150,7 +150,6 @@ Route::get('/facilityregister', [FacilityController::class, 'create'])->name('fa
 Route::post('facilityregister', [FacilityController::class, 'store'])->name('facilityregister.store');
 
 Route::resource('people', PersonController::class);
-// Route::get('people_content/{id}', [PersonController::class, 'people_content'])->name('people_content.show');
 Route::get('/people/{id}/content', [PersonController::class, 'getContent'])->name('people.content');
 Route::post('/people/{person}/associate-line-account', [PersonController::class, 'associateLineAccount'])->name('associate.line.account');
 Route::post('people/{id}',[PersonController::class,'destroy'])->name('people.delete');
@@ -431,8 +430,8 @@ Route::post('/hogosharegister', [HogoshaUserController::class, 'register'])
 // Add a GET route for displaying the form
 // Route::get('/hogosharegister/{people_id}', [HogoshaUserController::class, 'showRegister'])->name('hogosharegister');
 
-// Route::get('/hogosha', [HogoshaUserController::class, 'hogosha'])->name('hogosha');
-Route::get('/hogosha', [HogoshaController::class, 'index'])->name('hogosha');
+Route::get('/hogosha', [HogoshaUserController::class, 'hogosha'])->name('hogosha');
+// Route::get('/hogosha', [HogoshaController::class, 'index'])->name('hogosha');
 
 Route::get('hogoshanumber', [HogoshaUserController::class, 'create'])->name('hogoshanumber.show');
 Route::post('hogoshanumber', [HogoshaUserController::class, 'numberregister'])->name('hogoshanumber.store');
@@ -619,7 +618,8 @@ Route::post('notificationchange/{people_id}',[NotificationController::class,'upd
 
 
 // 子どもの体調について　親からの報告↓
-Route::get('hogosha', [HogoshaUserController::class, 'edit'])->name('condition.edit');
+// hogoshaビューを表示させるHogoshaUserControllerのhogoshaメソッドが反応しないため一旦コメントアウト↓
+// Route::get('hogosha', [HogoshaUserController::class, 'edit'])->name('condition.edit');
 Route::post('condition/{people_id}/edit', [ChildConditionController::class,'store'])->name('condition.post');
 
 // 編集↓

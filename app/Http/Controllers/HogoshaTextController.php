@@ -59,7 +59,7 @@ class HogoshaTextController extends Controller
     ->where('is_read', false)
     ->count();
 
-    return view('hogoshatext', compact('person', 'selectedDate', 'hogoshatexts','user_name',  'unreadMessages'));
+    return view('hogoshatext', compact('person',  'hogoshatexts','user_name',  'unreadMessages'));
 
 
 }
