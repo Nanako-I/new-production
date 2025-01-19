@@ -1,6 +1,5 @@
 <x-app-layout>
     
-        <!--ヘッダー[START]-->
         <head>
             @vite(['resources/css/app.css', 'resources/js/app.js'])
             <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -291,7 +290,6 @@
 </style>
     </head>
     <body class="font-sans antialiased" >
-    <!-- <body class="font-sans antialiased" style="margin-bottom: 60px;"> -->
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
         <div id="chatbot"
             data-user-identifier="{{ session('user_identifier') }}"
@@ -312,7 +310,7 @@
                     @foreach ($chats as $chat)
                     <li class="{{ $chat->user_identifier == session('user_identifier') ? 'self' : 'other' }}">
                         <div class="p-4 rounded-lg shadow mb-4 w-full {{ $chat->user_identifier == session('user_identifier') ? 'self-message' : 'other-message' }}">
-                        <!-- <div class="p-4 rounded-lg shadow mb-4 w-full {{ $chat->user_identifier == session('user_identifier') ? 'bg-blue-50 border-2 border-blue-500' : 'bg-white' }}"> -->
+                        
                             <div style="overflow-wrap: break-word;">
                                 <p style="overflow-wrap: break-word;" class="text-gray-900 font-bold">{{ $chat->message }}</p>
                                 @if($chat->filename)
@@ -320,9 +318,7 @@
                                         
                                         src="{{ asset('storage/sample/chat_photo/' . $chat->filename) }}"
                                         onerror="this.onerror=null;">
-                                        <!-- <img alt="team" class="w-80 h-64" 
-                                        src="{{ asset('storage/sample/chat_photo/' . $chat->filename) }}"
-                                        onerror="this.onerror=null;"> -->
+                                        
 
                                 @endif
                             </div>
@@ -348,7 +344,7 @@
                 </label>
                 
                 <div class="textarea-container">
-                    <!-- <textarea name="text" id="chatbot-text" class="notebook font-bold p-4 rounded-lg shadow">{{ old('text') }}</textarea> -->
+                    
                     <input type="text" id="chatbot-text" class="browser-default" name="message" placeholder="テキストを入力" required
                         style="word-wrap: break-word;" data-user-identifier="{{ session('user_identifier') }}">
                     <button type="submit" id="send-button" class="font-semibold">送信</button>

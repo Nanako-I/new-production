@@ -77,7 +77,7 @@
                       </div>
                       
                       
-                      <!--連絡事項（緊急の連絡はLINEで行ってもらうためチャットは一旦コメントアウト）↓ -->
+                     
                       <div class="border-2 p-2 rounded-lg bg-white my-2">
                                     <div class="flex justify-start items-center">
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
@@ -104,13 +104,13 @@
                                             @if($unreadChats)
                                                 <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">New</span>
                                             @else
-                                                <span id="contact-guardian-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold" >保護者に連絡する</span>
+                                            <span id="no-new-messages-{{ $person->id }}" class="ml-2 text-gray-500 text-xl font-bold">未読なし</span>
                                             @endif
                                         </a>
                                     </div>
                             </div>
 
-                                    <div class="border-2 p-2 rounded-lg bg-white mb-2 mt-8">
+                                    <!-- <div class="border-2 p-2 rounded-lg bg-white mb-2 mt-8">
                                           <div class="flex justify-start items-center">
                                             <i class="fa-solid fa-pencil text-orange-600" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
                                             <p class="font-bold text-xl ml-2">保護者からの連絡</p>
@@ -124,12 +124,12 @@
                                                     ->first();
                                             @endphp
                                             
-                                            @if ($todayHogoshaText)
+                                            @if ($todayHogoshaText) -->
                                                 <!-- 登録済みの場合 -->
-                                                <a href="{{ url('hogoshatext/'.$person->id) }}" class="relative ml-2 flex items-center">
-                                                  @csrf
+                                                <!-- <a href="{{ url('hogoshatext/'.$person->id) }}" class="relative ml-2 flex items-center">
+                                                  @csrf -->
                                                     <!-- 未読メッセージがある場合に new マークを表示 -->
-                                                @if($person->unreadMessages)
+                                                <!-- @if($person->unreadMessages)
                                                     <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">New</span>
                                                 @else
                                                 <span id="new-indicator-{{ $person->id }}" class="text-red-500 text-xl font-bold">
@@ -137,15 +137,15 @@
                                                 </span>
                                                 @endif
                                                 </a>
-                                            @else
+                                            @else -->
                                                 <!-- 未登録の場合 -->
-                                                <a href="{{ url('hogoshatext/'.$person->id) }}" class="relative">
+                                                <!-- <a href="{{ url('hogoshatext/'.$person->id) }}" class="relative">
                                                     <summary class="text-red-500 font-bold text-xl">登録する</summary>
                                                     @csrf
                                                 </a>
                                             @endif
                                         </div>
-                                    </div>
+                                    </div> -->
                  
                                   <!-- 利用時間など↓ -->
                                   <div class="border-2 p-2 rounded-lg bg-white my-2">

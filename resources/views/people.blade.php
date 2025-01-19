@@ -81,39 +81,38 @@
             <h2 class="text-gray-900 font-bold text-2xl mb-2">{{ $person->last_name }} {{ $person->first_name }}</h2>
             <p class="text-gray-700 mb-2">{{ $person->date_of_birth }} 生まれ</p>
             @php
-                                                $today = \Carbon\Carbon::now()->toDateString();
-                                                $todayHogoshaText = $person->hogosha_texts()
-                                                    ->whereDate('created_at', $today)
-                                                    ->latest()  // 最新のレコードを取得
-                                                    ->first();
-                                            @endphp
-                                            
-                                @if ($person->unreadMessages)
-                            
-                                    <a href="{{ url('hogoshatext/'.$person->id) }}" class="relative ml-2 flex items-center">
-                                            @csrf
-                                            <!-- 未読メッセージがある場合に new マークを表示 -->
-                                            <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold"><i class="fa-regular fa-envelope text-red-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>New</span>
-                                        </a>
-                                @endif
+                        $today = \Carbon\Carbon::now()->toDateString();
+                        $todayHogoshaText = $person->hogosha_texts()
+                            ->whereDate('created_at', $today)
+                            ->latest()  // 最新のレコードを取得
+                            ->first();
+                    @endphp
+                    
+        @if ($person->unreadMessages)
+    
+            <a href="{{ url('hogoshatext/'.$person->id) }}" class="relative ml-2 flex items-center">
+                    @csrf
+                    <!-- 未読メッセージがある場合に new マークを表示 -->
+                    <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold"><i class="fa-regular fa-envelope text-red-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>New</span>
+                </a>
+        @endif
 
-                                @if ($person->unreadChats)
-                                   <!-- 登録済みの場合 -->
-                                        <a href="{{ url('chat/'.$person->id) }}" class="relative ml-2 flex items-center">
-                                            @csrf
-                                            <!-- 未読メッセージがある場合に new マークを表示 -->
-                                            <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold"><i class="fa-regular fa-envelope text-red-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>New</span>
-                                        </a>
-                                @endif
+        @if ($person->unreadChats)
+            <!-- 登録済みの場合 -->
+                <a href="{{ url('chat/'.$person->id) }}" class="relative ml-2 flex items-center">
+                    @csrf
+                    <!-- 未読メッセージがある場合に new マークを表示 -->
+                    <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold"><i class="fa-regular fa-envelope text-red-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>New</span>
+                </a>
+        @endif
          </div>
                                   
     @endforeach
 
                                     
-
-                                </div>
-           <!-- 右半分: 利用者詳細情報 -->
-                                <div id="person-details" class="p-4 flex flex-col overflow-y-auto">
+</div>
+<!-- 右半分: 利用者詳細情報 -->
+<div id="person-details" class="p-4 flex flex-col overflow-y-auto">
 <!-- ここに部分ビューの内容が表示されます -->
 </div>
         @endhasanyrole
