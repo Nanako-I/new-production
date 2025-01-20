@@ -65,7 +65,8 @@ class Handler extends ExceptionHandler
         Auth::logout(); // ログアウト
         $request->session()->invalidate(); // セッションを無効化
         // return redirect()->route('before-login'); // ログインページにリダイレクト
-        return view('before-login');
+        // return view('before-login');
+        return response()->view('before-login');
     }
 
     return parent::render($request, $exception);

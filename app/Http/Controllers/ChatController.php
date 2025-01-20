@@ -29,7 +29,7 @@ class ChatController extends Controller
         $display = 5;
 
         $chats = Chat::offset($length-$display)->limit($display)->get();
-       return view('chat', ['id' => $person->id],compact('person'));
+       return response()->view('chat', ['id' => $person->id], compact('person'));
    }
 
     /**
@@ -216,7 +216,15 @@ class ChatController extends Controller
     ->count();
 
     // ビューにデータを渡して表示
-    return view('chat', ['id' => $person->id], compact('person', 'user_name', 'chats', 'unreadMessages'));
+    // return view('chat', ['id' => $person->id], compact('person', 'user_name', 'chats', 'unreadMessages'));
+    return response()->view('chat', [
+        'id' => $person->id,
+        'person' => $person,
+        'user_name' => $user_name,
+        'chats' => $chats,
+        'unreadMessages' => $unreadMessages,
+        
+    ]);
 }
 
 
