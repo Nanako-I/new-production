@@ -253,9 +253,11 @@
                                 @endif
                             </div>
                             <div>
+                              @if ($selectedDate == $today)
                                 <a href="{{ url('timechange/'.$person->id . '/'.$time->id) }}" class="flex items-center ml-4">
                                 <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
                                 </a>
+                              @endif
                             </div>
                         </div>
                         <div class="flex justify-start text-left items-start">
@@ -307,10 +309,12 @@
                     <p class="text-gray-900 font-bold text-xl ml-3">{{ $food->oyatsu_bikou }}</p>
                 </div>
             </div>
-            <a href="{{ route('food.change', ['people_id' => $person->id, 'id' => $food->id]) }}" class="flex items-center">
-              @csrf
-              <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
-            </a>
+              @if ($selectedDate == $today)
+              <a href="{{ route('food.change', ['people_id' => $person->id, 'id' => $food->id]) }}" class="flex items-center">
+                @csrf
+                <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
+              </a>
+              @endif
           </div>
           @endforeach
         
@@ -346,9 +350,11 @@
               </div>
           @endforeach
           </div>
-            <a href="{{ url('temperatureedit/' . $person->id) }}" class="text-stone-500">
-              <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
-            </a>
+            @if ($selectedDate == $today)
+              <a href="{{ url('temperatureedit/' . $person->id) }}" class="text-stone-500">
+                <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
+              </a>
+            @endif
           </div>
         </div>
         </div>
@@ -842,9 +848,12 @@
                       @if($optionItem->bikou !== null)
                           <p class="text-gray-900 font-bold text-xl px-3">{{ $optionItem->bikou }}</p>
                       @endif
-                      <a href="{{ url('optionchange/' . $person->id . '/' . $optionItem->id) }}" class="text-stone-500">
-                      <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
-                      </a>
+                      <!-- optionのデータは昨日以前のデータでえんぴつアイコンを押しても該当するデータが取得できる -->
+                      @if ($selectedDate == $today)
+                        <a href="{{ url('optionchange/' . $person->id . '/' . $optionItem->id) }}" class="text-stone-500">
+                        <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
+                        </a>
+                      @endif
                     </div>
                 </div>
               </div>
@@ -867,10 +876,13 @@
               <div class="flex justify-around text-left items-start">
                 <p class="text-gray-900 font-bold text-xl px-3">{{ $lastNotebook->notebook }}</p>
               </div>
-              <a href="{{ route('notebook.change', ['people_id' => $person->id, 'id' => $lastNotebook->id]) }}" class="relative ml-2 flex items-center">
-                @csrf
-                <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s; vertical-align: middle;"></i>
-              </a>
+              <!-- notebookのデータは昨日以前のデータでえんぴつアイコンを押しても該当するデータが取得できる -->
+              @if ($selectedDate == $today)
+                <a href="{{ route('notebook.change', ['people_id' => $person->id, 'id' => $lastNotebook->id]) }}" class="relative ml-2 flex items-center">
+                  @csrf
+                  <i class="fa-solid fa-pencil text-stone-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s; vertical-align: middle;"></i>
+                </a>
+              @endif
             </div>
           <hr style="border: 1px solid #666; margin: 0 auto; width: 100%;">
         </div>

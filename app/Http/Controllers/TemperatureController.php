@@ -127,9 +127,9 @@ public function edit(Request $request, $people_id)
 public function change(Request $request, $people_id, $id)
     {
         // ユーザーを取得
-        $user = User::findOrFail($people_id);
+        // $user = User::findOrFail($people_id);
         // ユーザーが持つ体温の記録からユーザーIDを取得
-        $user_id = $user->id;
+        // $user_id = $user->id;
     
         // すべてのユーザーを取得
         $users = User::all();
