@@ -14,6 +14,7 @@ use App\Models\Option;
 use App\Models\OptionItem;
 use App\Models\ScheduledVisit;
 use App\Models\HogoshaText;
+use App\Models\RecordConfirm;
 
 use Spatie\Permission\Models\Role as SpatieRole;
 use App\Enums\RoleType;
@@ -103,14 +104,22 @@ class PersonController extends Controller
             // }
 
             foreach ($people as $person) {
+                // 本日中にメッセージがあったかどうかを確認
+                $recentChat = Chat::where('people_id', $person->id)
+                                  ->where('created_at', '>=', now()->startOfDay())
+                                  ->exists();
+                
+                // 未読メッセージがあるかどうかを確認
                 $unreadChats = Chat::where('people_id', $person->id)
-                                    ->where('is_read', false)
-                                    ->where('user_identifier', '!=', $user->id)
-                                    ->exists();
+                                   ->where('is_read', false)
+                                   ->where('user_identifier', '!=', $user->id)
+                                   ->exists();
+                
+                // 本日中にメッセージがあったか、または未読メッセージがあるか
+                $person->unreadChats = $unreadChats || $recentChat;
             
-                $person->unreadChats = $unreadChats;
-                \Log::info("Person {$person->id} unread messages: " . ($unreadChats ? 'true' : 'false'));
-        }
+                \Log::info("Person {$person->id} unread messages or recent chat: " . ($person->unreadChats ? 'true' : 'false'));
+            }
 
         foreach ($people as $person) {
             $unreadMessages = HogoshaText::where('people_id', $person->id)
@@ -146,13 +155,19 @@ class PersonController extends Controller
                 ->get();
         }
 
+        // 職員が本日分の連絡帳を確定しているか情報を取得
+        $isConfirmed = RecordConfirm::where('person_id', $person->id)
+        ->whereDate('kiroku_date', $today) // 本日の日付でフィルタ
+        ->where('is_confirmed', true) // 確定フラグがtrue
+        ->exists();
+
         // 各利用者の訪問データを取得して送迎の要否を確認(送迎は開発途中のためコメントアウト）
         // foreach ($people as $person) {
         //     $scheduledVisit = ScheduledVisit::where('people_id', $person->id)->first();
         //     $person->transport = $scheduledVisit ? $scheduledVisit->transport : '未登録';
         // }
 
-    return view('people', compact('people', 'selectedItems', 'options', 'personOptions','unreadChats'));
+    return view('people', compact('people', 'selectedItems', 'options', 'personOptions','unreadChats','isConfirmed'));
     }
     else {
         // $people = collect([]); // 空のコレクションを作成

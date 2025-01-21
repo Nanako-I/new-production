@@ -88,23 +88,44 @@
                             ->first();
                     @endphp
                     
-        @if ($person->unreadMessages)
+        <!-- @if ($person->unreadMessages)
     
             <a href="{{ url('hogoshatext/'.$person->id) }}" class="relative ml-2 flex items-center">
-                    @csrf
+                    @csrf -->
                     <!-- 未読メッセージがある場合に new マークを表示 -->
-                    <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold"><i class="fa-regular fa-envelope text-red-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>New</span>
+                    <!-- <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold"><i class="fa-regular fa-envelope text-red-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>New</span>
                 </a>
-        @endif
+        @endif -->
 
-        @if ($person->unreadChats)
-            <!-- 登録済みの場合 -->
-                <a href="{{ url('chat/'.$person->id) }}" class="relative ml-2 flex items-center">
+
+    @if ($person->unreadChats)
+        <!-- 登録済みの場合 -->
+        <a href="{{ url('chat/'.$person->id) }}" class="relative ml-2 flex items-center">
+            @csrf
+            <!-- 未読メッセージがある場合、または本日中に連絡があった場合に new マークを表示 -->
+            <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">
+                <i class="fa-regular fa-envelope text-red-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>メッセージあり
+            </span>
+        </a>
+    @endif
+
+
+
+        <!-- @if ($isConfirmed) -->
+            <!-- 確定済みの場合の表示 -->
+                <!-- <a href="{{ url('notebook/'.$person->id) }}" class="relative ml-2 flex items-center">
                     @csrf
-                    <!-- 未読メッセージがある場合に new マークを表示 -->
-                    <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold"><i class="fa-regular fa-envelope text-red-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>New</span>
+                    <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">
+                        本日の連絡帳：送信済
+                    </span>
                 </a>
-        @endif
+            @else -->
+                <!-- 未確定の場合の表示 -->
+                <!-- <span id="new-indicator-{{ $person->id }}" class="ml-2 text-gray-500 text-xl font-bold">
+                    本日の連絡帳：未送信
+                </span>
+            @endif -->
+
          </div>
                                   
     @endforeach
