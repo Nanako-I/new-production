@@ -97,17 +97,33 @@
                 </a>
         @endif -->
 
+        @switch($person->messageStatus)
+    @case('unread')
+        <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">
+            <i class="fa-regular fa-envelope text-red-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
+            メッセージあり
+        </span>
+        @break
 
-    @if ($person->unreadChats)
-        <!-- 登録済みの場合 -->
-        <!-- <a href="{{ url('chat/'.$person->id) }}" class="relative ml-2 flex items-center"> -->
-            @csrf
-            <!-- 未読メッセージがある場合、または本日中に連絡があった場合に new マークを表示 -->
-            <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">
-                <i class="fa-regular fa-envelope text-red-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>メッセージあり
-            </span>
-        <!-- </a> -->
-    @endif
+    @case('today')
+        <span id="new-indicator-{{ $person->id }}" class="ml-2 text-yellow-500 text-xl font-bold">
+            <i class="fa-regular fa-comment-dots text-yellow-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
+            本日連絡あり
+        </span>
+        @break
+
+    @case('older')
+        <span class="ml-2 text-gray-500 text-xl font-bold">
+            過去の連絡あり
+        </span>
+        @break
+
+    @default
+        <span class="ml-2 text-gray-500 text-xl font-bold">
+            未読なし
+        </span>
+@endswitch
+
 
 
 

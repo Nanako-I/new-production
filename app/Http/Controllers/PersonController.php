@@ -104,21 +104,35 @@ class PersonController extends Controller
             // }
 
             foreach ($people as $person) {
-                // 本日中にメッセージがあったかどうかを確認
-                $recentChat = Chat::where('people_id', $person->id)
-                                  ->where('created_at', '>=', now()->startOfDay())
-                                  ->exists();
+                // 未読メッセージの確認
+                $hasUnreadMessages = Chat::where('people_id', $person->id)
+                                         ->where('is_read', false)
+                                         ->where('user_identifier', '!=', $user->id)
+                                         ->exists();
                 
-                // 未読メッセージがあるかどうかを確認
-                $unreadChats = Chat::where('people_id', $person->id)
-                                   ->where('is_read', false)
-                                   ->where('user_identifier', '!=', $user->id)
-                                   ->exists();
+                // 本日のメッセージ確認（自分以外からのメッセージ）
+                $hasTodayMessagesFromOthers = Chat::where('people_id', $person->id)
+                                                  ->where('created_at', '>=', now()->startOfDay())
+                                                  ->where('user_identifier', '!=', $user->id)
+                                                  ->exists();
                 
-                // 本日中にメッセージがあったか、または未読メッセージがあるか
-                $person->unreadChats = $unreadChats || $recentChat;
-            
-                \Log::info("Person {$person->id} unread messages or recent chat: " . ($person->unreadChats ? 'true' : 'false'));
+                // 昨日以前のメッセージ確認（自分以外からのメッセージ）
+                $hasOlderMessagesFromOthers = Chat::where('people_id', $person->id)
+                                                  ->where('created_at', '<', now()->startOfDay())
+                                                  ->where('user_identifier', '!=', $user->id)
+                                                  ->exists();
+                
+                // メッセージステータスの設定
+                $person->messageStatus = 'no_messages';
+                if ($hasUnreadMessages) {
+                    $person->messageStatus = 'unread';
+                } elseif ($hasTodayMessagesFromOthers) {
+                    $person->messageStatus = 'today';
+                } elseif ($hasOlderMessagesFromOthers) {
+                    $person->messageStatus = 'older';
+                }
+                
+                \Log::info("Person {$person->id} message status: {$person->messageStatus}");
             }
 
         foreach ($people as $person) {
@@ -167,7 +181,7 @@ class PersonController extends Controller
         //     $person->transport = $scheduledVisit ? $scheduledVisit->transport : '未登録';
         // }
 
-    return view('people', compact('people', 'selectedItems', 'options', 'personOptions','unreadChats','isConfirmed'));
+    return view('people', compact('people', 'selectedItems', 'options', 'personOptions','hasUnreadMessages','isConfirmed','hasTodayMessagesFromOthers', 'hasOlderMessagesFromOthers'));
     }
     else {
         // $people = collect([]); // 空のコレクションを作成

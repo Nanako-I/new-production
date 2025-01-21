@@ -79,43 +79,79 @@
                       
                      
                       <div class="border-2 p-2 rounded-lg bg-white my-2">
-                                <div class="flex justify-start items-center">
-                                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-                                    <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
-                                    <i class="fa-solid fa-comments text-sky-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
-                                    <p class="font-bold text-xl ml-2">連絡</p>
-                                </div>
-                                <div class="flex items-center justify-center p-4">
-                             
-                                    <a href="{{ url('chat/'.$person->id) }}" id="person-{{ $person->id }}" class="relative ml-2" style="display: flex; align-items: center;">
-                                        @csrf
-                                        
-                                        @php
-                                        $user = auth()->user();
-                                        
-                                        // 未読メッセージがあるかチェック
-                                        $unreadChats = $person->chats()
-                                                            ->where('is_read', false)
-                                                            ->where('user_identifier', '!=', $user->id)
-                                                            ->exists();
+    <div class="flex justify-start items-center">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+        <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
+        <i class="fa-solid fa-comments text-sky-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
+        <p class="font-bold text-xl ml-2">連絡</p>
+    </div>
+    <div class="flex items-center justify-center p-4">
+        <a href="{{ url('chat/'.$person->id) }}" id="person-{{ $person->id }}" class="relative ml-2" style="display: flex; align-items: center;">
+            @csrf
+            
+            @php
+            $user = auth()->user();
+            
+            // 未読メッセージの確認
+            $hasUnreadMessages = $person->chats()
+                                        ->where('is_read', false)
+                                        ->where('user_identifier', '!=', $user->id)
+                                        ->exists();
+            
+            // 本日のメッセージ確認（自分以外からのメッセージ）
+            $hasTodayMessagesFromOthers = $person->chats()
+                                                 ->where('created_at', '>=', now()->startOfDay())
+                                                 ->where('user_identifier', '!=', $user->id)
+                                                 ->exists();
+            
+            // 昨日以前のメッセージ確認（自分以外からのメッセージ）
+            $hasOlderMessagesFromOthers = $person->chats()
+                                                 ->where('created_at', '<', now()->startOfDay())
+                                                 ->where('user_identifier', '!=', $user->id)
+                                                 ->exists();
+            
+            // メッセージステータスの設定
+            if ($hasUnreadMessages) {
+                $messageStatus = 'unread';
+            } elseif ($hasTodayMessagesFromOthers) {
+                $messageStatus = 'today';
+            } elseif ($hasOlderMessagesFromOthers) {
+                $messageStatus = 'older';
+            } else {
+                $messageStatus = 'no_messages';
+            }
+            @endphp
 
-                                        // 本日中にメッセージがあったかどうかをチェック
-                                        $recentChat = $person->chats()
-                                                            ->where('created_at', '>=', now()->startOfDay())
-                                                            ->exists();
-                                        @endphp
+            @switch($messageStatus)
+                @case('unread')
+                    <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">
+                        <i class="fa-regular fa-envelope text-red-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
+                        メッセージあり
+                    </span>
+                    @break
 
-                                        <!-- 未読メッセージがある場合、または本日中にメッセージがあった場合にNewと表示 -->
-                                        @if($unreadChats || $recentChat)
-                                            <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">
-                                                <i class="fa-regular fa-envelope text-red-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>メッセージあり
-                                            </span>
-                                        @else
-                                            <span id="no-new-messages-{{ $person->id }}" class="ml-2 text-gray-500 text-xl font-bold">未読なし</span>
-                                        @endif
-                                    </a>
-                                </div>
-                            </div>
+                @case('today')
+                    <span id="new-indicator-{{ $person->id }}" class="ml-2 text-yellow-500 text-xl font-bold">
+                        <i class="fa-regular fa-comment-dots text-yellow-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
+                        本日連絡あり
+                    </span>
+                    @break
+
+                @case('older')
+                    <span id="old-messages-{{ $person->id }}" class="ml-2 text-gray-500 text-xl font-bold">
+                        過去の連絡あり
+                    </span>
+                    @break
+
+                @default
+                    <span id="no-new-messages-{{ $person->id }}" class="ml-2 text-gray-500 text-xl font-bold">
+                        未読なし
+                    </span>
+            @endswitch
+        </a>
+    </div>
+</div>
+
 
 
                                     <!-- <div class="border-2 p-2 rounded-lg bg-white mb-2 mt-8">
