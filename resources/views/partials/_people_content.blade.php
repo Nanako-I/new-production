@@ -87,7 +87,7 @@
                                 </div>
                                 <div class="flex items-center justify-center p-4">
                              
-                                    <!-- <a href="{{ url('chat/'.$person->id) }}" id="person-{{ $person->id }}" class="relative ml-2" style="display: flex; align-items: center;"> -->
+                                    <a href="{{ url('chat/'.$person->id) }}" id="person-{{ $person->id }}" class="relative ml-2" style="display: flex; align-items: center;">
                                         @csrf
                                         
                                         @php
@@ -113,7 +113,7 @@
                                         @else
                                             <span id="no-new-messages-{{ $person->id }}" class="ml-2 text-gray-500 text-xl font-bold">未読なし</span>
                                         @endif
-                                    <!-- </a> -->
+                                    </a>
                                 </div>
                             </div>
 
