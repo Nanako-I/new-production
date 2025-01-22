@@ -242,6 +242,11 @@
                     background-color: #ffffff; /* bg-white */
                     border: 2px solid #808080; /* 灰色のボーダー */
                 }
+            
+                br {
+                    margin: 0;
+                    padding: 0;
+                }
 
             
 
@@ -310,21 +315,13 @@
                     @foreach ($chats as $chat)
                     <li class="{{ $chat->user_identifier == session('user_identifier') ? 'self' : 'other' }}">
                         <div class="p-4 rounded-lg shadow mb-4 w-full {{ $chat->user_identifier == session('user_identifier') ? 'self-message' : 'other-message' }}">
-                        
-                            <div style="overflow-wrap: break-word;">
-                                <p style="overflow-wrap: break-word;" class="text-gray-900 font-bold">{{ $chat->message }}</p>
-                                @if($chat->filename)
+                        <div style="overflow-wrap: break-word; margin: 0;"><p style="white-space: pre-wrap; word-wrap: break-word; margin: 0; padding: 0;" class="text-gray-900 font-bold">{!! nl2br($chat->message) !!}</p><!-- @if($chat->filename)
                                     <img alt="team" class="w-80 h-64" 
-                                        
                                         src="{{ asset('storage/sample/chat_photo/' . $chat->filename) }}"
                                         onerror="this.onerror=null;">
-                                        
-
-                                @endif
-                            </div>
-                            <p class="font-normal text-black {{ $chat->user_identifier == session('user_identifier') }}">
-                                {{ $chat->created_at }} ＠{{ $chat->user_identifier == session('user_identifier') ? session('user_name') : $chat->last_name . $chat->first_name }}
-                            </p>
+                                @endif -->
+                            </div><p class="font-normal text-black {{ $chat->user_identifier == session('user_identifier') }}">
+                                {{ $chat->created_at }} ＠{{ $chat->user_identifier == session('user_identifier') ? session('user_name') : $chat->last_name . $chat->first_name }}</p>
                         </div>
                     </li>
                     @endforeach
@@ -344,11 +341,11 @@
                 </label>
                 
                 <div class="textarea-container">
-                    
-                    <input type="text" id="chatbot-text" class="browser-default" name="message" placeholder="テキストを入力" required
-                        style="word-wrap: break-word;" data-user-identifier="{{ session('user_identifier') }}">
-                    <button type="submit" id="send-button" class="font-semibold">送信</button>
-                </div>
+    <textarea id="chatbot-text" class="browser-default" name="message" placeholder="テキストを入力" required
+        style="word-wrap: break-word; white-space: pre-wrap; color: black;" data-user-identifier="{{ session('user_identifier') }}"></textarea>
+    <button type="submit" id="send-button" class="font-semibold">送信</button>
+</div>
+
            
         </form>
     </div>
