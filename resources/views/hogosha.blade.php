@@ -131,7 +131,7 @@
                                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                         <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
                                         <i class="fa-solid fa-comments text-sky-500" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
-                                        <p class="font-bold text-xl ml-2">連絡する</p>
+                                        <p class="font-bold text-xl ml-2">施設に連絡する</p>
                                     </div>
                                     <div class="flex items-center justify-center p-4">
                                     @php
@@ -149,7 +149,7 @@
                                         @csrf
                                         @if (isset($person->unreadChats)) {{-- unreadChatsが存在する場合 --}}
                                             @if ($person->unreadChats) {{-- unreadChatsがtrueの場合 --}}
-                                                <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">New</span>
+                                              <i class="fa-regular fa-envelope text-red-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i><span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">New</span>
                                             @else {{-- unreadChatsがfalseの場合 --}}
                                                 <span id="no-new-messages-{{ $person->id }}" class="ml-2 text-gray-500 text-xl font-bold">未読なし</span>
                                             @endif
@@ -738,16 +738,30 @@
                                             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
                                             <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
                                             <i class="fa-regular fa-clipboard text-green-700" style="font-size: 2em; padding: 0 5px; transition: transform 0.2s;"></i>
-                                            <p class="font-bold text-xl ml-2">{{$person->last_name}}{{$person->first_name}}さんの記録</p>
+                                            <p class="font-bold text-xl ml-2">{{$person->last_name}}{{$person->first_name}}さんの連絡帳</p>
                                           </div>
-                                          <div class="flex justify-center mt-4">
+                                          
+                                          @if($person->isConfirmed)
+                                              <div class="flex justify-center p-4">
+                                              <a href="{{ url('recordstamp/'.$person->id) }}" class="relative">
+                                              @csrf
+                                                  <i class="fa-solid fa-book-open-reader text-gray-500 " style="font-size: 2em; padding: 0 5px;"></i>
+                                                  <span class="ml-2 text-gray-500 text-xl font-bold">本日の連絡帳あり</span>
+                                                  <!-- <i class="fa-solid fa-book-open-reader text-pink-500 group-hover:text-purple-600 transition-colors duration-300" style="font-size: 2em; padding: 0 5px;"></i>
+                                                  <span class="ml-2 text-pink-500 text-xl font-bold group-hover:text-purple-600 transition-colors duration-300">本日の連絡帳あり</span> -->
+                                                </a>
+                                              </div>
+                                          @else
+                                          <div class="flex justify-center p-4">
                                             <a href="{{ url('recordstamp/'.$person->id) }}" class="relative">
                                               @csrf
-                                              <i class="material-icons md-90">add</i>
-                                            </a>
+                                              <span class="ml-2 text-gray-500 text-xl font-bold">連絡帳を見る</span>
+                                              </a>
                                           </div>
-                                    　　</div>
-                                    　　
+                                          @endif
+
+                                   </div>
+                                
 
 
 

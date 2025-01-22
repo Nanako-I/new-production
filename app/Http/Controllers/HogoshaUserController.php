@@ -22,6 +22,8 @@ use App\Models\Facility;
 use App\Models\Person;
 use App\Models\Role;
 use App\Models\Chat;
+use App\Models\HogoshaText;
+use App\Models\RecordConfirm;
 use Carbon\Carbon;
 use App\Mail\RegistrationCompleted;
 
@@ -159,7 +161,7 @@ public function register(Request $request)
   {
       // 現在ログインしているユーザーを取得
       $user = Auth::user();
-
+      $today = \Carbon\Carbon::now()->toDateString();
       // ユーザーが関連付けられている全てのPerson（利用者）を取得
       $people = $user->people_family()->get();
 // 未読メッセージの情報を各 Person に追加
@@ -173,9 +175,24 @@ foreach ($people as $person) {
     \Log::info("Person {$person->id} unread messages: " . ($unreadChats ? 'true' : 'false'));
 }
 
-      // データをビューに渡す
-      return view('hogosha', compact('people', 'unreadChats'));
-  }
+// 施設から連絡があった場合(hogoshatextビュー)の未読メッセージの情報を各 Person に追加↓
+foreach ($people as $person) {
+    $unreadMessages = HogoshaText::where('people_id', $person->id)
+                        ->where('is_read', false)
+                        ->where('user_identifier', '!=', $user->id)
+                        ->exists();
+
+    $person->unreadMessages = $unreadMessages;
+    \Log::info("Person {$person->id} unread messages: " . ($unreadMessages ? 'true' : 'false'));
+}
+$isConfirmed = RecordConfirm::where('person_id', $person->id)
+->whereDate('kiroku_date', $today)
+->where('is_confirmed', true)
+->exists();
+$person->isConfirmed = $isConfirmed;
+
+return view('hogosha', compact('people', 'unreadChats', 'isConfirmed'));
+}
    
    public function create()
    {

@@ -25,6 +25,9 @@ use App\Models\Notebook;
 use App\Models\RecordConfirm;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;//ログイン中のユーザIDを取得する
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NewRecordMessageNotification;
 
 class RecordController extends Controller
 {
@@ -205,12 +208,22 @@ class RecordController extends Controller
     // 職員側で連絡帳を確定させるボタン
     public function confirmRecord(Request $request, $people_id)
 {
+    $person = Person::findOrFail($people_id);
+    $user = Auth::user();
     $selectedDate = $request->input('selected_date');
 
     $record = RecordConfirm::where('person_id', $people_id)
                     ->whereDate('kiroku_date', $selectedDate)
                     ->first();
 
+    $familyEmails = $person->people_family()->get()->map(fn($family) => $family->email)->filter()->all();
+
+    foreach ($familyEmails as $email) {
+        // ログインしているユーザーのメールアドレスには送信しない
+        if ($email !== $user->email) {
+            Mail::to($email)->send(new NewRecordMessageNotification($person, $selectedDate));
+        }
+    }
     if (!$record) {
         $record = new RecordConfirm();
         $record->person_id = $people_id;
