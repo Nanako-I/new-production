@@ -68,15 +68,19 @@
                         </div>
 
                         <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
-                        <input type="time" name="start_time" id="scheduled-time" value="{{ $lastTime->start_time ? \Carbon\Carbon::parse($lastTime->start_time)->format('H:i') : '' }}">
+                        <input type="time" name="start_time" list="data-list"  id="scheduled-time" value="{{ $lastTime->start_time ? \Carbon\Carbon::parse($lastTime->start_time)->format('H:i') : '' }}"  step="300">
                             <p class="text-gray-900 font-bold text-xl px-1.5">～</p>
                         </div>
                         
                         <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
-                        <input type="time" name="end_time" id="scheduled-time" value="{{ $lastTime->end_time ? \Carbon\Carbon::parse($lastTime->end_time)->format('H:i') : '' }}">
+                        <input type="time" name="end_time" list="data-list" id="scheduled-time" value="{{ $lastTime->end_time ? \Carbon\Carbon::parse($lastTime->end_time)->format('H:i') : '' }}" step="300">
 
                         </div>
-                        
+                        <!-- <datalist id="data-list">
+  <option value="06:00"></option>
+  <option value="06:30"></option>
+  <option value="07:00"></option>
+</datalist> -->
                         <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
                             <i class="fa-solid fa-school text-gray-700" style="font-size: 1.5em; transition: transform 0.2s;"></i>
                             <p class="text-gray-900 font-bold text-xl px-1.5">利用形態</p>
@@ -132,7 +136,7 @@
              </div>
             </form>
 
-            <form action="{{ route('time.delete', [ 'id' => $lastTime->id]) }}" method="POST">
+            <form action="{{ route('time.delete', ['people_id' => $lastTime->people_id, 'id' => $lastTime->id]) }}" method="POST">
             @csrf
                 <div class="flex justify-center my-4">
                     <button type="button" class="delete-btn font-semibold px-4 py-2 bg-gray-600 text-lg text-white rounded-md hover:bg-gray-500" data-id="{{ $lastTime->id }}" data-toggle="modal" data-target="#confirmDeleteModal">

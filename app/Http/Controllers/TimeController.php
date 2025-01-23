@@ -14,13 +14,7 @@ class TimeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-       $time = Time::all();
-        // ('people')に$peopleが代入される
-        return redirect()->route('people.index');
-    }
-
+    
     /**
      * Show the form for creating a new resource.
      *
@@ -83,7 +77,6 @@ class TimeController extends Controller
         session(['selected_person' => $person]);
 
         return redirect()->route('people.index')->with('success', '登録が成功しました。');
-        // return redirect()->route('people.content', ['id' => $person->id])->with('success', '登録が成功しました。');
     }
 
     /**
@@ -107,11 +100,7 @@ class TimeController extends Controller
      * @param  \App\Models\Time  $time
      * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request, $people_id)
-{
-    $person = Person::findOrFail($people_id);
-    return view('timeedit', ['id' => $person->id],compact('person'));
-}
+    
 
     /**
      * Update the specified resource in storage.
@@ -179,11 +168,13 @@ class TimeController extends Controller
 
     $time->fill($form)->save();
 
-    $people = Person::all();
+    $person = Person::findOrFail($request->people_id);
     // 二重送信防止
     $request->session()->regenerateToken();
+    // セッションに$personを保存
+    session(['selected_person' => $person]);
 
-    return redirect()->route('people.index');
+    return redirect()->route('people.index')->with('success', '変更が完了しました');
 }
     /**
      * Remove the specified resource from storage.
@@ -191,13 +182,17 @@ class TimeController extends Controller
      * @param  \App\Models\Time  $time
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id) 
-        {
-            $lastTime = Time::find($id);       
-            if ($lastTime) {
-        
-              $lastTime->delete();
-            }       
-            return redirect()->route('people.index')->with('success', '削除が完了しました。');
-        }
+    public function destroy(Request $request, $people_id, $id) 
+{
+    $lastTime = Time::find($id);       
+    if ($lastTime) {
+        $lastTime->delete();
+    }  
+
+    $person = Person::findOrFail($request->people_id);
+    // セッションに$personを保存
+    session(['selected_person' => $person]);
+
+    return redirect()->route('people.index')->with('success', '削除が完了しました。');
+}
 }
