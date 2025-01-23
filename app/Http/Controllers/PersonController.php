@@ -181,7 +181,10 @@ class PersonController extends Controller
         //     $person->transport = $scheduledVisit ? $scheduledVisit->transport : '未登録';
         // }
 
-    return view('people', compact('people', 'selectedItems', 'options', 'personOptions','hasUnreadMessages','isConfirmed','hasTodayMessagesFromOthers', 'hasOlderMessagesFromOthers'));
+    // セッションから選択された人物を取得
+    $selectedPerson = session('selected_person');
+
+    return view('people', compact('people', 'selectedPerson', 'selectedItems', 'options', 'personOptions','hasUnreadMessages','isConfirmed','hasTodayMessagesFromOthers', 'hasOlderMessagesFromOthers'));
     }
     else {
         // $people = collect([]); // 空のコレクションを作成
@@ -246,7 +249,7 @@ public function getContent($id)
         $selectedItems = [];
         
     
-            $selectedItems[$person->id] = json_decode($person->selected_items, true) ?? [];
+        $selectedItems[$person->id] = json_decode($person->selected_items, true) ?? [];
 
         
         $today = \Carbon\Carbon::now()->toDateString();
@@ -264,6 +267,7 @@ public function getContent($id)
             $personOptions[$person->id] = Option::where('people_id', $person->id)
                 ->where('flag', 1)
                 ->get();
+
 
                 return view('partials._people_content',compact('people', 'person','selectedItems', 'options', 'personOptions'));
     }

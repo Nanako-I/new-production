@@ -74,12 +74,17 @@ class TimeController extends Controller
             'pick_up' => $request->boolean('pick_up'),
             'send' => $request->boolean('send'),
         ]);
-    $people = Person::all();
-     // 二重送信防止
-    $request->session()->regenerateToken();
-    // return view('people', compact('time', 'people'));
-    return redirect()->route('people.index')->with('success', '登録が成功しました。');
-}
+        $person = Person::findOrFail($request->people_id);
+    
+        // 二重送信防止
+        $request->session()->regenerateToken();
+
+        // セッションに$personを保存
+        session(['selected_person' => $person]);
+
+        return redirect()->route('people.index')->with('success', '登録が成功しました。');
+        // return redirect()->route('people.content', ['id' => $person->id])->with('success', '登録が成功しました。');
+    }
 
     /**
      * Display the specified resource.

@@ -150,6 +150,11 @@
 </div>
 <!-- 右半分: 利用者詳細情報 -->
 <div id="person-details" class="p-4 flex flex-col overflow-y-auto">
+@if(isset($selectedPerson))
+     @include('partials._people_content', ['person' => $selectedPerson])
+        @else
+            <p>利用者を選択してください。</p>
+        @endif
 <!-- ここに部分ビューの内容が表示されます -->
 </div>
         @endhasanyrole
