@@ -6,7 +6,7 @@
 </head>
 <body>
     <p>連絡帳アプリ「ぶーけあ」をご利用いただきありがとうございます。<br>
-    <br>アプリに施設から{{ $selectedDate }}の連絡帳が届きました。<br>
+    <br>施設から{{ $selectedDate }}の連絡帳が届きました。<br>
     <br>https://boocare.jp/before-login より<br>ログインいただき「連絡帳を見る」よりご確認ください。</p>
 </body>
 </html>
