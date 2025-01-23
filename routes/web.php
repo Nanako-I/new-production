@@ -507,7 +507,7 @@ Route::get('foodedit/{people_id}', [FoodController::class, 'edit'])->name('food.
 Route::post('food/{people_id}', [FoodController::class,'store'])->name('food.store');
 Route::get('foodchange/{people_id}/{id}',[FoodController::class,'change'])->name('food.change'); 
 Route::post('foodchange/{people_id}/{id}',[FoodController::class,'update'])->name('food_update');
-Route::post('fooddestroy/{id}',[FoodController::class,'destroy'])->name('food.delete');
+Route::post('fooddestroy/{people_id}/{id}',[FoodController::class,'destroy'])->name('food.delete');
 
 Route::post('toilet/{people_id}', [ToiletController::class, 'store'])->name('toilet.store');
 Route::get('toilet/{people_id}', [ToiletController::class, 'show'])->name('toilet.show');
@@ -594,8 +594,7 @@ Route::post('notebookwriting/{people_id}', [NotebookController::class,'store'])-
 // 編集↓
 Route::get('notebookchange/{people_id}/{id}', [NotebookController::class, 'change'])->name('notebook.change');
 Route::post('notebookchange/{people_id}/{id}',[NotebookController::class,'update'])->name('notebook_update');
-Route::post('notebookchange/{id}',[NotebookController::class,'update'])->name('notebook_update');
-Route::post('notebookchange/{id}',[NotebookController::class,'destroy'])->name('notebook.delete');
+Route::post('notebookchange/{people_id}/{id}/delete',[NotebookController::class,'destroy'])->name('notebook.delete');
 
 // 連絡帳(保護者側)↓
 Route::get('recordstamp/{people_id}', [RecordController::class, 'RecordStampshow'])->name('recordstamp.edit');

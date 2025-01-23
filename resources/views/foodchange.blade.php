@@ -89,7 +89,7 @@
     </div>
 </form>
 
-    <form action="{{ route('food.delete', [ 'id' => $food->id]) }}" method="POST">
+    <form action="{{ route('food.delete',  ['people_id' => $person->id, 'id' => $lastFood->id]) }}" method="POST">
     @csrf
         <div class="flex justify-center my-8">
             <button type="button" class="delete-btn font-semibold px-4 py-2 bg-gray-600 text-lg text-white rounded-md hover:bg-gray-500" data-id="{{ $food->id }}" data-toggle="modal" data-target="#confirmDeleteModal">

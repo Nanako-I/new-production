@@ -34,14 +34,7 @@ class NotebookController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-       $notebook = Notebook::all();
-        // ('people')に$peopleが代入される
-        
-        // 'people'はpeople.blade.phpの省略↓　// compact('people')で合っている↓
-        return view('people',compact('notebook'));
-    }
+  
 
     /**
      * Show the form for creating a new resource.
@@ -91,9 +84,13 @@ class NotebookController extends Controller
         'notebook' => $request->notebook,
         
     ]);
-   $people = Person::all();
-   $request->session()->regenerateToken();
-   return redirect()->route('people.index')->with('success', '文章が正常に登録されました。');
+    $person = Person::findOrFail($request->people_id);
+    // 二重送信防止
+    $request->session()->regenerateToken();
+
+    // セッションに$personを保存
+    session(['selected_person' => $person]);
+    return redirect()->route('people.index')->with('success', '文章が正常に登録されました。');
     }
 
     /**
@@ -350,7 +347,14 @@ $headers = [
     
     
     $notebook->save();
-    
+
+    $person = Person::findOrFail($request->people_id);
+    // 二重送信防止
+    $request->session()->regenerateToken();
+
+    // セッションに$personを保存
+    session(['selected_person' => $person]);
+
     return redirect()->route('people.index')->with('success', '更新されました。');
 }
     
@@ -363,13 +367,17 @@ $headers = [
      * @param  \App\Models\Speech  $speech
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $people_id, $id)
     {
        
         $lastNotebook = Notebook::find($id);
     if ($lastNotebook) {
         $lastNotebook->delete();
     }
-        return redirect()->route('people.index')->with('success', '削除が完了しました。');
+    $person = Person::findOrFail($request->people_id);
+    // セッションに$personを保存
+    session(['selected_person' => $person]);
+
+    return redirect()->route('people.index')->with('success', '削除が完了しました。');
     }
 }

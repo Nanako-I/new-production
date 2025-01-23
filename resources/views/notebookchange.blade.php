@@ -146,7 +146,7 @@
       </form>
          <p id="amivoiceApiKeyContainer" data-api-key="{{ $json_response }}"></p>
 
-      <form action="{{ route('notebook.delete', [ 'id' => $lastNotebook->id]) }}" method="POST">
+      <form action="{{ route('notebook.delete', ['people_id' => $person->id, 'id' => $lastNotebook->id]) }}" method="POST">
         @csrf
           <div class="flex justify-center my-4">
               <button type="button" class="delete-btn font-semibold px-4 py-2 bg-gray-600 text-lg text-white rounded-md hover:bg-gray-500" data-id="{{ $lastNotebook->id  }}" data-toggle="modal" data-target="#confirmDeleteModal">

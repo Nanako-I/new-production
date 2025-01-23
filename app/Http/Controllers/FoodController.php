@@ -11,35 +11,7 @@ use Illuminate\Support\Facades\Validator;
 
 class FoodController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-     
-    public function index() {
-   //** ↓ 下をコピー ↓ **    
-    
-		
-    $foods = Food::orderBy('created_at', 'asc')->get();
-
-    return view('foods', ['foods' => $foods]);
-    
-    //** ↑ 上をコピー ↑ **
-}
-    
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-//    public function create(Request $request)
-// {
-//     $person = Food::findOrFail($request->people_id);
    
-//     return view('people', ['people' => Person::all()]);
-// }
 
     /**
      * Store a newly created resource in storage.
@@ -83,11 +55,15 @@ class FoodController extends Controller
         'bikou' => $request->bikou,
          
     ]);
-    // return redirect('people/{id}/edit');
-    $people = Person::all();
+
+    $person = Person::findOrFail($request->people_id);
+    // 二重送信防止
     $request->session()->regenerateToken();
-    // return view('people', compact('food', 'people'));
-    return redirect()->route('people.index')->with('success', '登録完了しました。');
+
+    // セッションに$personを保存
+    session(['selected_person' => $person]);
+
+    return redirect()->route('people.index')->with('success', '登録が成功しました。');
     }
 
     /**
@@ -107,7 +83,6 @@ class FoodController extends Controller
 
 
 public function change(Request $request, $people_id, $id)
-// public function change(Food $food)
     {
         
         $person = Person::findOrFail($people_id);
@@ -167,8 +142,13 @@ public function edit(Request $request, $people_id)
     
     $food->save();
     
-    $people = Person::all();
-    // return redirect()->route('people.show', $people_id)->with('success', '食事情報が更新されました。');
+    $person = Person::findOrFail($request->people_id);
+    // 二重送信防止
+    $request->session()->regenerateToken();
+
+    // セッションに$personを保存
+    session(['selected_person' => $person]);
+
     return redirect()->route('people.index')->with('success', '食事情報が更新されました。');
 }
     
@@ -181,13 +161,17 @@ public function edit(Request $request, $people_id)
      * @param  \App\Models\Food  $food
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $people_id, $id)
     {
        
         $food = Food::find($id);
     if ($food) {
         $food->delete();
     }
-        return redirect()->route('people.index')->with('success', '削除が完了しました。');
+    $person = Person::findOrFail($request->people_id);
+    // セッションに$personを保存
+    session(['selected_person' => $person]);
+
+    return redirect()->route('people.index')->with('success', '削除が完了しました。');
     }
 }
