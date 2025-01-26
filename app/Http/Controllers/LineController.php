@@ -15,26 +15,54 @@ class LineController extends Controller
     private $channelSecret;
     private $redirectUri;
 
+    // public function __construct()
+    // {
+    //     $this->channelId = env('LINE_CHANNEL_ID');
+    //     $this->channelSecret = env('LINE_CHANNEL_SECRET');
+    //     $this->redirectUri = env('LINE_CALLBACK_URL');
+    // }
     public function __construct()
-    {
-        $this->channelId = env('LINE_CHANNEL_ID');
-        $this->channelSecret = env('LINE_CHANNEL_SECRET');
-        $this->redirectUri = env('LINE_CALLBACK_URL');
-    }
+{
+    // env()の代わりにconfig()を使用
+    $this->channelId = config('services.line.client_id');
+    $this->channelSecret = config('services.line.client_secret');
+    $this->redirectUri = config('services.line.redirect');
+}
 
+    // public function redirectToLine()
+    // {
+    //     $url = 'https://access.line.me/oauth2/v2.1/authorize?' . http_build_query([
+    //         'response_type' => 'code',
+    //         'client_id' => $this->channelId,
+    //         'redirect_uri' => $this->redirectUri,
+    //         'state' => 'random_string', // CSRF対策のためのランダムな文字列
+    //         'scope' => 'profile openid', // 必要なスコープ
+    //     ]);
+
+    //     return redirect($url);
+    // }
     public function redirectToLine()
     {
+        // デバッグログの追加
+        \Log::info('LINE Login Parameters', [
+            'channel_id' => $this->channelId,
+            'redirect_uri' => $this->redirectUri
+        ]);
+    
         $url = 'https://access.line.me/oauth2/v2.1/authorize?' . http_build_query([
             'response_type' => 'code',
             'client_id' => $this->channelId,
             'redirect_uri' => $this->redirectUri,
-            'state' => 'random_string', // CSRF対策のためのランダムな文字列
-            'scope' => 'profile openid', // 必要なスコープ
+            'state' => \Str::random(40), // よりセキュアなランダム文字列
+            'scope' => 'profile openid',
         ]);
-
+    
+        // 生成されたURLをログに記録
+        \Log::info('Generated LINE Login URL', ['url' => $url]);
+    
         return redirect($url);
     }
-
+    
     public function handleLineCallback(Request $request)
     {
         // LINEからのコールバックを処理
