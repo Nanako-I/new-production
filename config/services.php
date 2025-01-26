@@ -47,6 +47,7 @@ return [
         'channel_id' => env('LINE_CHANNEL_ID'),
         'channel_secret' => env('LINE_CHANNEL_SECRET'),
         'callback_url' => env('LINE_CALLBACK_URL'),
+        'channel_access_token' => env('LINE_CHANNEL_ACCESS_TOKEN'),
     ],
 
 

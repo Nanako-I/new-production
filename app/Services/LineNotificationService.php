@@ -10,7 +10,9 @@ class LineNotificationService
 
     public function __construct()
     {
-        $this->accessToken = env('LINE_CHANNEL_ACCESS_TOKEN'); // 環境変数から取得
+        // $this->accessToken = env('LINE_CHANNEL_ACCESS_TOKEN'); // 環境変数から取得
+        // env()の代わりにconfig()を使用
+        $this->accessToken = config('services.line.channel_access_token');
     }
 
     public function sendNotification($lineUserId, $message)
