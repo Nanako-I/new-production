@@ -37,4 +37,17 @@ return [
         'api_pw' => env('AMIVOICE_API_PW'),
     ],
 
+    'line' => [
+    'client_id' => env('LINE_CHANNEL_ID'),
+    'client_secret' => env('LINE_CHANNEL_SECRET'),
+    'redirect' => env('LINE_REDIRECT_URI'),
+],
+
+    'login' => [
+        'channel_id' => env('LINE_CHANNEL_ID'),
+        'channel_secret' => env('LINE_CHANNEL_SECRET'),
+        'callback_url' => env('LINE_CALLBACK_URL'),
+    ],
+
+
 ];

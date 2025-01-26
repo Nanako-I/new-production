@@ -85,7 +85,10 @@ class User extends Authenticatable
         'terms_accepted',
         'privacy_accepted',
         'terms_accepted_at',
-        'privacy_accepted_at'
+        'privacy_accepted_at',
+        'line_name',
+        'line_user_id',
+        'line_profile_picture'
     ];
 
     /**

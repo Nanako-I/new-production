@@ -23,10 +23,17 @@ use App\Enums\PermissionType;
 use App\Enums\RoleType as RoleEnums;
 use App\Enums\Role as RoleEnum;
 use App\Mail\NewChatMessageNotification;
+use App\Services\LineNotificationService;
 
 
 class ChatController extends Controller
 {
+    protected $lineNotificationService;
+
+    public function __construct(LineNotificationService $lineNotificationService)
+    {
+        $this->lineNotificationService = $lineNotificationService;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -72,8 +79,8 @@ class ChatController extends Controller
     
     try {
         $person = Person::findOrFail($people_id);
-        
-        $user = Auth::user();
+        $user = auth()->user(); // 現在のユーザーを取得
+        // $user = Auth::user();
         $roles = $user->roles()->get();  // これでロールが取得できる
 
         $rolename = $user->getRoleNames(); // ロールの名前を取得
@@ -113,9 +120,16 @@ class ChatController extends Controller
                     
                     foreach ($facilityStaffs as $facilitystaff) {
                         try {
-                            // \Log::info('Attempting to send email to: ' . $facilitystaff->email);
-                            Mail::to($facilitystaff->email)->send(new NewChatMessageNotification($person, $request->message));
-                            // \Log::info('Successfully sent email to: ' . $facilitystaff->email);
+                            // 統一メッセージ
+                        $lineMessage = "連絡帳アプリに新しいメッセージが届きました。https://boocare.jp/before-login よりご確認ください";
+
+                            if ($facilitystaff->line_user_id) {
+                                // LINE通知を送信
+                                $this->lineNotificationService->sendNotification($facilitystaff->line_user_id, $lineMessage);
+                            } else {
+                                // メールを送信
+                                Mail::to($facilitystaff->email)->send(new NewChatMessageNotification($person, $request->message));
+                            }
                         } catch (\Exception $e) {
                             // \Log::error('Failed to send email to ' . $facilitystaff->email . ': ' . $e->getMessage());
                         }
@@ -128,6 +142,7 @@ class ChatController extends Controller
             \Log::info('User roles present: ' . implode(', ', $rolename->toArray()));
             \Log::info('Normalized roles: ' . implode(', ', $rolename->map(fn($role) => strtolower(str_replace(' ', '', $role)))->toArray()));
         }
+        $family = $person->people_family()->first();
             // 自分以外のユーザーからのメッセージの場合、ファミリーにメールを送信
             if ($request->user_identifier !== $user_identifier) {
                 $familyEmails = $person->people_family()->get()->map(fn($family) => $family->email)->filter()->all();
@@ -135,7 +150,15 @@ class ChatController extends Controller
                 foreach ($familyEmails as $email) {
                     // ログインしているユーザーのメールアドレスには送信しない
                     if ($email !== $user->email) {
-                        Mail::to($email)->send(new NewChatMessageNotification($person, $request->message));
+                        // ファミリーのLINEユーザーIDが存在する場合
+                        $familyMember = User::where('email', $email)->first();
+                        if ($familyMember && $familyMember->line_user_id) {
+                            // LINE通知を送信
+                            $this->lineNotificationService->sendNotification($familyMember->line_user_id, $lineMessage);
+                        } else {
+                            // メールを送信
+                            Mail::to($email)->send(new NewChatMessageNotification($person, $request->message));
+                        }
                     }
                 }
             }
@@ -143,79 +166,81 @@ class ChatController extends Controller
             $user_name = 'Guest';
             $user_identifier = Str::random(20);
         }
-
-        session(['user_name' => $user_name]);
-        session(['user_identifier' => $user_identifier]);
-        \Log::info('Session user_name: ' . session('user_name'));
-        
-        $directory = 'sample/chat_photo';
-        $filename = null;
-        $filepath = null;
-
-        if ($request->hasFile('filename')) {
-            \Log::info('File received: ' . $request->file('filename')->getClientOriginalName());
-            $request->validate(['filename' => 'image|max:10240']);
-            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'heic'];
-            $originalExtension = strtolower($request->file('filename')->getClientOriginalExtension());
-
-            if (!in_array($originalExtension, $allowedExtensions)) {
-                return response()->json(['error' => 'サポートされていないファイルタイプです'], 400);
-            }
-
-            $originalExtension = $request->file('filename')->getClientOriginalExtension();
-
-            if (strtolower($originalExtension) === 'heic') {
-                $filename = uniqid() . '.jpg';
-                $image = Image::make($request->file('filename'))->encode('jpg');
-                $path = $directory . '/' . $filename;
-                \Storage::disk('public')->put($path, (string) $image);
-                \Log::info('HEIC file converted and stored at: ' . $path);
-            } else {
-                $filename = uniqid() . '.' . $originalExtension;
-                $path = $request->file('filename')->storeAs($directory, $filename, 'public');
-                \Log::info('File stored at: ' . $path);
-            }
-
-            $filepath = 'storage/' . $directory . '/' . $filename;
-        } else {
-            \Log::info('No file received in the request.');
-        }
-
-        $chat = Chat::create([
-            'people_id' => $people_id,
-            'user_name' => $user_name,
-            'user_identifier' => $user_identifier,
-            'message' => $request->message,
-            'filename' => $filename,
-            'path' => $filepath,
-            'last_name' => $user ? $user->last_name : null,
-            'first_name' => $user ? $user->first_name : null,
-        ]);
-
-        \Log::info('About to broadcast MessageSent event for chat ID: ' . $chat->id);
-        broadcast(new MessageSent($chat))->toOthers();
-        \Log::info('Broadcast method called for MessageSent event');
-        
-        // 送信ボタンを押したらJson形式の画面が返されるのでコメントアウト
-        // return response()->json([
-        //     'id' => $chat->id,
-        //     'message' => $request->message,
-        //     'user_identifier' => $user_identifier,
-        //     'user_name' => $user_name,
-        //     'created_at' => $chat->created_at->format('Y-m-d H:i:s'),
-        //     'filename' => $chat->filename,
-        //     'last_name' => $chat->last_name,
-        //     'first_name' => $chat->first_name,
-        // ]);
-        $request->session()->regenerateToken();
-        return redirect()->route('chat.show', ['people_id' => $people_id]);
-
-    } catch (\Exception $e) {
-        \Log::error('Error in store method: ' . $e->getMessage());
-        \Log::error('Stack trace: ' . $e->getTraceAsString());
-        return response()->json(['error' => $e->getMessage()], 500);
-    }
-}
+     
+             session(['user_name' => $user_name]);
+             session(['user_identifier' => $user_identifier]);
+             \Log::info('Session user_name: ' . session('user_name'));
+             
+             $directory = 'sample/chat_photo';
+             $filename = null;
+             $filepath = null;
+     
+             if ($request->hasFile('filename')) {
+                 \Log::info('File received: ' . $request->file('filename')->getClientOriginalName());
+                 $request->validate(['filename' => 'image|max:10240']);
+                 $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'heic'];
+                 $originalExtension = strtolower($request->file('filename')->getClientOriginalExtension());
+     
+                 if (!in_array($originalExtension, $allowedExtensions)) {
+                     return response()->json(['error' => 'サポートされていないファイルタイプです'], 400);
+                 }
+     
+                 $originalExtension = $request->file('filename')->getClientOriginalExtension();
+     
+                 if (strtolower($originalExtension) === 'heic') {
+                     $filename = uniqid() . '.jpg';
+                     $image = Image::make($request->file('filename'))->encode('jpg');
+                     $path = $directory . '/' . $filename;
+                     \Storage::disk('public')->put($path, (string) $image);
+                     \Log::info('HEIC file converted and stored at: ' . $path);
+                 } else {
+                     $filename = uniqid() . '.' . $originalExtension;
+                     $path = $request->file('filename')->storeAs($directory, $filename, 'public');
+                     \Log::info('File stored at: ' . $path);
+                 }
+     
+                 $filepath = 'storage/' . $directory . '/' . $filename;
+             } else {
+                 \Log::info('No file received in the request.');
+             }
+     
+             $chat = Chat::create([
+                 'people_id' => $people_id,
+                 'user_name' => $user_name,
+                 'user_identifier' => $user_identifier,
+                 'message' => $request->message,
+                 'filename' => $filename,
+                 'path' => $filepath,
+                 'last_name' => $user ? $user->last_name : null,
+                 'first_name' => $user ? $user->first_name : null,
+             ]);
+     
+             \Log::info('About to broadcast MessageSent event for chat ID: ' . $chat->id);
+             broadcast(new MessageSent($chat))->toOthers();
+             \Log::info('Broadcast method called for MessageSent event');
+             
+             // 送信ボタンを押したらJson形式の画面が返されるのでコメントアウト
+             // return response()->json([
+             //     'id' => $chat->id,
+             //     'message' => $request->message,
+             //     'user_identifier' => $user_identifier,
+             //     'user_name' => $user_name,
+             //     'created_at' => $chat->created_at->format('Y-m-d H:i:s'),
+             //     'filename' => $chat->filename,
+             //     'last_name' => $chat->last_name,
+             //     'first_name' => $chat->first_name,
+             // ]);
+             $request->session()->regenerateToken();
+     
+     
+             return redirect()->route('chat.show', ['people_id' => $people_id]);
+     
+         } catch (\Exception $e) {
+             \Log::error('Error in store method: ' . $e->getMessage());
+             \Log::error('Stack trace: ' . $e->getTraceAsString());
+             return response()->json(['error' => $e->getMessage()], 500);
+         }
+     }
 
     
 

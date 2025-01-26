@@ -190,10 +190,16 @@ Route::get('/registration-confirmation', function () {
 
 
 // LINEで保護者を利用者と直接紐づける↓
-Route::post('/generate-line-login-url', [LineController::class, 'generateLoginUrl']);
-Route::get('/line/callback', [LineController::class, 'callback'])->name('line.callback');
-Route::get('/line/friends', [LineController::class, 'showFriends'])->name('line.friends');
-Route::post('/line/friends', [LineController::class, 'storeFriends'])->name('line.store_friends');
+// Route::post('/generate-line-login-url', [LineController::class, 'generateLoginUrl']);
+// Route::get('/line/callback', [LineController::class, 'callback'])->name('line.callback');
+// Route::get('/line/friends', [LineController::class, 'showFriends'])->name('line.friends');
+// Route::post('/line/friends', [LineController::class, 'storeFriends'])->name('line.store_friends');
+
+// プロフィール画面にLINEアカウントの連携追加↓
+Route::get('/line-login', [LineController::class, 'redirectToLine'])->name('line.login');
+Route::get('/line/callback', [LineController::class, 'handleLineCallback'])->name('line.callback');
+// Route::get('/line-login', [LineController::class, 'redirectToProvider']);
+// Route::get('/line-callback', [LineController::class, 'handleProviderCallback']);
 
 //管理者が職員のIDを入力するためにfacility_idを取得し画面遷移させる↓
 Route::get('custom_id_entryform/{facilityId}', [BeforeInvitationController::class, 'beforeInvitation'])->name('beforeInvitation');
