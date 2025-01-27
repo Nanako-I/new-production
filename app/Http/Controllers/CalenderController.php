@@ -147,18 +147,21 @@ class CalenderController extends Controller
 
 
     public function rules()
-{
-    return [
-        'people_id' => 'required|integer|exists:people,id',
-        'arrival_datetime' => 'required|date',
-        // 'exit_datetime' => 'required|date|after:arrival_datetime',
-        'exit_datetime' => 'nullable|date', // 退館予定日についてnullを許容
-        'visit_type_id' => 'required|integer|exists:visit_types,id',
-        'notes' => 'nullable|string',
-        'pick_up_time' => 'nullable|date_format:Y-m-d H:i:s', 
-        'drop_off_time' => 'nullable|date_format:Y-m-d H:i:s',
-    ];
-}
+    {
+        return [
+            'people_id' => 'required|integer',
+            'visit_type_id' => 'required|integer',
+            'arrival_datetime' => 'required|date',
+            'exit_datetime' => 'nullable|date',
+            'pick_up' => 'nullable|string|in:必要,不要',
+            'drop_off' => 'nullable|string|in:必要,不要',
+            'pick_up_time' => 'nullable|date',
+            'drop_off_time' => 'nullable|date',
+            'pick_up_staff' => 'nullable|string|max:255',
+            'drop_off_staff' => 'nullable|string|max:255',
+            'notes' => 'nullable|string'
+        ];
+    }
     /**
      * カレンダーに利用者の訪問予定を登録する
      *
@@ -170,14 +173,14 @@ class CalenderController extends Controller
         try {
             // リクエストデータのログ
             \Log::info('Request data:', $request->all());
-            
+
             $array = CalenderRegisterRequest::getOnlyRequest($request);
-            
+
             // バリデーション前のデータチェック
             \Log::info('Validated data:', $array);
-            
+
             DB::beginTransaction();
-            
+
             $result = ScheduledVisit::create([
                 'people_id' => $array['people_id'],
                 'arrival_datetime' => $array['arrival_datetime'],
@@ -193,19 +196,18 @@ class CalenderController extends Controller
                 'pick_up_bus' => $array['pick_up_bus'],
                 'drop_off_bus' => $array['drop_off_bus'],
             ]);
-            
+
             \Log::info('Created record:', ['result' => $result]);
-            
+
             DB::commit();
             return response()->json(['message' => '登録成功'], 200);
-            
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Registration error:', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'message' => '登録に失敗しました',
                 'error' => $e->getMessage()
@@ -216,39 +218,36 @@ class CalenderController extends Controller
      * カレンダーに利用者の訪問予定を編集する
      *
      * @param CalenderEditRequest $request
+     * @param int $id
      * @return JsonResponse
      */
     public function edit(CalenderEditRequest $request, $id)
     {
-        $array = CalenderEditRequest::getOnlyRequest($request);
-
-        // nullでない値のみを抽出
-        $updateData = array_filter($array, function ($value) {
-            return !is_null($value);
-        });
+        \Log::info('編集リクエストデータ:', $request->all());
+        $array = array_merge(
+            CalenderEditRequest::getOnlyRequest($request),
+            ['scheduled_visit_id' => $id]
+        );
 
         DB::beginTransaction();
         try {
-            // scheduled_visit_idを使って特定のレコードを更新
-        // ScheduledVisit::where('id', $array['scheduled-visit-id'])
-        $scheduledVisit = ScheduledVisit::findOrFail($id);
-        // ScheduledVisit::find($array['schedule_id'])
-        $scheduledVisit ->update($updateData);
-            // ScheduledVisit::where('people_id', $array['people_id'])
-                // ->update($updateData);
+            $scheduledVisit = ScheduledVisit::findOrFail($id);
+            $scheduledVisit->update($array);
+
             DB::commit();
-            $response = self::returnMessageIndex(true);
-            $status = Response::HTTP_OK;
+            return response()->json(['message' => '更新成功'], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            $message = $e->getMessage();
-            $response = self::messageErrorStatusText($message);
-            $status = Response::HTTP_INTERNAL_SERVER_ERROR;
+            \Log::error('更新エラー:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => '更新に失敗しました',
+                'error' => $e->getMessage()
+            ], 500);
         }
-        return response()->json($response, $status);
-        // return view('/calendar', [
-        //     'scheduledVisit' => $scheduledVisit,
-        // ]);
     }
 
 

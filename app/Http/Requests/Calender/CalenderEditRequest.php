@@ -38,7 +38,7 @@ class CalenderEditRequest extends FormRequest
             'exit_datetime' => ['nullable', 'date_format:Y-m-d H:i:s'],
             'pick_up' => ['required', 'in:必要,不要'], 
             'drop_off' => ['required', 'in:必要,不要'],
-            'notes' => ['nullable', 'text'],
+            'notes' => ['nullable', 'string'],
         ];
     }
 
