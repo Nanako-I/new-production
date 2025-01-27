@@ -405,6 +405,11 @@ function closeModal() {
     document.body.style.overflow = "";
     document.body.style.paddingRight = ""; // 補正を解除
     const modal = document.getElementById("modalBackdrop");
+    const form = document.getElementById("eventForm");
+
+    form.reset();
+    form.dataset.eventId = "";
+
     modal.classList.add("hidden");
 }
 
