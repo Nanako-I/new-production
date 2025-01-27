@@ -170,10 +170,13 @@ class PersonController extends Controller
         }
 
         // 職員が本日分の連絡帳を確定しているか情報を取得
-        $isConfirmed = RecordConfirm::where('person_id', $person->id)
-        ->whereDate('kiroku_date', $today) // 本日の日付でフィルタ
-        ->where('is_confirmed', true) // 確定フラグがtrue
-        ->exists();
+        $isConfirmed = RecordConfirm::whereIn('person_id', $people->pluck('id'))
+        ->whereDate('kiroku_date', $today)
+        ->where('is_confirmed', true)
+        ->pluck('person_id')
+        ->flip()
+        ->map(function () { return true; })
+        ->all();
 
         // 各利用者の訪問データを取得して送迎の要否を確認(送迎は開発途中のためコメントアウト）
         // foreach ($people as $person) {
@@ -268,8 +271,16 @@ public function getContent($id)
                 ->where('flag', 1)
                 ->get();
 
+// 職員が本日分の連絡帳を確定しているか情報を取得
+$isConfirmed = RecordConfirm::whereIn('person_id', $people->pluck('id'))
+->whereDate('kiroku_date', $today)
+->where('is_confirmed', true)
+->pluck('person_id')
+->flip()
+->map(function () { return true; })
+->all();
 
-                return view('partials._people_content',compact('people', 'person','selectedItems', 'options', 'personOptions'));
+                return view('partials._people_content',compact('people', 'person','selectedItems', 'options', 'personOptions', 'isConfirmed'));
     }
 
     public function show($id)

@@ -96,62 +96,59 @@
                     <!-- <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold"><i class="fa-regular fa-envelope text-red-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>New</span>
                 </a>
         @endif -->
-
+     <div class="flex flex-col mb-2">
         @switch($person->messageStatus)
     @case('unread')
-        <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">
+        <span id="new-indicator-{{ $person->id }}" class="text-red-500 text-xl font-bold">
             <i class="fa-regular fa-envelope text-red-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
             メッセージあり
         </span>
         @break
 
     @case('today')
-        <span id="new-indicator-{{ $person->id }}" class="ml-2 text-yellow-500 text-xl font-bold">
+        <span id="new-indicator-{{ $person->id }}" class="text-yellow-500 text-xl font-bold">
             <i class="fa-regular fa-comment-dots text-yellow-500" style="font-size: 1.5em; padding: 0 5px; transition: transform 0.2s;"></i>
             本日連絡あり
         </span>
         @break
 
     @case('older')
-        <span class="ml-2 text-gray-500 text-xl font-bold">
+        <span class="text-gray-500 text-xl font-bold">
             過去の連絡あり
         </span>
         @break
 
     @default
-        <span class="ml-2 text-gray-500 text-xl font-bold">
+        <span class="text-gray-500 text-xl font-bold">
             未読なし
         </span>
 @endswitch
+</div>
 
 
-
-
-        <!-- @if ($isConfirmed) -->
-            <!-- 確定済みの場合の表示 -->
-                <!-- <a href="{{ url('notebook/'.$person->id) }}" class="relative ml-2 flex items-center">
-                    @csrf
-                    <span id="new-indicator-{{ $person->id }}" class="ml-2 text-red-500 text-xl font-bold">
-                        本日の連絡帳：送信済
-                    </span>
-                </a>
-            @else -->
-                <!-- 未確定の場合の表示 -->
-                <!-- <span id="new-indicator-{{ $person->id }}" class="ml-2 text-gray-500 text-xl font-bold">
-                    本日の連絡帳：未送信
-                </span>
-            @endif -->
-
-         </div>
-                                  
+<div class="flex flex-col mb-2">
+    @if (isset($isConfirmed[$person->id]))
+        <!-- 確定済みの場合の表示 -->
+        @csrf
+            <span id="new-indicator-{{ $person->id }}" class="text-orange-400 text-xl font-bold">
+                本日の連絡帳：済
+            </span>
+    @else
+        <!-- 未確定の場合の表示 -->
+        <span id="new-indicator-{{ $person->id }}" class="text-gray-500 text-xl font-bold">
+            本日の連絡帳：未
+        </span>
+    @endif
+</div>
+     </div>                              
     @endforeach
-
+    
                                     
 </div>
 <!-- 右半分: 利用者詳細情報 -->
 <div id="person-details" class="p-4 flex flex-col overflow-y-auto">
 @if(isset($selectedPerson))
-     @include('partials._people_content', ['person' => $selectedPerson])
+     @include('partials._people_content', ['person' => $selectedPerson,'isConfirmed' => $isConfirmed])
         @else
             <p>利用者を選択してください。</p>
         @endif

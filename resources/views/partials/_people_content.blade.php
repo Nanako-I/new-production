@@ -2188,7 +2188,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                             @endif
                                         </div>
                                     </div>
-                                   
+
+                                    
                                     
                                     
                                         <div class="border-2 p-2 rounded-lg bg-white my-2">
@@ -2201,7 +2202,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                           <div class="flex justify-center mt-4">
                                             <a href="{{ url('record/'.$person->id.'/edit') }}" class="relative">
                                               @csrf
-                                              <i class="material-icons md-90">add</i>
+                                              @if (isset($isConfirmed[$person->id]))
+                                          
+                                                    <span class="text-orange-400 font-bold text-xl">本日の連絡帳：送信済</span>
+                                                @else
+                                                    <span class="text-gray-500 font-bold text-xl">本日の連絡帳：未</span>
+                                                @endif
                                             </a>
                                           </div>
                                     　　</div>
