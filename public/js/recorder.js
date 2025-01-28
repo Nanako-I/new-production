@@ -20,7 +20,7 @@ var Recorder = function() {
 		version: "Recorder/1.0.08",
 		sampleRate: 16000,
 		sampleRateElement: undefined,
-		maxRecordingTime: 60000,
+		maxRecordingTime: 360000,
 		maxRecordingTimeElement: undefined,
 		downSampling: false,
 		downSamplingElement: undefined,
