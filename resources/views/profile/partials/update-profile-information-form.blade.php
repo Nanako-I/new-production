@@ -68,7 +68,7 @@
         </div>
     @endhasanyrole
 
-    @hasanyrole('super administrator|facility staff administrator|facility staff user|facility staff reader')
+    <!-- @hasanyrole('super administrator|facility staff administrator|facility staff user|facility staff reader')
     <div>
         <x-input-label for="line_account" :value="__('LINEアカウント連携')" />
         @if($user->line_user_id)
@@ -84,7 +84,7 @@
             </a>
         @endif
     </div>
-    @endhasanyrole
+    @endhasanyrole -->
 
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('変更') }}</x-primary-button>
