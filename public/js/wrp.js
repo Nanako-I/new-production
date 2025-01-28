@@ -1023,7 +1023,7 @@ var Wrp = function() {
 
 	// 録音の停止を自動的に行うためのタイマの開始
 function startCheckIntervalTimeoutTimer_() {
-	var fixedTime = 60000; // 60000 ミリ秒 = 1 分
+	var fixedTime = 600000; // 60000 ミリ秒 = 10 分
 
 	// 既存のタイマーがある場合、それを停止する。
 	stopCheckIntervalTimeoutTimer_();
@@ -1033,7 +1033,7 @@ function startCheckIntervalTimeoutTimer_() {
 
 	// トレース機能が有効な場合、ログを出力する。
 	if (wrp_.TRACE) {
-			wrp_.TRACE("INFO: started check interval time timer: 60000 (1 minute)");
+			wrp_.TRACE("INFO: started check interval time timer: 600000 (10 minute)");
 	}
 }
 
@@ -1043,7 +1043,7 @@ function stopCheckIntervalTimeoutTimer_() {
 			clearTimeout(checkIntervalTimeoutTimerId_);
 			checkIntervalTimeoutTimerId_ = null;
 			if (wrp_.TRACE) {
-					wrp_.TRACE("INFO: stopped check interval time timer: 60000 (1 minute)");
+					wrp_.TRACE("INFO: stopped check interval time timer: 600000 (10 minute)");
 			}
 	}
 }
@@ -1051,7 +1051,7 @@ function stopCheckIntervalTimeoutTimer_() {
 // 録音の停止を自動的に行うためのタイマの発火
 function fireCheckIntervalTimeoutTimer_() {
 	if (wrp_.TRACE) {
-			wrp_.TRACE("INFO: fired check interval time timer: 60000 (1 minute)");
+			wrp_.TRACE("INFO: fired check interval time timer: 600000(10 minute)");
 	}
 	feedDataPause_();
 }
