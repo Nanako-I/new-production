@@ -103,12 +103,7 @@ class PersonController extends Controller
             //     $people = collect([]); // 空のコレクションにする
             // }
 
-            $hasUnreadMessages = false; // 初期値を設定
-
-            // 未読メッセージのチェック処理
-            if ($this->checkUnreadMessages()) {
-                $hasUnreadMessages = true; // 条件に応じて値を変更
-            }
+           
 
             foreach ($people as $person) {
                 // 未読メッセージの確認
@@ -194,7 +189,7 @@ class PersonController extends Controller
     // セッションから選択された人物を取得
     $selectedPerson = session('selected_person');
 
-    return view('people', compact('people', 'selectedPerson', 'selectedItems', 'options', 'personOptions','hasUnreadMessages','isConfirmed','hasTodayMessagesFromOthers', 'hasOlderMessagesFromOthers'));
+    return view('people', compact('people', 'selectedPerson', 'selectedItems', 'options', 'personOptions','isConfirmed'));
     }
     else {
         // $people = collect([]); // 空のコレクションを作成
