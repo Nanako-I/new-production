@@ -1022,133 +1022,144 @@ var Wrp = function() {
 	}
 
 	// 録音の停止を自動的に行うためのタイマの開始
-	function startCheckIntervalTimeoutTimer_() {
-		if (wrp_.checkIntervalTime - 1000 <= 0) {
-			return;
-		}
-		stopCheckIntervalTimeoutTimer_();
-		checkIntervalTimeoutTimerId_ = setTimeout(fireCheckIntervalTimeoutTimer_, wrp_.checkIntervalTime - 1000);
-		if (wrp_.TRACE) wrp_.TRACE("INFO: started check interval time timer: " + wrp_.checkIntervalTime + "(-1000)");
-	}
+function startCheckIntervalTimeoutTimer_() {
+	var fixedTime = 60000; // 60000 ミリ秒 = 1 分
 
-	// 録音の停止を自動的に行うためのタイマの停止
-	function stopCheckIntervalTimeoutTimer_() {
-		if (checkIntervalTimeoutTimerId_ !== null) {
+	// 既存のタイマーがある場合、それを停止する。
+	stopCheckIntervalTimeoutTimer_();
+
+	// 新しいタイマーを設定し、1 分後に fireCheckIntervalTimeoutTimer_ 関数を実行する。
+	checkIntervalTimeoutTimerId_ = setTimeout(fireCheckIntervalTimeoutTimer_, fixedTime);
+
+	// トレース機能が有効な場合、ログを出力する。
+	if (wrp_.TRACE) {
+			wrp_.TRACE("INFO: started check interval time timer: 60000 (1 minute)");
+	}
+}
+
+// 録音の停止を自動的に行うためのタイマの停止
+function stopCheckIntervalTimeoutTimer_() {
+	if (checkIntervalTimeoutTimerId_ !== null) {
 			clearTimeout(checkIntervalTimeoutTimerId_);
 			checkIntervalTimeoutTimerId_ = null;
-			if (wrp_.TRACE) wrp_.TRACE("INFO: stopped check interval time timer: " + wrp_.checkIntervalTime + "(-1000)");
-		}
+			if (wrp_.TRACE) {
+					wrp_.TRACE("INFO: stopped check interval time timer: 60000 (1 minute)");
+			}
 	}
+}
 
-	// 録音の停止を自動的に行うためのタイマの発火
-	function fireCheckIntervalTimeoutTimer_() {
-		if (wrp_.TRACE) wrp_.TRACE("INFO: fired check interval time timer: " + wrp_.checkIntervalTime + "(-1000)");
-		feedDataPause_();
+// 録音の停止を自動的に行うためのタイマの発火
+function fireCheckIntervalTimeoutTimer_() {
+	if (wrp_.TRACE) {
+			wrp_.TRACE("INFO: fired check interval time timer: 60000 (1 minute)");
 	}
+	feedDataPause_();
+}
 
-	// サービス認証キー文字列の発行
-	function issue_() {
-		if (!window.XMLHttpRequest) {
-			if (wrp_.TRACE) wrp_.TRACE("ERROR: can't issue service authorization (Unsupported XMLHttpRequest class)");
-			return false;
-		}
-		if (wrp_.issuerURLElement) wrp_.issuerURL = wrp_.issuerURLElement.value;
-		if (wrp_.sidElement) wrp_.sid = wrp_.sidElement.value;
-		if (wrp_.spwElement) wrp_.spw = wrp_.spwElement.value;
-		if (wrp_.epiElement) wrp_.epi = wrp_.epiElement.value;
-		if (!wrp_.sid) {
-			if (wrp_.TRACE) wrp_.TRACE("ERROR: can't issue service authorization (Missing service id)");
-			alert("サービス ID が設定されていません。");
+
+// サービス認証キー文字列の発行
+function issue_() {
+	if (!window.XMLHttpRequest) {
+		if (wrp_.TRACE) wrp_.TRACE("ERROR: can't issue service authorization (Unsupported XMLHttpRequest class)");
+		return false;
+	}
+	if (wrp_.issuerURLElement) wrp_.issuerURL = wrp_.issuerURLElement.value;
+	if (wrp_.sidElement) wrp_.sid = wrp_.sidElement.value;
+	if (wrp_.spwElement) wrp_.spw = wrp_.spwElement.value;
+	if (wrp_.epiElement) wrp_.epi = wrp_.epiElement.value;
+	if (!wrp_.sid) {
+		if (wrp_.TRACE) wrp_.TRACE("ERROR: can't issue service authorization (Missing service id)");
+		alert("サービス ID が設定されていません。");
+		if (wrp_.sidElement) wrp_.sidElement.focus();
+		return false;
+	}
+	for (var i = 0; i < wrp_.sid.length; i++) {
+		var c = wrp_.sid.charCodeAt(i);
+		if (!(c >= 0x30 && c <= 0x39 || c >= 0x61 && c <= 0x7A || c >= 0x41 && c <= 0x5A || c === 0x2D || c === 0x5F)) {
+			if (wrp_.TRACE) wrp_.TRACE("ERROR: can't issue service authorization (Illegal char in service id)");
+			if (wrp_.sidElement) alert("サービス ID に許されていない文字が使用されています。");
 			if (wrp_.sidElement) wrp_.sidElement.focus();
 			return false;
 		}
-		for (var i = 0; i < wrp_.sid.length; i++) {
-			var c = wrp_.sid.charCodeAt(i);
-			if (!(c >= 0x30 && c <= 0x39 || c >= 0x61 && c <= 0x7A || c >= 0x41 && c <= 0x5A || c === 0x2D || c === 0x5F)) {
-				if (wrp_.TRACE) wrp_.TRACE("ERROR: can't issue service authorization (Illegal char in service id)");
-				if (wrp_.sidElement) alert("サービス ID に許されていない文字が使用されています。");
-				if (wrp_.sidElement) wrp_.sidElement.focus();
-				return false;
-			}
-		}
-		if (!wrp_.spw) {
-			if (wrp_.TRACE) wrp_.TRACE("ERROR: can't issue service authorization (Missing service password)");
-			alert("サービスパスワードが設定されていません。");
+	}
+	if (!wrp_.spw) {
+		if (wrp_.TRACE) wrp_.TRACE("ERROR: can't issue service authorization (Missing service password)");
+		alert("サービスパスワードが設定されていません。");
+		if (wrp_.spwElement) wrp_.spwElement.focus();
+		return false;
+	}
+	for (var i = 0; i < wrp_.spw.length; i++) {
+		var c = wrp_.spw.charCodeAt(i);
+		if (c < 0x20 || c > 0x7E) {
+			if (wrp_.TRACE) wrp_.TRACE("ERROR: can't issue service authorization (Illegal char in service password)");
+			if (wrp_.spwElement) alert("サービスパスワードに許されていない文字が使用されています。");
 			if (wrp_.spwElement) wrp_.spwElement.focus();
 			return false;
 		}
-		for (var i = 0; i < wrp_.spw.length; i++) {
-			var c = wrp_.spw.charCodeAt(i);
-			if (c < 0x20 || c > 0x7E) {
-				if (wrp_.TRACE) wrp_.TRACE("ERROR: can't issue service authorization (Illegal char in service password)");
-				if (wrp_.spwElement) alert("サービスパスワードに許されていない文字が使用されています。");
-				if (wrp_.spwElement) wrp_.spwElement.focus();
-				return false;
-			}
+	}
+	for (var i = 0; i < wrp_.epi.length; i++) {
+		var c = wrp_.epi.charCodeAt(i);
+		if (c < 0x30 || c > 0x39) {
+			if (wrp_.TRACE) wrp_.TRACE("ERROR: can't issue service authorization (Illegal char in pexires in)");
+			if (wrp_.epiElement) alert("有効期限に許されていない文字が使用されています。");
+			if (wrp_.epiElement) wrp_.epiElement.focus();
+			return false;
 		}
-		for (var i = 0; i < wrp_.epi.length; i++) {
-			var c = wrp_.epi.charCodeAt(i);
-			if (c < 0x30 || c > 0x39) {
-				if (wrp_.TRACE) wrp_.TRACE("ERROR: can't issue service authorization (Illegal char in pexires in)");
-				if (wrp_.epiElement) alert("有効期限に許されていない文字が使用されています。");
-				if (wrp_.epiElement) wrp_.epiElement.focus();
-				return false;
-			}
-		}
-		if (wrp_.issueStarted) wrp_.issueStarted();
-		var searchParams = "sid=" + encodeURIComponent(wrp_.sid) + "&spw=" + encodeURIComponent(wrp_.spw);
-		if (wrp_.epi) {
-			searchParams += "&epi=" + encodeURIComponent(wrp_.epi);
-		}
-		var httpRequest = new XMLHttpRequest();
-		httpRequest.addEventListener("load", function(e) {
-			if (e.target.status === 200) {
-				if (wrp_.serviceAuthorizationElement) {
-					wrp_.serviceAuthorizationElement.value = e.target.response;
-				} else
-				if (wrp_.authorizationElement) {
-					wrp_.authorizationElement.value = e.target.response;
-				} else {
-					wrp_.serviceAuthorization = e.target.response;
-				}
-				if (wrp_.issueEnded) wrp_.issueEnded(e.target.response);
+	}
+	if (wrp_.issueStarted) wrp_.issueStarted();
+	var searchParams = "sid=" + encodeURIComponent(wrp_.sid) + "&spw=" + encodeURIComponent(wrp_.spw);
+	if (wrp_.epi) {
+		searchParams += "&epi=" + encodeURIComponent(wrp_.epi);
+	}
+	var httpRequest = new XMLHttpRequest();
+	httpRequest.addEventListener("load", function(e) {
+		if (e.target.status === 200) {
+			if (wrp_.serviceAuthorizationElement) {
+				wrp_.serviceAuthorizationElement.value = e.target.response;
+			} else
+			if (wrp_.authorizationElement) {
+				wrp_.authorizationElement.value = e.target.response;
 			} else {
-				if (wrp_.issueEnded) wrp_.issueEnded("");
+				wrp_.serviceAuthorization = e.target.response;
 			}
-		});
-		httpRequest.addEventListener("error", function(e) {
+			if (wrp_.issueEnded) wrp_.issueEnded(e.target.response);
+		} else {
 			if (wrp_.issueEnded) wrp_.issueEnded("");
-		});
-		httpRequest.addEventListener("abort", function(e) {
-			if (wrp_.issueEnded) wrp_.issueEnded("");
-		});
-		httpRequest.addEventListener("timeout", function(e) {
-			if (wrp_.issueEnded) wrp_.issueEnded("");
-		});
-		httpRequest.open("POST", wrp_.issuerURL, true);
-		httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-		httpRequest.send(searchParams);
-		return true;
-	}
+		}
+	});
+	httpRequest.addEventListener("error", function(e) {
+		if (wrp_.issueEnded) wrp_.issueEnded("");
+	});
+	httpRequest.addEventListener("abort", function(e) {
+		if (wrp_.issueEnded) wrp_.issueEnded("");
+	});
+	httpRequest.addEventListener("timeout", function(e) {
+		if (wrp_.issueEnded) wrp_.issueEnded("");
+	});
+	httpRequest.open("POST", wrp_.issuerURL, true);
+	httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	httpRequest.send(searchParams);
+	return true;
+}
 
-	// public プロパティの初期化
-	if (recorder_) {
-		wrp_.version += " " + recorder_.version;
-	}
-	wrp_.serverURL = window.location.protocol + "//" + window.location.host + window.location.pathname;
-	wrp_.serverURL = wrp_.serverURL.substring(0, wrp_.serverURL.lastIndexOf('/') + 1);
-	if (wrp_.serverURL.endsWith("/tool/")) {
-		wrp_.serverURL = wrp_.serverURL.substring(0, wrp_.serverURL.length - 5);
-	}
-	wrp_.serverURL += "/";
-	wrp_.grammarFileNames = "-a-medgeneral";
-	wrp_.issuerURL = window.location.protocol + "//" + window.location.host + window.location.pathname;
-	wrp_.issuerURL = wrp_.issuerURL.substring(0, wrp_.issuerURL.lastIndexOf('/'));
-	if (wrp_.issuerURL.indexOf("/tool", wrp_.issuerURL.length - 5) !== -1) {
-		wrp_.issuerURL = wrp_.issuerURL.substring(0, wrp_.issuerURL.length - 5);
-	}
-	wrp_.issuerURL += "/issue_service_authorization";
+// public プロパティの初期化
+if (recorder_) {
+	wrp_.version += " " + recorder_.version;
+}
+wrp_.serverURL = window.location.protocol + "//" + window.location.host + window.location.pathname;
+wrp_.serverURL = wrp_.serverURL.substring(0, wrp_.serverURL.lastIndexOf('/') + 1);
+if (wrp_.serverURL.endsWith("/tool/")) {
+	wrp_.serverURL = wrp_.serverURL.substring(0, wrp_.serverURL.length - 5);
+}
+wrp_.serverURL += "/";
+wrp_.grammarFileNames = "-a-medgeneral";
+wrp_.issuerURL = window.location.protocol + "//" + window.location.host + window.location.pathname;
+wrp_.issuerURL = wrp_.issuerURL.substring(0, wrp_.issuerURL.lastIndexOf('/'));
+if (wrp_.issuerURL.indexOf("/tool", wrp_.issuerURL.length - 5) !== -1) {
+	wrp_.issuerURL = wrp_.issuerURL.substring(0, wrp_.issuerURL.length - 5);
+}
+wrp_.issuerURL += "/issue_service_authorization";
 
-	// public オブジェクトの返却
-	return wrp_;
+// public オブジェクトの返却
+return wrp_;
 }();
