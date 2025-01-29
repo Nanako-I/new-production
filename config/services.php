@@ -41,6 +41,7 @@ return [
     'client_id' => env('LINE_CHANNEL_ID'),
     'client_secret' => env('LINE_CHANNEL_SECRET'),
     'redirect' => env('LINE_REDIRECT_URI'),
+    'channel_access_token' => env('LINE_CHANNEL_ACCESS_TOKEN'),
 ],
 
     'login' => [
