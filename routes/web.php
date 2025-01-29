@@ -198,8 +198,17 @@ Route::get('/registration-confirmation', function () {
 // プロフィール画面にLINEアカウントの連携追加↓
 Route::get('/line-login', [LineController::class, 'redirectToLine'])->name('line.login');
 Route::get('/line/callback', [LineController::class, 'handleLineCallback'])->name('line.callback');
-// Route::get('/line-login', [LineController::class, 'redirectToProvider']);
-// Route::get('/line-callback', [LineController::class, 'handleProviderCallback']);
+
+// LINEボットのQRコード表示用のルート
+Route::get('/lines/qr-code', function () {
+    return view('lines.qr_code');
+})->name('lines.qr_code');
+
+// LINE連携の成功メッセージを表示するためのルート
+Route::get('/line/success', function () {
+    return redirect()->route('people.index')->with('success', 'LINEが正常に連携されました。');
+})->name('line.success');
+
 
 //管理者が職員のIDを入力するためにfacility_idを取得し画面遷移させる↓
 Route::get('custom_id_entryform/{facilityId}', [BeforeInvitationController::class, 'beforeInvitation'])->name('beforeInvitation');

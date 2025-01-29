@@ -101,11 +101,9 @@ class LineController extends Controller
             $lineId = '@988wfeox'; // あなたのLINEボットのベーシックIDに置き換え
             $qrCodeUrl = "https://line.me/R/ti/p/{$lineId}";
 
-            // QRコードのURLをビューに渡す
-            return redirect()->route('people.index')->with([
-                'success' => 'LINEアカウントが連携されました。',
-                'qrCodeUrl' => $qrCodeUrl, // QRコードのURLを渡す
-            ]);
+        
+           // QRコード表示用のビューに遷移
+           return view('lines.qr_code', ['qrCodeUrl' => $qrCodeUrl]);
         }
 
         return redirect()->route('people.index')->withErrors(['msg' => 'LINEアカウントの連携に失敗しました。']);
