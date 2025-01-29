@@ -87,19 +87,25 @@ class LineController extends Controller
             // 現在のユーザーを取得
             $user = auth()->user();
 
-            // ユーザー情報を更新
-
-            $user->update([
+             // ユーザー情報を更新
+             $user->update([
                 'line_name' => $userInfo['displayName'],
                 'line_user_id' => $userInfo['userId'],
                 'line_profile_picture' => $userInfo['pictureUrl'],
             ]);
 
-    
             // 保存
             $user->save();
 
-            return redirect()->route('people.index')->with('success', 'LINEアカウントが連携されました。');
+            // QRコードのURLを生成
+            $lineId = '@988wfeox'; // あなたのLINEボットのベーシックIDに置き換え
+            $qrCodeUrl = "https://line.me/R/ti/p/{$lineId}";
+
+            // QRコードのURLをビューに渡す
+            return redirect()->route('people.index')->with([
+                'success' => 'LINEアカウントが連携されました。',
+                'qrCodeUrl' => $qrCodeUrl, // QRコードのURLを渡す
+            ]);
         }
 
         return redirect()->route('people.index')->withErrors(['msg' => 'LINEアカウントの連携に失敗しました。']);
