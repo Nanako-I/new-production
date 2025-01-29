@@ -120,23 +120,16 @@ class ChatController extends Controller
                     
                     foreach ($facilityStaffs as $facilitystaff) {
                         try {
-                            // \Log::info('Attempting to send email to: ' . $facilitystaff->email);
-                            Mail::to($facilitystaff->email)->send(new NewChatMessageNotification($person, $request->message));
-                            // \Log::info('Successfully sent email to: ' . $facilitystaff->email);
+                            // 統一メッセージ
+                        $lineMessage = "連絡帳アプリに新しいメッセージが届きました。https://boocare.jp/before-login よりご確認ください";
 
-                    // lineも送るバージョン↓        
-                    // foreach ($facilityStaffs as $facilitystaff) {
-                        // try {
-                        //     // 統一メッセージ
-                        // $lineMessage = "連絡帳アプリに新しいメッセージが届きました。https://boocare.jp/before-login よりご確認ください";
-
-                        //     if ($facilitystaff->line_user_id) {
-                        //         // LINE通知を送信
-                        //         $this->lineNotificationService->sendNotification($facilitystaff->line_user_id, $lineMessage);
-                        //     } else {
-                        //         // メールを送信
-                        //         Mail::to($facilitystaff->email)->send(new NewChatMessageNotification($person, $request->message));
-                        //     }
+                            if ($facilitystaff->line_user_id) {
+                                // LINE通知を送信
+                                $this->lineNotificationService->sendNotification($facilitystaff->line_user_id, $lineMessage);
+                            } else {
+                                // メールを送信
+                                Mail::to($facilitystaff->email)->send(new NewChatMessageNotification($person, $request->message));
+                            }
                         } catch (\Exception $e) {
                             // \Log::error('Failed to send email to ' . $facilitystaff->email . ': ' . $e->getMessage());
                         }
@@ -153,27 +146,21 @@ class ChatController extends Controller
             // 自分以外のユーザーからのメッセージの場合、ファミリーにメールを送信
             if ($request->user_identifier !== $user_identifier) {
                 $familyEmails = $person->people_family()->get()->map(fn($family) => $family->email)->filter()->all();
-                
+
                 foreach ($familyEmails as $email) {
                     // ログインしているユーザーのメールアドレスには送信しない
                     if ($email !== $user->email) {
-                        Mail::to($email)->send(new NewChatMessageNotification($person, $request->message));
-                // foreach ($familyEmails as $email) {
-                //     // ログインしているユーザーのメールアドレスには送信しない
-                //     if ($email !== $user->email) {
-                //         // ファミリーのLINEユーザーIDが存在する場合
-                //         $familyMember = User::where('email', $email)->first();
-                //         if ($familyMember && $familyMember->line_user_id) {
-                //             // LINE通知を送信
-                //             $this->lineNotificationService->sendNotification($familyMember->line_user_id, $lineMessage);
-                //         } else {
-                //             // メールを送信
-                //             Mail::to($email)->send(new NewChatMessageNotification($person, $request->message));
-                //         }
-                //     }
-                // }
-            }
-            }
+                        // ファミリーのLINEユーザーIDが存在する場合
+                        $familyMember = User::where('email', $email)->first();
+                        if ($familyMember && $familyMember->line_user_id) {
+                            // LINE通知を送信
+                            $this->lineNotificationService->sendNotification($familyMember->line_user_id, $lineMessage);
+                        } else {
+                            // メールを送信
+                            Mail::to($email)->send(new NewChatMessageNotification($person, $request->message));
+                        }
+                    }
+                }
             }
         } else {
             $user_name = 'Guest';
