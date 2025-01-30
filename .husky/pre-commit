@@ -1,0 +1,41 @@
+#!/bin/sh
+fileList=$(git diff --diff-filter=d --cached --name-only)
+
+phpFiles=$(echo "$fileList" | grep -E '\.(php)$')
+bladeFiles=$(echo "$fileList" | grep -E '\.blade\.php$')
+
+if [ ${#phpFiles} -gt 0 ]; then
+  # Lintスタート
+  echo 'Start Linting with laravel/pint.'
+  for filename in $phpFiles
+    do
+        echo "Linting: $filename"
+        ./vendor/bin/sail pint ${filename} "$@"
+        # エラーがあれば、コミットさせない
+        if [ $? -gt 0 ]; then
+          exit 1
+        fi
+        # エラーがなければ、Linterが変更した差分を取り込んでコミット
+        git add ${filename}
+    done
+
+fi
+
+# Blade ファイルのフォーマット
+if [ -n "$bladeFiles" ]; then
+  echo 'Start Formatting Blade files...'
+
+  for filename in $bladeFiles
+  do
+      echo "Formatting: $filename"
+      npx blade-formatter --write "$filename"
+
+      if [ $? -ne 0 ]; then
+        echo "Blade formatting failed for $filename. Commit aborted."
+        exit 1
+      fi
+
+      git add "$filename"
+  done
+fi
+
