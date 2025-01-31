@@ -457,7 +457,7 @@
                                                                 </div>
 <!-- モーダルを開くボタン部分 -->
 <div class="my-2" style="display: flex; justify-content: center; align-items: center; max-width: 300px;">
-    <button type="button" data-micromodal-trigger="modal-1" class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+    <button type="button" data-micromodal-trigger="modal-1"  class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
         他の利用者にも同じ設定をする
     </button>
 </div>
@@ -502,46 +502,65 @@
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 初期化処理をfunction化して必要な時に呼び出せるようにする
-    function initializeModal() {
+    // MicroModal初期化用の関数を定義
+    function initializeMicroModal() {
+        // ページ読み込み直後にMicroModalを初期化
         if (typeof MicroModal !== 'undefined') {
             MicroModal.init({
                 onShow: modal => console.log(`${modal.id} is shown`),
-                onClose: modal =>  {const checkboxes = modal.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = false; });
-        },
+                onClose: modal => {
+                    // モーダルを閉じる際にチェックボックスをリセット
+                    const checkboxes = modal.querySelectorAll('input[type="checkbox"]');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                },
                 disableScroll: true,
                 disableFocus: false,
                 awaitOpenAnimation: false,
                 awaitCloseAnimation: false
             });
+            console.log('MicroModal初期化完了');
         } else {
-            setTimeout(initializeModal, 100);
+            // MicroModalが読み込まれていない場合は、少し待って再試行
+            setTimeout(initializeMicroModal, 100);
         }
     }
 
-    // 初期化実行
-    initializeModal();
+    // ページ読み込み直後に初期化
+    initializeMicroModal();
 
-    // personDetailsのDOM更新を監視
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.type === 'childList') {
-                // DOMが更新されたらモーダルを再初期化
-                initializeModal();
-            }
-        });
-    });
-
-    // 監視の開始
+    // Ajaxで読み込まれたコンテンツに対応するため、person-detailsの変更を監視
     const personDetails = document.getElementById('person-details');
     if (personDetails) {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    // DOMが更新されたらモーダルを再初期化
+                    initializeMicroModal();
+                }
+            });
+        });
+
+        // 監視の開始
         observer.observe(personDetails, {
             childList: true,
             subtree: true
         });
     }
+
+    // モーダルトリガーボタンのイベントリスナーを追加
+    document.addEventListener('click', function(event) {
+        const trigger = event.target.closest('[data-micromodal-trigger]');
+        if (trigger) {
+            const targetModalId = trigger.getAttribute('data-micromodal-trigger');
+            const targetModal = document.getElementById(targetModalId);
+            
+            if (targetModal && typeof MicroModal !== 'undefined') {
+                MicroModal.show(targetModalId);
+            }
+        }
+    });
 });
 </script>
                                                             </details>

@@ -34,6 +34,7 @@
     @endphp 
 
     <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/micromodal/dist/micromodal.min.js"></script>
         <script>
             window.peopleIds = @json($people->pluck('id'));
             window.UserId = {{ Auth::id() }};
@@ -229,20 +230,68 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(html => {
                     document.getElementById('person-details').innerHTML = html;
                     if (typeof MicroModal !== 'undefined') {
-                        MicroModal.init({
-                            onShow: modal => console.log(`${modal.id} is shown`),
-                            onClose: modal => console.log(`${modal.id} is hidden`),
-                            disableScroll: true,
-                            disableFocus: false,
-                            awaitOpenAnimation: false,
-                            awaitCloseAnimation: false
-                        });
+                        try {
+                            MicroModal.init({
+                                onShow: modal => console.log(`${modal.id} is shown`),
+                                onClose: modal => {
+                                    const checkboxes = modal.querySelectorAll('input[type="checkbox"]');
+                                    checkboxes.forEach(checkbox => checkbox.checked = false);
+                                },
+                                disableScroll: true,
+                                disableFocus: false,
+                                awaitOpenAnimation: false,
+                                awaitCloseAnimation: false
+                            });
+                            console.log('MicroModal successfully initialized');
+                        } catch (error) {
+                            console.error('Error initializing MicroModal:', error);
+                        }
+                    } else {
+                        console.warn('MicroModal is not loaded');
                     }
                 })
                 .catch(error => console.error('Error fetching person details:', error));
         });
     });
 });
+
+document.addEventListener('click', function(event) {
+    const trigger = event.target.closest('[data-micromodal-trigger]');
+    if (trigger) {
+        const modalId = trigger.getAttribute('data-micromodal-trigger');
+        if (typeof MicroModal !== 'undefined') {
+            MicroModal.show(modalId);
+        }
+    }
+});
+
+const personDetails = document.getElementById('person-details');
+if (personDetails) {
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                if (typeof MicroModal !== 'undefined') {
+                    MicroModal.init({
+                        onShow: modal => console.log(`${modal.id} is shown`),
+                        onClose: modal => {
+                            const checkboxes = modal.querySelectorAll('input[type="checkbox"]');
+                            checkboxes.forEach(checkbox => checkbox.checked = false);
+                        },
+                        disableScroll: true,
+                        disableFocus: false,
+                        awaitOpenAnimation: false,
+                        awaitCloseAnimation: false
+                    });
+                }
+            }
+        });
+    });
+
+    observer.observe(personDetails, {
+        childList: true,
+        subtree: true
+    });
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     const personDetailsContainer = document.getElementById('person-details');
