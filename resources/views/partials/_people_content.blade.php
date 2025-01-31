@@ -4,6 +4,7 @@
             <!-- 右半分 -->
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
             <script src="https://kit.fontawesome.com/de653d534a.js" crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/micromodal/dist/micromodal.min.js"></script>
 
              <div class="p-4 flex flex-col overflow-y-auto">
             
@@ -11,6 +12,78 @@
                     <div id="record-list-{{ $person->id }}" class="w-full flex">
                    <div class="slide height:auto  border-2 p-4 w-full rounded-lg bg-white">
                      <style>
+                        .modal {
+        display: none;
+    }
+    .modal.is-open {
+        display: block;
+    }
+    .modal {
+        display: none;
+    }
+    
+    .modal.is-open {
+        display: block;
+    }
+    
+    .modal__overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 50;
+    }
+    
+    .modal__container {
+        background-color: white;
+        padding: 2rem;
+        max-width: 500px;
+        max-height: 90vh;
+        border-radius: 0.5rem;
+        overflow-y: auto;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .modal__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .modal__close {
+        background: none;
+        border: none;
+        padding: 0.5rem;
+        cursor: pointer;
+        font-size: 1.5rem;
+    }
+    
+    .modal__content {
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+
+    .modal__btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        background-color: #4B5563;
+        color: white;
+        border-radius: 0.375rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .modal__btn:hover {
+        background-color: #374151;
+    }
                         .slider {
                             display: flex;
                             flex-wrap: wrap;
@@ -382,9 +455,95 @@
                                                                         送信
                                                                     </button>
                                                                 </div>
-                                                                <button class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
-                                                                      他の利用者に反映
-                                                                    </button>
+<!-- モーダルを開くボタン部分 -->
+<div class="my-2" style="display: flex; justify-content: center; align-items: center; max-width: 300px;">
+    <button type="button" data-micromodal-trigger="modal-1" class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+        他の利用者にも同じ設定をする
+    </button>
+</div>
+
+<!-- モーダル本体 -->
+<div id="modal-1" aria-hidden="true" class="modal">
+    <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+        <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title" style="min-width: 800px;">
+            <header class="modal__header">
+                <h2 id="modal-1-title" class="text-xl font-bold">
+                    同じ設定にする利用者を選択してください
+                </h2>
+                <button class="modal__close" aria-label="Close modal" data-micromodal-close>
+                    ×
+                </button>
+            </header>
+            <div class="modal__content" id="modal-1-content">
+                <table class="w-full">
+                    @foreach($people->chunk(3) as $chunk)
+                    <tr>
+                        @foreach($chunk as $modalPerson)
+                        <td class="p-2">
+                            <div class="flex items-center">
+                                <input type="checkbox" class="w-6 h-6 mr-2">
+                                <span class="text-gray-900 font-bold text-lg">
+                                    {{ $modalPerson->last_name }} {{ $modalPerson->first_name }}
+                                </span>
+                            </div>
+                        </td>
+                        @endforeach
+                    </tr>
+                    @endforeach
+                </table>
+            </div>
+            <footer class="modal__footer flex justify-center mt-4">
+                <button class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150" data-micromodal-close>
+                    設定する
+                </button>
+            </footer>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 初期化処理をfunction化して必要な時に呼び出せるようにする
+    function initializeModal() {
+        if (typeof MicroModal !== 'undefined') {
+            MicroModal.init({
+                onShow: modal => console.log(`${modal.id} is shown`),
+                onClose: modal =>  {const checkboxes = modal.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false; });
+        },
+                disableScroll: true,
+                disableFocus: false,
+                awaitOpenAnimation: false,
+                awaitCloseAnimation: false
+            });
+        } else {
+            setTimeout(initializeModal, 100);
+        }
+    }
+
+    // 初期化実行
+    initializeModal();
+
+    // personDetailsのDOM更新を監視
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                // DOMが更新されたらモーダルを再初期化
+                initializeModal();
+            }
+        });
+    });
+
+    // 監視の開始
+    const personDetails = document.getElementById('person-details');
+    if (personDetails) {
+        observer.observe(personDetails, {
+            childList: true,
+            subtree: true
+        });
+    }
+});
+</script>
                                                             </details>
                                                             
                                                         </form>
@@ -2258,3 +2417,4 @@ document.addEventListener('DOMContentLoaded', function() {
                   </div>
                 </div>
               @endif
+   

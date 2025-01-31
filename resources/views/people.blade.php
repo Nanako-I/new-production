@@ -228,6 +228,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.text())
                 .then(html => {
                     document.getElementById('person-details').innerHTML = html;
+                    if (typeof MicroModal !== 'undefined') {
+                        MicroModal.init({
+                            onShow: modal => console.log(`${modal.id} is shown`),
+                            onClose: modal => console.log(`${modal.id} is hidden`),
+                            disableScroll: true,
+                            disableFocus: false,
+                            awaitOpenAnimation: false,
+                            awaitCloseAnimation: false
+                        });
+                    }
                 })
                 .catch(error => console.error('Error fetching person details:', error));
         });
