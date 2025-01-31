@@ -304,14 +304,43 @@
                                                                     <input type="date" name="date" id="usage_date" value="{{ now()->format('Y-m-d') }}" required>
                                                                 </div>
 
-                                                                <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
-                                                                    <input type="time" step="300" name="start_time" id="scheduled-time">
-                                                                    <p class="text-gray-900 font-bold text-xl px-1.5">～</p>
-                                                                </div>
+                                                               <!-- 時間入力部分を以下のように変更 -->
+<div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
+    <div class="flex items-center">
+        <!-- 時間選択 -->
+        <select name="start_hour" class="mx-1">
+            @for ($h = 0; $h <= 23; $h++)
+                <option value="{{ str_pad($h, 2, '0', STR_PAD_LEFT) }}">{{ str_pad($h, 2, '0', STR_PAD_LEFT) }}</option>
+            @endfor
+        </select>
+        <span class="mx-1">:</span>
+        <!-- 分選択 -->
+        <select name="start_minute" class="mx-1">
+            @for ($m = 0; $m <= 55; $m += 5)
+                <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}</option>
+            @endfor
+        </select>
+    </div>
+    <p class="text-gray-900 font-bold text-xl px-1.5">～</p>
+</div>
 
-                                                                <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
-                                                                    <input type="time" step="300" name="end_time" id="scheduled-time">
-                                                                </div>
+<div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
+    <div class="flex items-center">
+        <!-- 時間選択 -->
+        <select name="end_hour" class="mx-1">
+            @for ($h = 0; $h <= 23; $h++)
+                <option value="{{ str_pad($h, 2, '0', STR_PAD_LEFT) }}">{{ str_pad($h, 2, '0', STR_PAD_LEFT) }}</option>
+            @endfor
+        </select>
+        <span class="mx-1">:</span>
+        <!-- 分選択 -->
+        <select name="end_minute" class="mx-1">
+            @for ($m = 0; $m <= 55; $m += 5)
+                <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}</option>
+            @endfor
+        </select>
+    </div>
+</div>
 
                                                                 <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
                                                                     <i class="fa-solid fa-school text-gray-700" style="font-size: 1.5em; transition: transform 0.2s;"></i>

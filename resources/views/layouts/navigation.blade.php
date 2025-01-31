@@ -88,11 +88,11 @@
                         </x-nav-link>
                     </div>
                     
-                     <!-- <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('calendar') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
+                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('calendar') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
                          <x-nav-link :href="url('calendar')" :active="request()->is('calendar')">
                             {{ __('カレンダー') }}
                         </x-nav-link>
-                    </div> -->
+                    </div>
                     
                     <!-- <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ request()->is('before-invitation') ? ' text-black' : '' }} px-4 rounded-md text-xl font-bold items-center justify-center">
                          <x-nav-link :href="url('before-invitation')" :active="request()->is('before-invitation')">
@@ -254,9 +254,9 @@
                     {{ __('保護者を招待する') }}
                 </x-dropdown-link> -->
 
-                <!-- <x-dropdown-link :href="url('calendar')" class="text-lg">
+                <x-dropdown-link :href="url('calendar')" class="text-lg">
                     {{ __('カレンダー') }}
-                </x-dropdown-link> -->
+                </x-dropdown-link>
 
                 @endhasanyrole
 

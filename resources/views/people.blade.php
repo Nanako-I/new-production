@@ -223,6 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
         personElement.addEventListener('click', function() {
             const personId = this.getAttribute('data-person-id');
             console.log(personId);
+            console.log(personElement);
             fetch(`/people/${personId}/content`)
                 .then(response => response.text())
                 .then(html => {

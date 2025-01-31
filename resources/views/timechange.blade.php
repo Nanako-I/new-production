@@ -67,15 +67,52 @@
                            <input type="date" name="date" id="usage_date" value="{{ \Carbon\Carbon::parse($lastTime->date)->format('Y-m-d') }}" required>
                         </div>
 
-                        <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
-                        <input type="time" name="start_time" list="data-list"  id="scheduled-time" value="{{ $lastTime->start_time ? \Carbon\Carbon::parse($lastTime->start_time)->format('H:i') : '' }}"  step="300">
-                            <p class="text-gray-900 font-bold text-xl px-1.5">～</p>
-                        </div>
-                        
-                        <div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
-                        <input type="time" name="end_time" list="data-list" id="scheduled-time" value="{{ $lastTime->end_time ? \Carbon\Carbon::parse($lastTime->end_time)->format('H:i') : '' }}" step="300">
+                       <!-- 開始時間の選択部分 -->
+<div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
+    <div class="flex items-center">
+        <select name="start_hour" class="mx-1">
+            @for ($h = 0; $h <= 23; $h++)
+                <option value="{{ str_pad($h, 2, '0', STR_PAD_LEFT) }}" 
+                    {{ $lastTime->start_time && \Carbon\Carbon::parse($lastTime->start_time)->format('H') == $h ? 'selected' : '' }}>
+                    {{ str_pad($h, 2, '0', STR_PAD_LEFT) }}
+                </option>
+            @endfor
+        </select>
+        <span class="mx-1">:</span>
+        <select name="start_minute" class="mx-1">
+            @for ($m = 0; $m <= 55; $m += 5)
+                <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}"
+                    {{ $lastTime->start_time && \Carbon\Carbon::parse($lastTime->start_time)->format('i') == $m ? 'selected' : '' }}>
+                    {{ str_pad($m, 2, '0', STR_PAD_LEFT) }}
+                </option>
+            @endfor
+        </select>
+    </div>
+    <p class="text-gray-900 font-bold text-xl px-1.5">～</p>
+</div>
 
-                        </div>
+<!-- 終了時間の選択部分 -->
+<div style="display: flex; flex-direction: row; align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem;" class="my-3">
+    <div class="flex items-center">
+        <select name="end_hour" class="mx-1">
+            @for ($h = 0; $h <= 23; $h++)
+                <option value="{{ str_pad($h, 2, '0', STR_PAD_LEFT) }}"
+                    {{ $lastTime->end_time && \Carbon\Carbon::parse($lastTime->end_time)->format('H') == $h ? 'selected' : '' }}>
+                    {{ str_pad($h, 2, '0', STR_PAD_LEFT) }}
+                </option>
+            @endfor
+        </select>
+        <span class="mx-1">:</span>
+        <select name="end_minute" class="mx-1">
+            @for ($m = 0; $m <= 55; $m += 5)
+                <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}"
+                    {{ $lastTime->end_time && \Carbon\Carbon::parse($lastTime->end_time)->format('i') == $m ? 'selected' : '' }}>
+                    {{ str_pad($m, 2, '0', STR_PAD_LEFT) }}
+                </option>
+            @endfor
+        </select>
+    </div>
+</div>
                         <!-- <datalist id="data-list">
   <option value="06:00"></option>
   <option value="06:30"></option>

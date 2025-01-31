@@ -33,22 +33,30 @@ class TimeController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-{
-    // バリデーションルールを設定
-    $request->validate([
-        'start_time' => 'nullable',
-        'end_time' => 'nullable',
-        'school' => 'nullable',
-        'is_absent' => 'nullable',
-        'pick_up' => 'nullable',
-        'send' => 'nullable',
-    ]);
-
-    // すべてのフィールドが空であるかをチェック
-    if (empty($request->start_time) && empty($request->end_time) && empty($request->school) &&
-        empty($request->is_absent) && empty($request->pick_up) && empty($request->send)) {
-        return redirect()->back()->withErrors(['fields' => 'いずれか登録してください。'])->withInput();
-    }
+    {
+        // バリデーションルールを設定
+        $request->validate([
+            'start_hour' => 'nullable|numeric|between:0,23',
+            'start_minute' => 'nullable|numeric|between:0,55',
+            'end_hour' => 'nullable|numeric|between:0,23',
+            'end_minute' => 'nullable|numeric|between:0,55',
+            'school' => 'nullable',
+            'is_absent' => 'nullable',
+            'pick_up' => 'nullable',
+            'send' => 'nullable',
+        ]);
+    
+        // 時間を結合して形式を整える
+        $start_time = null;
+        $end_time = null;
+        
+        if ($request->start_hour !== null && $request->start_minute !== null) {
+            $start_time = sprintf('%02d:%02d', $request->start_hour, $request->start_minute);
+        }
+        
+        if ($request->end_hour !== null && $request->end_minute !== null) {
+            $end_time = sprintf('%02d:%02d', $request->end_hour, $request->end_minute);
+        }
 
        //JSON形式からboolean型に更新するため、コメントアウト
         // チェックボックスのデータをJSON形式に変換
@@ -61,8 +69,8 @@ class TimeController extends Controller
             'people_id' => $request->people_id,
             'date' => $request->date,
             //$is_absentがtrueの場合はnullを代入
-            'start_time' =>$request->start_time,
-            'end_time' =>$request->end_time,
+            'start_time' =>$start_time,
+            'end_time' =>$end_time,
             'school' => $request->school,
             'is_absent' => $request->boolean('is_absent'),
             'pick_up' => $request->boolean('pick_up'),
@@ -135,43 +143,47 @@ class TimeController extends Controller
     
     public function update(Request $request, Time $time, $id)
 {
-    // IDをリクエストから取得
     $id = $request->id;
-    // Time モデルのレコードを取得
     $time = Time::find($id);
 
-    // レコードが存在しない場合のエラーハンドリング
     if (!$time) {
         return redirect()->back()->with('error', '指定されたデータが見つかりません。');
     }
 
-    // フォームの値を更新
-    $form = $request->all();
+    // 時間を結合して形式を整える
+    $start_time = null;
+    $end_time = null;
+    
+    if ($request->start_hour !== null && $request->start_minute !== null) {
+        $start_time = sprintf('%02d:%02d', $request->start_hour, $request->start_minute);
+    }
+    
+    if ($request->end_hour !== null && $request->end_minute !== null) {
+        $end_time = sprintf('%02d:%02d', $request->end_hour, $request->end_minute);
+    }
 
     // is_absentが1の場合、他のカラムをクリア
     if ($request->boolean('is_absent')) {
+        $form = $request->all();
         $form['start_time'] = null;
         $form['end_time'] = null;
         $form['school'] = null;
         $form['pick_up'] = false;
         $form['send'] = false;
     } else {
-        // is_absentが0の場合、通常の値を設定
-        $form['start_time'] = $request->start_time;
-        $form['end_time'] = $request->end_time;
-        $form['school'] = $request->school;
+        $form = $request->all();
+        $form['start_time'] = $start_time;
+        $form['end_time'] = $end_time;
         $form['pick_up'] = $request->boolean('pick_up');
         $form['send'] = $request->boolean('send');
     }
 
     $form['is_absent'] = $request->boolean('is_absent');
-
+    
     $time->fill($form)->save();
 
     $person = Person::findOrFail($request->people_id);
-    // 二重送信防止
     $request->session()->regenerateToken();
-    // セッションに$personを保存
     session(['selected_person' => $person]);
 
     return redirect()->route('people.index')->with('success', '変更が完了しました');
