@@ -382,8 +382,14 @@
                                                                         送信
                                                                     </button>
                                                                 </div>
+                                                                <button class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-lg text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                                                                      他の利用者に反映
+                                                                    </button>
                                                             </details>
+                                                            
                                                         </form>
+                                                        
+                                                                </div>
                                                     @endif
                                                 </div>
                                             </div>
