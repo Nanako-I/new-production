@@ -1,29 +1,32 @@
 {
-    "private": true,
-    "scripts": {
-        "dev": "vite",
-        "build": "vite build"
-    },
-    "devDependencies": {
-        "@tailwindcss/forms": "^0.5.2",
-        "@vitejs/plugin-vue": "^4.5.0",
-        "alpinejs": "^3.4.2",
-        "autoprefixer": "^10.4.20",
-        "axios": "^1.6.8",
-        "laravel-vite-plugin": "^1.0.5",
-        "lodash": "^4.17.19",
-        "postcss": "^8.4.47",
-        "tailwindcss": "^3.4.13",
-        "vite": "^5.4.8"
-    },
-    "dependencies": {
-        "@fullcalendar/core": "^6.1.11",
-        "@fullcalendar/daygrid": "^6.1.11",
-        "@fullcalendar/interaction": "^6.1.11",
-        "chart.js": "^4.4.0",
-        "dayjs": "^1.11.10",
-        "fullcalendar": "^6.1.15",
-        "laravel-echo": "^1.17.1",
-        "pusher-js": "^8.4.0-rc2"
-    }
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "prepare": "husky && husky install"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.2",
+    "@vitejs/plugin-vue": "^4.5.0",
+    "alpinejs": "^3.4.2",
+    "autoprefixer": "^10.4.20",
+    "axios": "^1.6.8",
+    "blade-formatter": "^1.42.1",
+    "husky": "^8.0.0",
+    "laravel-vite-plugin": "^1.0.5",
+    "lodash": "^4.17.19",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "vite": "^5.4.8"
+  },
+  "dependencies": {
+    "@fullcalendar/core": "^6.1.11",
+    "@fullcalendar/daygrid": "^6.1.11",
+    "@fullcalendar/interaction": "^6.1.11",
+    "chart.js": "^4.4.0",
+    "dayjs": "^1.11.10",
+    "fullcalendar": "^6.1.15",
+    "laravel-echo": "^1.17.1",
+    "pusher-js": "^8.4.0-rc2"
+  }
 }
