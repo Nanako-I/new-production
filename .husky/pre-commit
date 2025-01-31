@@ -1,24 +1,33 @@
 #!/bin/sh
+
+echo "Running pre-commit hook..."
+
+# ステージングされたファイル一覧を取得
 fileList=$(git diff --diff-filter=d --cached --name-only)
 
-phpFiles=$(echo "$fileList" | grep -E '\.(php)$')
-bladeFiles=$(echo "$fileList" | grep -E '\.blade\.php$')
+# PHP ファイルの抽出
+phpFiles=$(echo "$fileList" | grep -E '\.php$' || true)
 
-if [ ${#phpFiles} -gt 0 ]; then
-  # Lintスタート
+# Blade ファイルの抽出
+bladeFiles=$(echo "$fileList" | grep -E '\.blade\.php$' || true)
+
+# PHP ファイルの Lint
+if [ -n "$phpFiles" ]; then
   echo 'Start Linting with laravel/pint.'
   for filename in $phpFiles
-    do
-        echo "Linting: $filename"
-        ./vendor/bin/sail pint ${filename} "$@"
-        # エラーがあれば、コミットさせない
-        if [ $? -gt 0 ]; then
-          exit 1
-        fi
-        # エラーがなければ、Linterが変更した差分を取り込んでコミット
-        git add ${filename}
-    done
+  do
+      echo "Linting: $filename"
+      ./vendor/bin/sail pint "$filename"
 
+      # エラーがあれば、コミットを中止
+      if [ $? -ne 0 ]; then
+        echo "Error: Pint failed for $filename. Commit aborted."
+        exit 1
+      fi
+
+      # Pint による変更を Git に反映
+      git add "$filename"
+  done
 fi
 
 # Blade ファイルのフォーマット
@@ -28,10 +37,10 @@ if [ -n "$bladeFiles" ]; then
   for filename in $bladeFiles
   do
       echo "Formatting: $filename"
-      npx blade-formatter --write "$filename"
+      ./vendor/bin/sail npx blade-formatter --write "$filename"
 
       if [ $? -ne 0 ]; then
-        echo "Blade formatting failed for $filename. Commit aborted."
+        echo "Error: Blade formatting failed for $filename. Commit aborted."
         exit 1
       fi
 
@@ -39,3 +48,4 @@ if [ -n "$bladeFiles" ]; then
   done
 fi
 
+echo "Pre-commit hook completed successfully."
